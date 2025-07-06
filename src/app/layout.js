@@ -1,8 +1,9 @@
 
 import { Geist, Geist_Mono } from "next/font/google";
-import Sidebar from "../components/Sidebar";
+// import Sidebar from "../components/Sidebar";
+import { Hero } from "../components/Hero";
 import ClientLayoutWrapper from "../components/ClientLayoutWrapper";
-import ClientLastVisitWrapper from "../components/ClientLastVisitWrapper";
+// import ClientLastVisitWrapper from "../components/ClientLastVisitWrapper";
 import "./globals.css";
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,8 +23,8 @@ export const metadata = {
 import { cookies } from "next/headers";
 import { AuthProvider } from "../providers/AuthProvider";
 // import axios from "axios";
-// import { redirect } from "next/navigation";
-import LoginForm from "../features/auth/LoginForm";
+import { redirect } from "next/navigation";
+// import LoginForm from "../features/auth/LoginForm";
 
 export default async function RootLayout({ children }) {
   const cookieStore = await cookies();
@@ -32,27 +33,32 @@ export default async function RootLayout({ children }) {
   console.log(token);
   let user = null;
   let isAuthorized = false;
-
+  // if (!token) {
+  //   redirect('/login');
+  // }
 
 
   if (token) {
     try {
       const res = await fetch("http://localhost:3030/api/v1/auth/user/me", {
+        method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
         },
         credentials: "include",
-        cache: "no-store",
+        // cache: "no-store",
       });
       if (res.ok) {
         const data = await res.json();
         user = data.user;
         isAuthorized = true;
+        // redirect("/")
       }
     } catch (e) {
       console.log(e);
     }
   }
+  console.log("hiiiiiii")
 
 
 
@@ -61,10 +67,13 @@ export default async function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* {isAuthorized && <Sidebar />} */}
+
 
         <AuthProvider initialUser={user} initialAuth={isAuthorized}>
-          <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
+          <ClientLayoutWrapper>
+            <Hero />
+            {children}
+          </ClientLayoutWrapper>
         </AuthProvider>
       </body>
     </html>

@@ -9,6 +9,7 @@ import { MdWorkOutline } from "react-icons/md";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { MdOutlineRecommend } from "react-icons/md";
 // import AssuredWorkloadIcon from '@mui/icons-material/AssuredWorkload';
+import { FaShieldAlt } from "react-icons/fa";
 // 
 // import DashboardIcon from '@mui/icons-material/Dashboard';
 import { MdDashboard } from "react-icons/md";
@@ -35,14 +36,20 @@ export const sidebarItems = [
     },
     {
         label: "Model Basket",
-        path: "/modelbasket",
+        path: "/baskets",
         icon: MdOutlineRecommend,
         description: "For employers to post new jobs or internships",
     },
     {
         label: "KYC Verification",
-        path: "/kyc-verification",
+        path: "/kycverify",
         icon: CiBank,
         description: "Account and app preferences",
     },
+    {
+        label: "Risk Profiling",
+        path: "/riskprofile",
+        icon: FaShieldAlt,
+        description: "Risk Profiling"
+    }
 ];

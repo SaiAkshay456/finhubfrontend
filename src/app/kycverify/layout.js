@@ -3,15 +3,16 @@ import { sidebarItems } from '../../constants/sidebarRoutes';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-export default async function Layout({ children }) {
+export default async function KycLayout({ children }) {
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
 
     if (!token) {
         redirect('/login');
     }
+
     // Get current path from pathname (can also be hardcoded per layout)
-    const currentPath = '/createuser'; // or get from route segment
+    const currentPath = '/baskets'; // or get from route segment
 
     // Find label based on current path
     const matched = sidebarItems.find(item => item.path === currentPath);
@@ -30,16 +31,16 @@ export default async function Layout({ children }) {
         },
         credentials: 'include',
         body: JSON.stringify({ path: label }),
-        // cache: 'no-store',
+        cache: 'no-store',
     });
 
     const data = await res.json();
 
     if (!data.success) {
-        redirect('/unauthorized');
+        redirect('/');
     }
 
-    return <main className="min-h-screen flex justify-center items-cente">
+    return <main className="min-h-screen flex justify-center items-center">
         {children}
     </main>
 }

@@ -1,10 +1,10 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../providers/AuthProvider';
 import axios from 'axios';
 export default function LoginForm() {
-    const { setUser, user, setIsAuthorized } = useAuth();
+    const { setUser, user, setIsAuthorized, isAuthorized } = useAuth();
     const [form, setForm] = useState({ username: '', email: '', password: '' });
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -13,6 +13,13 @@ export default function LoginForm() {
         setForm({ ...form, [e.target.name]: e.target.value });
         setError('');
     };
+    //optional for layout.js
+    // useEffect(() => {
+    //     if (isAuthorized) {
+    //         router.push("/");
+    //     }
+    // }, [isAuthorized, router]);
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();

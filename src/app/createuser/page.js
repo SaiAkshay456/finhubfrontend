@@ -151,8 +151,7 @@
 // }
 
 
-"use client"
-import React, { useState } from 'react';
+import React from 'react';
 import MultiStepForm from '../../components/MutlistepForm';
 export default function CreateUserPage() {
     return <>
