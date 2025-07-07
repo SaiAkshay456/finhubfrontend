@@ -8,6 +8,7 @@ import { HiOutlineViewGrid } from "react-icons/hi";
 import { MdWorkOutline } from "react-icons/md";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { MdOutlineRecommend } from "react-icons/md";
+import { BsBank2 } from "react-icons/bs";
 // import AssuredWorkloadIcon from '@mui/icons-material/AssuredWorkload';
 import { FaShieldAlt } from "react-icons/fa";
 import { FaFileUpload } from "react-icons/fa";
@@ -44,7 +45,7 @@ export const sidebarItems = [
     {
         label: "KYC Verification",
         path: "/kycverify",
-        icon: CiBank,
+        icon: BsBank2,
         description: "Account and app preferences",
     },
     {

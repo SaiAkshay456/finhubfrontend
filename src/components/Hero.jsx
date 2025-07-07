@@ -20,7 +20,7 @@ export function Hero() {
             });
             setUser(null);
             setIsAuthorized(false);
-            router.replace('/login');
+            window.location.href = '/login';
         } catch (err) {
             console.error('Logout failed:', err);
             setIsLoggingOut(false);
@@ -28,8 +28,10 @@ export function Hero() {
     };
 
     if (!isAuthorized) {
-        router.replace("/login");
-        // return null;
+        if (typeof window !== "undefined") {
+            window.location.href = "/login"; // ensures full redirect
+        }
+        // return null; // stop rendering
     }
 
     return (

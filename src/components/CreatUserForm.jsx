@@ -22,6 +22,14 @@ export default function CreateUserForm() {
     const [errors, setErrors] = useState({});
     const [msg, setMsg] = useState('');
 
+    const isValidPassword = (password) => {
+        const hasUpperCase = /[A-Z]/.test(password);
+        const hasLowerCase = /[a-z]/.test(password);
+        const hasDigit = /[0-9]/.test(password);
+        const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+        return hasUpperCase && hasLowerCase && hasDigit && hasSpecialChar;
+    };
+
     const validateStep1 = () => {
         const newErrors = {};
 
@@ -41,6 +49,8 @@ export default function CreateUserForm() {
             newErrors.password = 'Password is required';
         } else if (form.password.length < 8) {
             newErrors.password = 'Password must be at least 8 characters';
+        } else if (!isValidPassword(form.password)) {
+            newErrors.password = 'Password must contain at least one uppercase, lowercase, digit, and special character';
         }
 
         if (!form.phoneNumber) {
@@ -168,180 +178,210 @@ export default function CreateUserForm() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 p-4 flex flex-col">
-            {/* Full-width form container */}
-            <div className="w-full bg-white rounded-lg shadow-md flex flex-col flex-grow">
-                {/* Updated header with new background color */}
-                <div className="bg-indigo-700 px-6 py-4 rounded-t-lg">
-                    <h1 className="text-xl font-bold text-white">Create New User</h1>
-                    <div className="flex items-center mt-3">
-                        <div className={`flex items-center ${step === 1 ? 'text-white' : 'text-indigo-200'}`}>
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-2 ${step === 1 ? 'bg-white text-indigo-700' : 'bg-indigo-600 text-white'}`}>
-                                1
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+            <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+                {/* Header with progress steps */}
+                <div className="px-8 py-6 bg-gradient-to-r from-blue-50 to-indigo-50">
+                    <div className="flex items-center justify-between space-x-4 md:space-x-12">
+                        {[1, 2].map((stepNum, idx) => (
+                            <div key={stepNum} className="flex items-center space-x-2">
+                                <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300
+                ${step === stepNum
+                                        ? 'bg-indigo-600 text-white'
+                                        : step > stepNum
+                                            ? 'bg-green-500 text-white'
+                                            : 'bg-gray-300 text-gray-700'
+                                    }`}>
+                                    {step > stepNum ? '✓' : stepNum}
+                                </div>
+                                <span className={`text-xs md:text-sm font-medium ${step >= stepNum ? 'text-gray-900' : 'text-gray-400'}`}>
+                                    {idx === 0 ? 'User Details' : 'Permissions'}
+                                </span>
                             </div>
-                            <span className="text-sm font-medium">User Details</span>
-                        </div>
-                        <div className="flex-1 mx-4 border-t-2 border-indigo-500"></div>
-                        <div className={`flex items-center ${step === 2 ? 'text-white' : 'text-indigo-200'}`}>
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-2 ${step === 2 ? 'bg-white text-indigo-700' : 'bg-indigo-600 text-white'}`}>
-                                2
-                            </div>
-                            <span className="text-sm font-medium">Permissions</span>
-                        </div>
+                        ))}
                     </div>
                 </div>
 
-                {/* Scrollable form content */}
-                <div className="p-6 overflow-auto flex-grow">
+                {/* Form content */}
+                <div className="p-8">
                     {msg && (
-                        <div className={`mb-4 p-3 rounded ${msg.toLowerCase().includes('success') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                            {msg}
+                        <div className={`mb-6 p-4 rounded-xl border ${msg.toLowerCase().includes('success') ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'} flex items-start shadow-sm`}>
+                            <div className={`flex-shrink-0 p-1.5 rounded-lg ${msg.toLowerCase().includes('success') ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                                {msg.toLowerCase().includes('success') ? '✓' : '!'}
+                            </div>
+                            <div className="ml-3">
+                                <p className={`text-sm ${msg.toLowerCase().includes('success') ? 'text-green-700' : 'text-red-700'}`}>
+                                    {msg}
+                                </p>
+                            </div>
                         </div>
                     )}
 
                     {step === 1 ? (
-                        <div className="space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Username*</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Username*</label>
                                     <input
                                         name="username"
                                         value={form.username}
                                         onChange={handleChange}
-                                        className={`w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${errors.username ? 'border-red-500' : 'border-gray-300'}`}
+                                        className={`w-full px-4 py-3 rounded-xl border ${errors.username ? 'border-red-300 focus:ring-red-300' : 'border-gray-200 focus:ring-blue-300'} focus:outline-none focus:ring-2 focus:border-transparent`}
                                         placeholder="Enter username"
                                     />
-                                    {errors.username && <p className="mt-1 text-xs text-red-600">{errors.username}</p>}
+                                    {errors.username && (
+                                        <p className="mt-2 text-xs text-red-500 flex items-center">
+                                            <span className="mr-1">!</span>
+                                            {errors.username}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Email*</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Email*</label>
                                     <input
                                         name="email"
                                         type="email"
                                         value={form.email}
                                         onChange={handleChange}
-                                        className={`w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
+                                        className={`w-full px-4 py-3 rounded-xl border ${errors.email ? 'border-red-300 focus:ring-red-300' : 'border-gray-200 focus:ring-blue-300'} focus:outline-none focus:ring-2 focus:border-transparent`}
                                         placeholder="Enter email"
                                     />
-                                    {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
+                                    {errors.email && (
+                                        <p className="mt-2 text-xs text-red-500 flex items-center">
+                                            <span className="mr-1">!</span>
+                                            {errors.email}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Password*</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Password*</label>
                                     <input
                                         name="password"
                                         type="password"
                                         value={form.password}
                                         onChange={handleChange}
-                                        className={`w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${errors.password ? 'border-red-500' : 'border-gray-300'}`}
+                                        className={`w-full px-4 py-3 rounded-xl border ${errors.password ? 'border-red-300 focus:ring-red-300' : 'border-gray-200 focus:ring-blue-300'} focus:outline-none focus:ring-2 focus:border-transparent`}
                                         placeholder="Enter password"
                                     />
-                                    {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password}</p>}
+                                    {errors.password ? (
+                                        <p className="mt-2 text-xs text-red-500 flex items-center">
+                                            <span className="mr-1">!</span>
+                                            {errors.password}
+                                        </p>
+                                    ) : (
+                                        <p className="mt-2 text-xs text-gray-500">
+                                            Password must be at least 8 characters with uppercase, lowercase, number, and special character
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number*</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number*</label>
                                     <input
                                         name="phoneNumber"
                                         type="tel"
                                         value={form.phoneNumber}
                                         onChange={handleChange}
-                                        className={`w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${errors.phoneNumber ? 'border-red-500' : 'border-gray-300'}`}
+                                        className={`w-full px-4 py-3 rounded-xl border ${errors.phoneNumber ? 'border-red-300 focus:ring-red-300' : 'border-gray-200 focus:ring-blue-300'} focus:outline-none focus:ring-2 focus:border-transparent`}
                                         placeholder="Enter phone number"
                                     />
-                                    {errors.phoneNumber && <p className="mt-1 text-xs text-red-600">{errors.phoneNumber}</p>}
+                                    {errors.phoneNumber && (
+                                        <p className="mt-2 text-xs text-red-500 flex items-center">
+                                            <span className="mr-1">!</span>
+                                            {errors.phoneNumber}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                                    <div className="relative">
-                                        <select
-                                            name="role"
-                                            value={form.role}
-                                            onChange={handleChange}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none bg-white pr-8"
-                                        >
-                                            <option value="user">User</option>
-                                            <option value="advisor">Advisor</option>
-                                            <option value="admin">Admin</option>
-                                        </select>
-                                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                                            <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                                            </svg>
-                                        </div>
-                                    </div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                                    <select
+                                        name="role"
+                                        value={form.role}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-blue-300 focus:outline-none focus:ring-2 focus:border-transparent appearance-none bg-white"
+                                    >
+                                        <option value="user">User</option>
+                                        <option value="advisor">Advisor</option>
+                                        <option value="admin">Admin</option>
+                                    </select>
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Gender*</label>
-                                    <div className="relative">
-                                        <select
-                                            name="gender"
-                                            value={form.gender}
-                                            onChange={handleChange}
-                                            className={`w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none bg-white pr-8 ${errors.gender ? 'border-red-500' : 'border-gray-300'}`}
-                                        >
-                                            <option value="">Select Gender</option>
-                                            <option value="Male">Male</option>
-                                            <option value="Female">Female</option>
-                                            <option value="Other">Other</option>
-                                        </select>
-                                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                                            <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                    {errors.gender && <p className="mt-1 text-xs text-red-600">{errors.gender}</p>}
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Gender*</label>
+                                    <select
+                                        name="gender"
+                                        value={form.gender}
+                                        onChange={handleChange}
+                                        className={`w-full px-4 py-3 rounded-xl border ${errors.gender ? 'border-red-300 focus:ring-red-300' : 'border-gray-200 focus:ring-blue-300'} focus:outline-none focus:ring-2 focus:border-transparent appearance-none bg-white`}
+                                    >
+                                        <option value="">Select Gender</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                    {errors.gender && (
+                                        <p className="mt-2 text-xs text-red-500 flex items-center">
+                                            <span className="mr-1">!</span>
+                                            {errors.gender}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
 
-                            <div className="flex justify-end pt-2">
+                            <div className="flex justify-end pt-4">
                                 <button
                                     type="button"
                                     onClick={nextStep}
-                                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded"
+                                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-colors font-medium flex items-center shadow-lg shadow-blue-100"
                                 >
-                                    Next Step →
+                                    Continue →
                                 </button>
                             </div>
                         </div>
                     ) : (
-                        <form onSubmit={handleSubmit} className="space-y-4">
+                        <form onSubmit={handleSubmit} className="space-y-6">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Sidebar Permissions*</label>
-                                {errors.sidebar && <p className="text-xs text-red-600 mb-2">{errors.sidebar}</p>}
-                                <div className="space-y-2 max-h-[40vh] overflow-y-auto p-2 border rounded">
+                                <label className="block text-sm font-medium text-gray-700 mb-3">Sidebar Permissions*</label>
+                                {errors.sidebar && (
+                                    <p className="text-xs text-red-500 mb-3 flex items-center">
+                                        <span className="mr-1">!</span>
+                                        {errors.sidebar}
+                                    </p>
+                                )}
+                                <div className="space-y-3 max-h-[50vh] overflow-y-auto p-3 border border-gray-200 rounded-lg">
                                     {form.sidebar.map((item, index) => (
-                                        <div key={index} className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded">
+                                        <div key={index} className="flex items-center space-x-4 p-3 hover:bg-gray-50 rounded-md">
                                             <div className="flex-1">
                                                 <input
                                                     placeholder="Permission label"
                                                     value={item.label}
                                                     onChange={(e) => handleSidebarChange(index, 'label', e.target.value)}
-                                                    className={`w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 ${errors[`sidebar-${index}-label`] ? 'border-red-500' : 'border-gray-300'}`}
+                                                    className={`w-full px-4 py-2.5 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 ${errors[`sidebar-${index}-label`] ? 'border-red-500' : 'border-gray-300'}`}
                                                 />
                                                 {errors[`sidebar-${index}-label`] && (
                                                     <p className="mt-1 text-xs text-red-600">{errors[`sidebar-${index}-label`]}</p>
                                                 )}
                                             </div>
-                                            <label className="flex items-center space-x-2 cursor-pointer">
+                                            <label className="flex items-center space-x-3 cursor-pointer">
                                                 <input
                                                     type="checkbox"
                                                     checked={item.access}
                                                     onChange={() => toggleSidebarAccess(index)}
-                                                    className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
+                                                    className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 border-gray-300"
                                                 />
                                                 <span className="text-sm text-gray-700">Access</span>
                                             </label>
                                             <button
                                                 type="button"
                                                 onClick={() => removeSidebarItem(index)}
-                                                className="text-gray-500 hover:text-red-500 p-1"
+                                                className="text-gray-400 hover:text-gray-600 p-1"
                                             >
-                                                ×
+                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
                                             </button>
                                         </div>
                                     ))}
@@ -349,25 +389,28 @@ export default function CreateUserForm() {
                                 <button
                                     type="button"
                                     onClick={addSidebarItem}
-                                    className="mt-2 text-sm text-indigo-600 hover:text-indigo-800"
+                                    className="mt-3 text-sm text-blue-600 hover:text-blue-800 flex items-center focus:outline-none"
                                 >
-                                    + Add permission
+                                    <svg className="w-5 h-5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                    </svg>
+                                    Add permission
                                 </button>
                             </div>
 
-                            <div className="flex justify-between pt-4">
+                            <div className="flex justify-between pt-6">
                                 <button
                                     type="button"
                                     onClick={prevStep}
-                                    className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded"
+                                    className="px-6 py-3 bg-white text-gray-700 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors font-medium flex items-center shadow-sm"
                                 >
                                     ← Back
                                 </button>
                                 <button
                                     type="submit"
-                                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded"
+                                    className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl hover:from-green-600 hover:to-emerald-600 transition-colors font-medium flex items-center shadow-lg shadow-green-100"
                                 >
-                                    Create User
+                                    ✓ Create User
                                 </button>
                             </div>
                         </form>
