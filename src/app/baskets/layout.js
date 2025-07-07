@@ -37,7 +37,7 @@ export default async function BasketLayout({ children }) {
     const data = await res.json();
 
     if (!data.success) {
-        redirect('/');
+        redirect('/unauthorized');
     }
 
     return <main className="min-h-screen flex justify-center items-center">

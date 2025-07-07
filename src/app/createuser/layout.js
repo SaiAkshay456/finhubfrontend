@@ -1,4 +1,3 @@
-
 import { sidebarItems } from '../../constants/sidebarRoutes';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -28,7 +27,7 @@ export default async function Layout({ children }) {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
         },
-        credentials: 'include',
+        // credentials: 'include',optional if you need keep 
         body: JSON.stringify({ path: label }),
         // cache: 'no-store',
     });
@@ -39,7 +38,7 @@ export default async function Layout({ children }) {
         redirect('/unauthorized');
     }
 
-    return <main className="min-h-screen flex justify-center items-cente">
+    return <main className="min-h-screen flex justify-center items-center">
         {children}
     </main>
 }

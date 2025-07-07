@@ -12,7 +12,7 @@ export default async function RiskProfileLayout({ children }) {
     }
 
     // Get current path from pathname (can also be hardcoded per layout)
-    const currentPath = '/baskets'; // or get from route segment
+    const currentPath = '/riskprofile'; // or get from route segment
 
     // Find label based on current path
     const matched = sidebarItems.find(item => item.path === currentPath);
@@ -37,7 +37,7 @@ export default async function RiskProfileLayout({ children }) {
     const data = await res.json();
 
     if (!data.success) {
-        redirect('/');
+        redirect('/unauthorized');
     }
 
     return <main className="min-h-screen flex justify-center items-center">

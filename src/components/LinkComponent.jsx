@@ -7,8 +7,8 @@ export default function LinkComponent() {
 
     return (
         <button
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
-            onClick={() => router.push('/createuser')} // ✅ wrapped in arrow function
+            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors cursor-pointer"
+            onClick={() => router.push('/createuser')}
         >
             Add User
         </button>

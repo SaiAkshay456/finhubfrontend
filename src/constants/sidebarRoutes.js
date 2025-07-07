@@ -10,6 +10,7 @@ import { IoIosNotificationsOutline } from "react-icons/io";
 import { MdOutlineRecommend } from "react-icons/md";
 // import AssuredWorkloadIcon from '@mui/icons-material/AssuredWorkload';
 import { FaShieldAlt } from "react-icons/fa";
+import { FaFileUpload } from "react-icons/fa";
 // 
 // import DashboardIcon from '@mui/icons-material/Dashboard';
 import { MdDashboard } from "react-icons/md";
@@ -50,6 +51,12 @@ export const sidebarItems = [
         label: "Risk Profiling",
         path: "/riskprofile",
         icon: FaShieldAlt,
+        description: "Risk Profiling"
+    },
+    {
+        label: "Portfolio Upload",
+        path: "/upload-portfolio",
+        icon: FaFileUpload,
         description: "Risk Profiling"
     }
 ];

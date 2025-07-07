@@ -11,7 +11,7 @@ export default function ClientLayoutWrapper({ children }) {
     const router = useRouter()
     useEffect(() => {
         if (!isAuthorized) {
-            router.push("/login");
+            return router.push("/login");
         }
     }, [isAuthorized, router]);
     return (

@@ -3,14 +3,15 @@
 // import { Hero } from "../components/Hero";
 import { cookies } from "next/headers";
 // import { useAuth } from "../providers/AuthProvider";
-
+import Statistics from "../components/Statistics";
 
 export default async function Home() {
   const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
+  // const token = cookieStore.get("token")?.value;
   return (
     <>
-      <h1>Home Page</h1>
+      <Statistics />
+
     </>
   );
 }

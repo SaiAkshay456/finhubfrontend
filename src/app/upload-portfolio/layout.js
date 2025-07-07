@@ -1,18 +1,16 @@
-
 import { sidebarItems } from '../../constants/sidebarRoutes';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-export default async function KycLayout({ children }) {
+export default async function PortfolioLayout({ children }) {
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
 
     if (!token) {
         redirect('/login');
     }
-
     // Get current path from pathname (can also be hardcoded per layout)
-    const currentPath = '/kycverify'; // or get from route segment
+    const currentPath = '/upload-portfolio'; // or get from route segment
 
     // Find label based on current path
     const matched = sidebarItems.find(item => item.path === currentPath);
@@ -29,9 +27,9 @@ export default async function KycLayout({ children }) {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
         },
-        credentials: 'include',
+        // credentials: 'include',optional if you need keep 
         body: JSON.stringify({ path: label }),
-        cache: 'no-store',
+        // cache: 'no-store',
     });
 
     const data = await res.json();
@@ -39,6 +37,7 @@ export default async function KycLayout({ children }) {
     if (!data.success) {
         redirect('/unauthorized');
     }
+
     return <main className="min-h-screen flex justify-center items-center">
         {children}
     </main>

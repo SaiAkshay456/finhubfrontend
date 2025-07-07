@@ -1,5 +1,3 @@
-
-
 'use client';
 
 import axios from 'axios';
@@ -29,31 +27,38 @@ export function Hero() {
         }
     };
 
-    if (!isAuthorized || !user) return null;
+    if (!isAuthorized) {
+        router.replace("/login");
+        // return null;
+    }
 
     return (
-        <div className="w-full flex items-center justify-between px-6 py-3 bg-white border-b border-gray-200 shadow-sm text-sm text-gray-700">
-            <div className="flex items-center space-x-2">
-                <div className="p-2 bg-blue-50 rounded-full">
-                    <FiUser className="text-blue-600" />
+        <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 px-4 sm:px-6 py-3 bg-white border-b border-gray-200 shadow-sm">
+            <div className="flex items-center gap-2 sm:gap-3">
+                <div className="p-1.5 sm:p-2 bg-blue-50 rounded-full flex-shrink-0">
+                    <FiUser className="text-blue-600 text-base sm:text-lg" />
                 </div>
-                <div>
-                    <span className="font-medium text-gray-900">Welcome, {user.username}</span>
-                    <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
-                        {user.role}
+                <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-2">
+                    <span className="text-sm sm:text-base font-medium text-gray-800 truncate max-w-[160px] sm:max-w-none">
+                        Welcome, {user?.username}
+                    </span>
+                    <span className="px-2 py-0.5 sm:py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full whitespace-nowrap">
+                        {user?.role}
                     </span>
                 </div>
             </div>
             <button
                 onClick={handleLogout}
                 disabled={isLoggingOut}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-all ${isLoggingOut
-                    ? 'bg-gray-100 text-gray-500'
-                    : 'bg-red-50 text-red-600 hover:bg-red-100 hover:shadow-sm'
+                className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-colors duration-200 self-end sm:self-auto ${isLoggingOut
+                    ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                    : 'bg-red-50 text-red-600 hover:bg-red-100 active:bg-red-200'
                     }`}
             >
-                <CiLogout className="text-base" />
-                <span>{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
+                <CiLogout className="text-base sm:text-lg flex-shrink-0" />
+                <span className="text-xs sm:text-sm font-medium">
+                    {isLoggingOut ? 'Signing out...' : 'Sign out'}
+                </span>
             </button>
         </div>
     );

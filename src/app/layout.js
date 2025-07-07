@@ -33,11 +33,6 @@ export default async function RootLayout({ children }) {
   console.log(token);
   let user = null;
   let isAuthorized = false;
-  // if (!token) {
-  //   redirect('/login');
-  // }
-
-
   if (token) {
     try {
       const res = await fetch("http://localhost:3030/api/v1/auth/user/me", {
@@ -67,8 +62,6 @@ export default async function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-
-
         <AuthProvider initialUser={user} initialAuth={isAuthorized}>
           <ClientLayoutWrapper>
             <Hero />
