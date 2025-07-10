@@ -12,9 +12,11 @@ export default function Sidebar({ user, children }) {
 
     const toggleSidebar = () => setIsOpen(!isOpen);
 
-    const allowedSidebar = sidebarItems.filter(route =>
-        user?.sidebar?.some(item => item.label === route.label && item.access)
-    );
+    const allowedSidebar = sidebarItems
+        .filter(route =>
+            user?.sidebar?.some(item => item.label === route.label && item.access)
+        )
+    // .filter(route => route.label !== "Create User"); // hide this Create User 
 
     return (
         <div className="flex h-screen bg-gray-50 text-gray-800">
@@ -48,6 +50,7 @@ export default function Sidebar({ user, children }) {
                 <nav className="flex-1 overflow-y-auto px-2 py-4">
                     <ul className="space-y-1">
                         {allowedSidebar.map((item) => {
+                            if (item.label === "Create User") return null; // ⬅️ Hide here safely
                             const Icon = item.icon;
                             return (
                                 <li key={item.path}>

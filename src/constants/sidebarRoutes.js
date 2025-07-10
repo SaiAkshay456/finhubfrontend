@@ -61,3 +61,40 @@ export const sidebarItems = [
         description: "Risk Profiling"
     }
 ];
+// try {
+//     isLoading = true;
+//     if(searchTerm.length>0){
+
+//     }
+//     const res = await fetch(`${backend_url}/api/v1/users/get-all-users?search=${searchTerm}&page=${currentPage}&limit=${limit}`, {
+//         method: 'GET',
+//         headers: {
+//             Authorization: `Bearer ${token}`
+//         },
+//         // cache: 'no-store',
+//         credentials: 'include'
+//     });
+
+
+//     const data = await res.json();
+//     if (data.success) {
+//         users = data.users;
+//         totalPages = data.totalPages;
+//         stats = {
+//             totalUsers: data.totalUsers,
+//             totalActiveUsers: data.totalActiveUsers,
+//             totalSuspendedUsers: data.totalSuspendedUsers,
+//             totalKycPendingUsers: data.totalKycPendingUsers
+//         };
+//         // currentPage = data.currentPage
+//     } else {
+//         error = data.message || 'Failed to fetch users';
+//     }
+// } catch (err) {
+//     console.error('Failed to fetch users:', err);
+//     error = 'Failed to connect to server';
+// } finally {
+//     isLoading = false;
+// }
+
+//try of users page.js

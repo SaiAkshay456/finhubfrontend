@@ -2,6 +2,11 @@ import { sidebarItems } from '../../constants/sidebarRoutes';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
+
+export const metadata = {
+    title: "Add User Page",
+    description: "Browse and add user here",
+};
 export default async function Layout({ children }) {
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;

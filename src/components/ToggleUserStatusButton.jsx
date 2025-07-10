@@ -6,11 +6,10 @@ import { useState } from 'react';
 export default function ToggleUserStatusButton({ userId, isActive }) {
     const [status, setStatus] = useState(isActive);
     const [loading, setLoading] = useState(false);
-
     const handleToggle = async () => {
         try {
             setLoading(true);
-            const res = await fetch(`http://localhost:3030/api/v1/adminuse/user-status/${userId}`, {
+            const res = await fetch(`http://localhost:3030/api/v1/adminuse/user-status-update/${userId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -22,6 +21,7 @@ export default function ToggleUserStatusButton({ userId, isActive }) {
             const data = await res.json();
             if (data.success) {
                 setStatus(!status);
+
             } else {
                 alert(data.message || 'Failed to update status');
             }

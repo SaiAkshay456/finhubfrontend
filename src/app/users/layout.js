@@ -1,11 +1,16 @@
 
-import { useAuth } from "../../providers/AuthProvider";
+// import { useAuth } from "../../providers/AuthProvider";
 
 // layout.js (server component)
 
 import { sidebarItems } from '../../constants/sidebarRoutes';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+
+export const metadata = {
+    title: "Users Page",
+    description: "Browse and manage users",
+};
 
 export default async function Layout({ children }) {
     const cookieStore = await cookies();

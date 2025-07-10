@@ -2,6 +2,7 @@
 
 import axios from 'axios';
 import { useState } from 'react';
+import { isAtLeast18 } from '../constants/dobValidation';
 
 export default function KycFormUser({ userId }) {
     const [formData, setFormData] = useState({
@@ -28,6 +29,11 @@ export default function KycFormUser({ userId }) {
         e.preventDefault();
         setIsSubmitting(true);
         setError(null);
+        if (!isAtLeast18(formData.dob)) {
+            setError("user must be at least 18 years old to submit KYC.");
+            setIsSubmitting(false);
+            return;
+        }
         try {
             const formPayload = new FormData();
             formPayload.append('firstName', formData.firstName);
@@ -40,7 +46,7 @@ export default function KycFormUser({ userId }) {
                 formPayload
                 , {
                     headers: {
-                        // Authorization: `Bearer ${token}`,
+                        Authorization: `Bearer ${token}`,
                         'Content-Type': 'multipart/form-data' // if protected
                     },
                     withCredentials: true // if using cookies (optional
@@ -57,7 +63,7 @@ export default function KycFormUser({ userId }) {
     if (success) {
         return (
             <div className="p-4 bg-green-50 text-green-700 rounded-lg">
-                KYC submitted successfully! Our team will verify your documents shortly.
+                KYC submitted successfully! Our team will contact you through registered email or phone.
             </div>
         );
     }
@@ -129,7 +135,7 @@ export default function KycFormUser({ userId }) {
                             name="aadharFile"
                             onChange={handleChange}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                            accept="image/*,.pdf"
+                            accept="application/pdf"
                             required
                         />
                         <p className="text-xs text-gray-500 mt-1">Upload front and back as single file</p>
@@ -141,7 +147,7 @@ export default function KycFormUser({ userId }) {
                             name="panFile"
                             onChange={handleChange}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                            accept="image/*,.pdf"
+                            accept="application/pdf"
                             required
                         />
                     </div>

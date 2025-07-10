@@ -31,7 +31,7 @@ export function Hero() {
         if (typeof window !== "undefined") {
             window.location.href = "/login"; // ensures full redirect
         }
-        // return null; // stop rendering
+        return null; // stop rendering
     }
 
     return (
