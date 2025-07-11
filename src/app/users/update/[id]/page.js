@@ -3,7 +3,8 @@ import { redirect } from 'next/navigation';
 // import UpdateUserForm from '@/components/UpdateUserForm'; // You'll create this next
 import UpdateUserForm from '../../../../components/UpdateUserForm';
 export default async function UpdateUserPage({ params }) {
-    const token = await cookies().get('token')?.value;
+    const token1 = await cookies()
+    const token = token1.get('token')?.value;
     if (!token) redirect('/login');
     const { id } = await params;
 
