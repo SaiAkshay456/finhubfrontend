@@ -24,8 +24,7 @@ export default async function UpdateUserPage({ params }) {
     }
 
     return (
-        <div className="max-w-3xl mx-auto p-6 bg-white shadow rounded">
-            <h2 className="text-xl font-bold mb-4">Edit User Profile</h2>
+        <div className="max-w-3xl mx-auto p-6 rounded">
             <UpdateUserForm user={data.user} token={token} />
         </div>
     );

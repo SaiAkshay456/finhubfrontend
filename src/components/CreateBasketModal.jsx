@@ -196,3 +196,37 @@
 //         </div>
 //     );
 // }
+
+
+'use client';
+
+import React from 'react';
+
+export default function QuestionnaireModal({ isOpen, onClose, questionnaires, onSelect }) {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                <h2 className="text-xl font-semibold mb-4 text-gray-800">Select Questionnaire</h2>
+                <ul className="max-h-60 overflow-y-auto space-y-2">
+                    {questionnaires.map((q) => (
+                        <li
+                            key={q._id}
+                            className="p-3 bg-gray-100 hover:bg-blue-100 rounded cursor-pointer"
+                            onClick={() => onSelect(q)}
+                        >
+                            {q.title}
+                        </li>
+                    ))}
+                </ul>
+                <button
+                    className="mt-4 w-full py-2 bg-gray-200 rounded hover:bg-gray-300 text-sm"
+                    onClick={onClose}
+                >
+                    Cancel
+                </button>
+            </div>
+        </div>
+    );
+}

@@ -3,15 +3,13 @@ import { sidebarItems } from '../../constants/sidebarRoutes';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-export default async function RiskProfileLayout({ children }) {
+export default async function BasketLayout({ children }) {
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
 
     if (!token) {
         redirect('/login');
     }
-
-    // Get current path from pathname (can also be hardcoded per layout)
     const currentPath = '/riskprofile'; // or get from route segment
 
     // Find label based on current path

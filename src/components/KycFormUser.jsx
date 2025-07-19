@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useState } from 'react';
 import { isAtLeast18 } from '../constants/dobValidation';
 
-export default function KycFormUser({ userId }) {
+export default function KycFormUser({ userId, token }) {
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -63,21 +63,20 @@ export default function KycFormUser({ userId }) {
     if (success) {
         return (
             <div className="p-4 bg-green-50 text-green-700 rounded-lg">
-                KYC submitted successfully! Our team will contact you through registered email or phone.
+                KYC Saved Successfully!!
             </div>
         );
     }
 
     return (
         <div className="bg-white p-6 rounded-xl shadow-md border border-yellow-200">
-            <h2 className="text-lg font-bold text-yellow-800 mb-4">Complete KYC Verification</h2>
+            <h2 className="text-lg font-bold text-yellow-800 mb-4">KYC Verification</h2>
 
             {error && (
                 <div className="mb-4 p-2 bg-red-50 text-red-700 rounded text-sm">
                     {error}
                 </div>
             )}
-
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -158,7 +157,7 @@ export default function KycFormUser({ userId }) {
                     disabled={isSubmitting}
                     className={`px-4 py-2 text-white rounded-md ${isSubmitting ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'}`}
                 >
-                    {isSubmitting ? 'Submitting...' : 'Submit Verification'}
+                    {isSubmitting ? 'Submitting...' : 'Submit KYC'}
                 </button>
             </form>
         </div>

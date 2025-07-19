@@ -63,7 +63,7 @@ export default function UpdateUserForm({ user, token }) {
         });
 
         // KYC fields if KYC is completed
-        if (user.isKycCompleted) {
+        if (user.status.isKycCompleted) {
             const kycFields = [
                 'firstName', 'lastName', 'dob', 'address'
             ];
@@ -131,7 +131,7 @@ export default function UpdateUserForm({ user, token }) {
 
     return (
         <div className="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-lg">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">Update User Details</h2>
+            <h2 className="text-2xl font-bold text-center text-gray-800 mb-6 border-b pb-2">Update User Details</h2>
 
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -180,17 +180,6 @@ export default function UpdateUserForm({ user, token }) {
                 <div className="bg-gray-50 p-5 rounded-xl border border-gray-200">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                         <h3 className="text-lg font-semibold text-gray-800">Sidebar Permissions</h3>
-                        <div className="flex space-x-2">
-                            <button
-                                type="button"
-                                onClick={() => setEditMode('visual')}
-                                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${editMode === 'visual' ?
-                                    'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-                            >
-                                Visual Editor
-                            </button>
-
-                        </div>
                     </div>
 
 
@@ -215,7 +204,7 @@ export default function UpdateUserForm({ user, token }) {
                     </div>
                 </div>
 
-                {user.isKycCompleted && (
+                {user.status.isKycCompleted && (
                     <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
                         <h3 className="text-lg font-semibold text-gray-800 mb-4">KYC Details <span className="text-sm font-normal text-gray-500">(Required)</span></h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
