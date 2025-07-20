@@ -16,7 +16,7 @@ import {
 import { useState } from 'react';
 
 export default function Statistics() {
-    const [darkMode, setDarkMode] = useState(true);
+    const [darkMode, setDarkMode] = useState(false);
 
     const toggleTheme = () => {
         setDarkMode(!darkMode);

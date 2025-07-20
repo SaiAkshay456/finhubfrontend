@@ -1,11 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import { recommendedQuestions } from '@/constants/predefinedQuestions';
 
 export default function QuestionnaireForm() {
     const [questions, setQuestions] = useState([
         { text: '', options: [{ label: '' }] }
     ]);
+    const [suggestions, setSuggestions] = useState([]);
+
     const [currentSlide, setCurrentSlide] = useState(0);
     const [msg, setMsg] = useState('');
 
@@ -46,11 +49,30 @@ export default function QuestionnaireForm() {
         setMsg('');
     };
 
+    // const handleQuestionChange = (index, value) => {
+    //     const updated = [...questions];
+    //     updated[index].text = value;
+    //     setQuestions(updated);
+    // };
     const handleQuestionChange = (index, value) => {
         const updated = [...questions];
         updated[index].text = value;
         setQuestions(updated);
+
+        const input = value.toLowerCase();
+        const matches = recommendedQuestions.filter(
+            (q) => q.toLowerCase().includes(input) && input.length > 0
+        );
+        setSuggestions(matches);
     };
+    const applySuggestion = (suggestion) => {
+        const updated = [...questions];
+        updated[currentSlide].text = suggestion;
+        setQuestions(updated);
+        setSuggestions([]); // Hide suggestions
+    };
+
+
 
     const addOption = (qIndex) => {
         const updated = [...questions];
@@ -180,6 +202,17 @@ export default function QuestionnaireForm() {
                             )}
                         </div>
 
+                        {/* <div className="mb-6">
+                            <input
+                                type="text"
+                                value={questions[currentSlide].text}
+                                onChange={(e) => handleQuestionChange(currentSlide, e.target.value)}
+                                placeholder="Enter your question"
+                                className="w-full px-4 py-2 text-gray-800 border-b-2 border-gray-200 focus:border-teal-500 focus:outline-none"
+                                required
+                                autoFocus
+                            />
+                        </div> */}
                         <div className="mb-6">
                             <input
                                 type="text"
@@ -190,6 +223,20 @@ export default function QuestionnaireForm() {
                                 required
                                 autoFocus
                             />
+
+                            {suggestions.length > 0 && (
+                                <ul className="bg-white border border-gray-200 rounded-md shadow-md mt-1 max-h-60 overflow-y-auto z-20 absolute w-full">
+                                    {suggestions.map((sugg, i) => (
+                                        <li
+                                            key={i}
+                                            onClick={() => applySuggestion(sugg)}
+                                            className="px-4 py-2 hover:bg-gray-100 text-sm cursor-pointer"
+                                        >
+                                            {sugg}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
                         </div>
 
                         {/* Options */}
@@ -268,3 +315,4 @@ export default function QuestionnaireForm() {
         </div>
     );
 }
+

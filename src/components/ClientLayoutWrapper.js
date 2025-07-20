@@ -42,9 +42,15 @@ export default function ClientLayoutWrapper({ children }) {
 
     // Show sidebar for all pages when authorized
     return (
-        <div className="flex h-screen">
+        // <div className="flex h-screen">
+        //     <Sidebar user={user} />
+        //     <main className="flex-1 p-6 overflow-y-auto">
+        //         {children}
+        //     </main>
+        // </div>
+        <div className="flex h-screen w-screen overflow-hidden">
             <Sidebar user={user} />
-            <main className="flex-1 p-6 overflow-y-auto">
+            <main className="flex-1 overflow-y-auto">
                 {children}
             </main>
         </div>

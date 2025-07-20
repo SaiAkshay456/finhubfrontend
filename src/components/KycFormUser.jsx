@@ -49,7 +49,7 @@ export default function KycFormUser({ userId, token }) {
                         Authorization: `Bearer ${token}`,
                         'Content-Type': 'multipart/form-data' // if protected
                     },
-                    withCredentials: true // if using cookies (optional
+                    // if using cookies (optional
                 })
             setSuccess(true);
         } catch (err) {

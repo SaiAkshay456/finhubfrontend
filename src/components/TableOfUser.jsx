@@ -331,7 +331,7 @@ import { useRouter } from 'next/navigation';
 const getUserStatusLabel = (user) => {
     const s = user.status || {};
     if (!s.isKycCompleted) return 'KYC Pending';
-    if (!s.questionarrieStatus) return 'Questionnaire Pending';
+    if (!s.questionarrieStatus) return 'Q/A Pending';
     if (!s.riskProfileStatus) return 'Risk Profile Pending';
     return user.riskCategory;
 };
@@ -396,7 +396,7 @@ export default function TableOfUser({ users, questionnaires, token }) {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${token}`,
                     },
-                    credentials: 'include',
+                    // credentials: 'include',
                     body: JSON.stringify({ assignments: payload }),
                 }
             );
@@ -501,13 +501,16 @@ export default function TableOfUser({ users, questionnaires, token }) {
                                     Status
                                 </th>
                                 <th scope="col" className="px-6 py-3 border-b border-gray-200">
+                                    Modify Risk Level
+                                </th>
+                                <th scope="col" className="px-6 py-3 border-b border-gray-200">
                                     Actions
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
                             {users.map((user, index) => (
-                                <tr key={user._id} className="bg-white hover:bg-gray-50">
+                                <tr key={user._id} className="odd:bg-white even:bg-gray-50 bg-white hover:bg-gray-50">
                                     <td className="p-4 border-b border-gray-100">
                                         <div className="flex items-center">
                                             <input
@@ -548,42 +551,44 @@ export default function TableOfUser({ users, questionnaires, token }) {
 
                                     </td>
                                     <td className="px-6 py-4 border-b border-gray-100">
-                                        <div className="flex flex-col gap-2">
-                                            {getUserPendingStepLink(user) ? (
-                                                <Link href={getUserPendingStepLink(user)}>
-                                                    <span className={`inline-flex items-center px-3 py-1 rounded-md text-xs font-medium ${getUserStatusColor(user)} hover:shadow-sm transition-all`}>
-                                                        {getUserStatusLabel(user)}
-                                                    </span>
-                                                </Link>
-                                            ) : (
-                                                <span className={`inline-flex items-center px-3 py-1 rounded-md text-xs font-medium ${getUserStatusColor(user)}`}>
+                                        {/* <div className="flex flex-col gap-2"> */}
+                                        {getUserPendingStepLink(user) ? (
+                                            <Link href={getUserPendingStepLink(user)}>
+                                                <span className={`inline-flex items-center px-3 py-1 rounded-md text-xs font-medium ${getUserStatusColor(user)} hover:shadow-sm transition-all`}>
                                                     {getUserStatusLabel(user)}
                                                 </span>
-                                            )}
-                                            {user.riskCategory && (
-                                                <Link href={`/riskprofile/${user._id}`}>
-                                                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-md text-xs font-medium bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors">
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            className="h-3.5 w-3.5"
-                                                            viewBox="0 0 20 20"
-                                                            fill="currentColor"
-                                                        >
-                                                            <path d="M17.414 2.586a2 2 0 00-2.828 0L6 11.172V14h2.828l8.586-8.586a2 2 0 000-2.828zM4 16a1 1 0 100-2 1 1 0 000 2z" />
-                                                        </svg>
-                                                        Update Risk
-                                                    </span>
-                                                </Link>
-                                            )}
-                                        </div>
+                                            </Link>
+                                        ) : (
+                                            <span className={`inline-flex items-center px-3 py-1 rounded-md text-xs font-medium ${getUserStatusColor(user)}`}>
+                                                {getUserStatusLabel(user)}
+                                            </span>
+                                        )}
+                                        {/* </div> */}
+                                    </td>
+                                    <td className="px-6 py-4 border-b border-gray-100">
+                                        {user.riskCategory ? (
+                                            <Link href={`/riskprofile/${user._id}`}>
+                                                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-md text-xs font-medium bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors">
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        className="h-3.5 w-3.5"
+                                                        viewBox="0 0 20 20"
+                                                        fill="currentColor"
+                                                    >
+                                                        <path d="M17.414 2.586a2 2 0 00-2.828 0L6 11.172V14h2.828l8.586-8.586a2 2 0 000-2.828zM4 16a1 1 0 100-2 1 1 0 000 2z" />
+                                                    </svg>
+                                                    Update Risk
+                                                </span>
+                                            </Link>
+                                        ) : "N/A"}
                                     </td>
                                     <td className="px-6 py-4 border-b border-gray-100">
                                         <div className="flex items-center gap-2">
-                                            <button onClick={() => router.push(`/users/${user._id}`)} className="flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors">
+                                            <button onClick={() => router.push(`/users/${user._id}`)} className="flex items-center gap-1 cursor-pointer px-3 py-1.5 rounded-md text-xs font-medium bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors">
                                                 <ListFilter className="w-3.5 h-3.5" />
                                                 View
                                             </button>
-                                            <button onClick={() => router.push(`/users/update/${user._id}`)} className="flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors">
+                                            <button onClick={() => router.push(`/users/update/${user._id}`)} className="flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium bg-gray-50 text-gray-600 hover:bg-gray-100 cursor-pointer transition-colors">
                                                 <Clock className="w-3.5 h-3.5" />
                                                 Update
                                             </button>

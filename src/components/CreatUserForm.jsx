@@ -577,7 +577,7 @@ export default function CreateUserForm() {
                 const res = await fetch('http://localhost:3030/api/v1/adminuse/create-user', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(form),
+                    body: JSON.stringify(form),//also other way Authorizaton Bearer
                     credentials: "include",
                 });
 

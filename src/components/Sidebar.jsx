@@ -708,7 +708,6 @@ export default function Sidebar({ user, children }) {
 
                         <button
                             onClick={handleLogoutUser}
-                            title="Logout "
                             className={`w-full flex ml-3 items-center px-2 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md transition-colors ${!isOpen ? "justify-center" : ""
                                 }`}
                         >
@@ -726,7 +725,7 @@ export default function Sidebar({ user, children }) {
 
                 {/* Main Content */}
                 <main
-                    className={`flex-1 p-6 overflow-y-auto bg-white shadow-inner rounded-l-xl ml-0 transition-all duration-300 ${isOpen ? "lg:ml-64" : "lg:ml-20"
+                    className={`flex flex-1 overflow-y-auto bg-white ml-0 transition-all duration-300 ${isOpen ? "lg:ml-64" : "lg:ml-20"
                         }`}
                 >
                     {children}

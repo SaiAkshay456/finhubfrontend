@@ -46,9 +46,9 @@ export default function AssignRiskCategory({ userId }) {
                     required
                 >
                     <option value="">Select Risk Category</option>
-                    <option value="Low Risk">✅ Low Profile</option>
-                    <option value="Medium Risk">⚠️ Medium Profile</option>
-                    <option value="High Risk">🔥 High Profile</option>
+                    <option value="Low Risk">Low Profile</option>
+                    <option value="Medium Risk"> Medium Profile</option>
+                    <option value="High Risk"> High Profile</option>
                 </select>
 
                 <button

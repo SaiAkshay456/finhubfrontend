@@ -38,7 +38,7 @@ export default async function Layout({ children }) {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
         },
-        credentials: 'include',
+        // credentials: 'include',
         body: JSON.stringify({ path: label }),
         // cache: 'no-store',
     });

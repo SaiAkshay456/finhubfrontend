@@ -856,7 +856,6 @@ export async function fetchQuestionnaires(token) {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
-            credentials: "include",
             cache: "no-store",
         })
         const questionnaires = await res.json()
@@ -892,7 +891,7 @@ export default async function AllUsersPage({ searchParams }) {
     let users = []
     let error = null
     let totalPages = 1
-    const limit = 3
+    const limit = 5
     let stats = {
         totalUsers: 0,
         totalActiveUsers: 0,
@@ -911,7 +910,6 @@ export default async function AllUsersPage({ searchParams }) {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
-            credentials: "include",
         })
         const data = await res.json()
         if (data.success) {
@@ -959,7 +957,7 @@ export default async function AllUsersPage({ searchParams }) {
         {
             label: "KYC Pending",
             value: stats.totalKycPendingUsers, // Hardcoded to match image
-            change: "1",
+            change: "0",
             changeType: "increase",
             timeframe: "(Past 5 days)",
             valueColor: "text-black-600", // Specific color for this card's value
@@ -986,10 +984,11 @@ export default async function AllUsersPage({ searchParams }) {
                 </div>
                 {/* Stats Cards - Dashboard Style (Tailwind CSS only) */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-2">
+                    {/* <div className="grid grid-cols-2 lg:grid-cols-4 gap-1 sm:gap-2 mb-2 max-w-[96%] mx-auto"> */}
                     {dashboardCardsData.map((card) => (
                         <div
                             key={card.label}
-                            className="rounded-lg border border-gray-200 bg-white shadow-xs p-3 flex flex-col justify-between"
+                            className="rounded-sm border border-gray-200 bg-white shadow-xs p-3 flex flex-col justify-between"
                         >
                             <div className="flex flex-col gap-0.5">
                                 <h3 className="text-xs font-medium text-gray-500">{card.label}</h3>
@@ -1018,7 +1017,7 @@ export default async function AllUsersPage({ searchParams }) {
                     ))}
                 </div>
                 {/* Main Content Card - Wider Table Container */}
-                <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+                <div className="bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden">
                     {/* Search Section */}
                     <div className="bg-gradient-to-r from-gray-50 to-slate-50 p-6 border-b border-gray-200">
                         <form method="GET" className="flex flex-col sm:flex-row gap-4">

@@ -79,7 +79,6 @@ import { cookies } from 'next/headers';
 import { AuthProvider } from '@/providers/AuthProvider';
 import ClientLayoutWrapper from '@/components/ClientLayoutWrapper';
 import { Hero } from '@/components/Hero';
-
 const geistSans = Geist({ subsets: ['latin'], variable: '--font-geist-sans' });
 const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono' });
 
@@ -98,7 +97,9 @@ export default async function RootLayout({ children }) {
   if (token) {
     try {
       const res = await fetch('http://localhost:3030/api/v1/auth/user/me', {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
         cache: 'no-store',
       });
       if (res.ok) {

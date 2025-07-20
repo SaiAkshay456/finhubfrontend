@@ -22,7 +22,9 @@
 
  /* Tailwind CSS directives - ESSENTIAL for Tailwind to work */
 
- @tailwind utilities;
+ /* @import "tailwindcss/preflight"; layout got broke here*/
+ @import "tailwindcss/utilities";
+
 
  :root {
    --background: #ffffff;

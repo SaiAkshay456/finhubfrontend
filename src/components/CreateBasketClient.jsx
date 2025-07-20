@@ -52,6 +52,7 @@ export default function CreateBasketClient() {
             const res = await fetch("/api/baskets", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
+                credentials: "include",
                 body: JSON.stringify({ title, description, stockIds, category }),
             });
 
