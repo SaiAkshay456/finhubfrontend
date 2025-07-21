@@ -1,6 +1,6 @@
 
 // import { useAuth } from "../../providers/AuthProvider";
-
+import Sidebar from '../../components/Sidebar';
 // layout.js (server component)
 
 import { sidebarItems } from '../../constants/sidebarRoutes';

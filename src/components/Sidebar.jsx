@@ -12,10 +12,9 @@ export default function Sidebar({ user, children }) {
 
     const toggleSidebar = () => setIsOpen(!isOpen);
 
-    const allowedSidebar = sidebarItems
-        .filter(route =>
-            user?.sidebar?.some(item => item.label === route.label && item.access)
-        )
+    // const allowedSidebar = sidebarItems;
+// or conditionally:
+     const allowedSidebar = sidebarItems
     // .filter(route => route.label !== "Create User"); // hide this Create User 
 
     return (
