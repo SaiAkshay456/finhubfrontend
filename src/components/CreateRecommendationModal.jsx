@@ -25,10 +25,26 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
   const [page, setPage] = useState(1)
 const [hasNext, setHasNext] = useState(false)
 const [hasPrev, setHasPrev] = useState(false)
+const [initialAssets, setInitialAssets] = useState([])
+const [showDropdown, setShowDropdown] = useState(false)
 
+useEffect(() => {
+  if (!isOpen) return;
 
+  const fetchInitialAssets = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/api/mutualfund/list-mf?page=1&limit=50");
+      const result = await res.json();
+      setInitialAssets(result.data);
+    } catch (err) {
+      console.error("Error fetching initial assets:", err);
+    }
+  };
+  fetchInitialAssets();
+},[isOpen])
   useEffect(() => {
     if (!isOpen) return
+    if (!isOpen || !searchTerm) return    
     const controller = new AbortController()
   
     const fetchAssets = async () => {
@@ -39,16 +55,16 @@ const [hasPrev, setHasPrev] = useState(false)
         )
         const result = await res.json()
     
-        console.log("Raw API Data:", result.data)
-    
-        const filtered = searchTerm
-          ? result.data.filter(item =>
-              item.name.toLowerCase().includes(searchTerm.toLowerCase())
-            )
-          : result.data // 
+        // console.log("Raw API Data:", result.data)
+        
+
+        // setAssets(result.data)
+setFilteredAssets(result.data)
+// console.log("searchTerm", searchTerm);
+// console.log("filteredAssets", filteredAssets);
     
         setAssets(result.data)
-        setFilteredAssets(filtered)
+        // setFilteredAssets(filtered)
         setHasNext(result.pagination?.hasNext)
         setHasPrev(result.pagination?.hasPrev)
       } catch (err) {
@@ -67,12 +83,12 @@ const [hasPrev, setHasPrev] = useState(false)
   
 
 
-  useEffect(() => {
-    const filtered = assets.filter(
-      (item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()),
-    )
-    setFilteredAssets(filtered)
-  }, [assets, form.assetType, searchTerm])
+  // useEffect(() => {
+  //   const filtered = assets.filter(
+  //     (item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  //   )
+  //   setFilteredAssets(filtered)
+  // }, [assets, form.assetType, searchTerm])
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -201,44 +217,54 @@ const [hasPrev, setHasPrev] = useState(false)
                 onChange={(e) => {
                   setSearchTerm(e.target.value)
                   setPage(1)
+                  setShowDropdown(false)
                 }}
-                
+                onClick={() => {
+                  if (!searchTerm) {
+                    setShowDropdown(true)
+                  }
+                }}
+                autoComplete="off"
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
                 placeholder="Search for an asset..."
               />
-              {searchTerm && (
-  <div className="absolute top-full left-0 right-0 z-10 mt-1">
-    <ul className="max-h-60 overflow-y-auto bg-white border border-gray-200 rounded-t-xl shadow-lg">
-      {filteredAssets.map((a, i) => (
-        <li
-          key={a._id}
-          className="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-colors duration-150 border-b border-gray-100"
-          onClick={() => handleAssetSelect(a)}
-        >
-          <div className="font-medium text-gray-900">{a.name}</div>
-          {a.sector && <div className="text-sm text-gray-500">{a.sector}</div>}
-        </li>
-      ))}
-    </ul>
-    <div className="flex items-center justify-between px-4 py-2 bg-white border border-t-0 border-gray-200 rounded-b-xl shadow">
-      <button
-        disabled={!hasPrev}
-        onClick={() => setPage(p => Math.max(1, p - 1))}
-        className="text-blue-600 hover:underline disabled:text-gray-400 disabled:cursor-not-allowed"
-      >
-        Prev
-      </button>
-      <button
-        disabled={!hasNext}
-        onClick={() => setPage(p => p + 1)}
-        className="text-blue-600 hover:underline disabled:text-gray-400 disabled:cursor-not-allowed"
-      >
-        Next
-      </button>
-    </div>
-  </div>
-)}
-
+              {(searchTerm || showDropdown) && (
+                <div className="absolute top-full left-0 right-0 z-10 mt-1">
+                  <ul className="max-h-60 overflow-y-auto bg-white border border-gray-200 rounded-t-xl shadow-lg">
+                    {(searchTerm ? filteredAssets : showDropdown ? initialAssets : []).map((a) => (
+                      <li
+                        key={a._id}
+                        className="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-colors duration-150 border-b border-gray-100"
+                        onClick={() => {
+                          handleAssetSelect(a)
+                          setShowDropdown(false)
+                        }}
+                      >
+                        <div className="font-medium text-gray-900">{a.name}</div>
+                        {a.sector && <div className="text-sm text-gray-500">{a.sector}</div>}
+                      </li>
+                    ))}
+                  </ul>
+                  {searchTerm && (hasNext || hasPrev) && (
+                    <div className="flex items-center justify-between px-4 py-2 bg-white border border-t-0 border-gray-200 rounded-b-xl shadow">
+                      <button
+                        disabled={!hasPrev}
+                        onClick={() => setPage((p) => Math.max(1, p - 1))}
+                        className="text-blue-600 hover:underline disabled:text-gray-400 disabled:cursor-not-allowed"
+                      >
+                        Prev
+                      </button>
+                      <button
+                        disabled={!hasNext}
+                        onClick={() => setPage((p) => p + 1)}
+                        className="text-blue-600 hover:underline disabled:text-gray-400 disabled:cursor-not-allowed"
+                      >
+                        Next
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
               {form.name && (
                 <div className="mt-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg">
                   <span className="text-sm font-medium text-blue-800">Selected: {form.name}</span>
