@@ -10,7 +10,7 @@ export default async function EditPage({ params }) {
     let data = null
     let error = null;
     try {
-        const res = await fetch(`http://localhost:3030/api/v1/riskprofile/get/questionarrie-user/${id}`, {
+        const res = await fetch(`http://localhost:3030/v1/riskprofile/get/questionarrie-user/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
             credentials: "include",
             cache: 'no-store'

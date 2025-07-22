@@ -5,6 +5,7 @@ import Link from 'next/link';
 import ToggleUserStatusButton from './ToggleUserStatusButton';
 import { Clock, ListFilter, ChevronDown, User, Mail, Hash } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import axiosInstance from '@/helpers/axios';
 
 
 const getUserStatusLabel = (user) => {
@@ -67,21 +68,18 @@ export default function TableOfUser({ users, questionnaires, token }) {
                 questionnaireId: selectedQuestionnaire,
             }));
 
-            const res = await fetch(
-                'http://localhost:3030/api/v1/riskprofile/send/questionaries-to-users',
+            const { data } = await axiosInstance.post(
+                '/v1/riskprofile/send/questionaries-to-users', { assignments: payload },
                 {
-                    method: 'POST',
+
                     headers: {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${token}`,
                     },
-                    // credentials: 'include',
-                    body: JSON.stringify({ assignments: payload }),
                 }
             );
-
-            const result = await res.json();
-            if (res.ok) {
+            const result = data
+            if (result.success) {
                 setMsg(`Success: ${result.message}`);
                 setSelectedUsers([]);
                 setSelectedQuestionnaire('');

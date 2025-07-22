@@ -7,7 +7,7 @@ import TableOfUser from "@/components/TableOfUser"
 import { ArrowUp, ArrowDown } from "lucide-react" // Using specific icons for percentage change
 export async function fetchQuestionnaires(token) {
     try {
-        const res = await fetch(`http://localhost:3030/api/v1/riskprofile/get/questionarries`, {
+        const res = await fetch(`http://localhost:3030/v1/riskprofile/get/questionarries`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -59,7 +59,7 @@ export default async function AllUsersPage({ searchParams }) {
         const isValidSearch =
             sanitizedSearchTerm.length > 0 && !sanitizedSearchTerm.includes('"') && !sanitizedSearchTerm.includes("'")
         const searchQuery = isValidSearch ? `search=${encodeURIComponent(sanitizedSearchTerm)}&` : ""
-        const apiURL = `http://localhost:3030/api/v1/users/get-all-users?${searchQuery}page=${currentPage}&limit=${limit}`
+        const apiURL = `http://localhost:3030/v1/users/get-all-users?${searchQuery}page=${currentPage}&limit=${limit}`
         const res = await fetch(apiURL, {
             method: "GET",
             headers: {

@@ -90,7 +90,7 @@ export default function UpdateQuestionnaireForm({ questionnaire, token }) {
         if (!isValidForm()) return;
 
         try {
-            const res = await fetch(`http://localhost:3030/api/v1/riskprofile/update/questionarrie/${questionnaire._id}`, {
+            const res = await fetch(`http://localhost:3030/v1/riskprofile/update/questionarrie/${questionnaire._id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

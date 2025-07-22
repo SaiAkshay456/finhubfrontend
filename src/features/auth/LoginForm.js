@@ -25,7 +25,7 @@ export default function LoginForm() {
 
         try {
             const res = await axios.post(
-                'http://localhost:3030/api/v1/auth/login',
+                'http://localhost:3030/v1/auth/login',
                 form,
                 {
                     headers: {

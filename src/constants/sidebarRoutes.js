@@ -124,7 +124,7 @@ export const sidebarItems = [
 // };
 // export async function fetchQuestionnaires(token) {
 //     try {
-//         const res = await fetch(`http://localhost:3030/api/v1/riskprofile/get/questionarries`, {
+//         const res = await fetch(`http://localhost:3030/v1/riskprofile/get/questionarries`, {
 //             headers: {
 //                 Authorization: `Bearer ${token}`,
 //             },
@@ -173,7 +173,7 @@ export const sidebarItems = [
 
 //         const searchQuery = isValidSearch ? `search=${sanitizedSearchTerm}&` : '';
 
-//         const apiURL = `http://localhost:3030/api/v1/users/get-all-users?${searchQuery}page=${currentPage}&limit=${limit}`;
+//         const apiURL = `http://localhost:3030/v1/users/get-all-users?${searchQuery}page=${currentPage}&limit=${limit}`;
 
 //         const res = await fetch(apiURL, {
 //             method: 'GET',

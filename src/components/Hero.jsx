@@ -15,7 +15,7 @@
 //     const handleLogout = async () => {
 //         setIsLoggingOut(true);
 //         try {
-//             await axios.get('http://localhost:3030/api/v1/auth/logout', {
+//             await axios.get('http://localhost:3030/v1/auth/logout', {
 //                 withCredentials: true,
 //             });
 //             setUser(null);
@@ -83,7 +83,7 @@ export function Hero() {
     const handleLogout = async () => {
         setIsLoggingOut(true);
         try {
-            await axios.get('http://localhost:3030/api/v1/auth/logout', {
+            await axios.get('http://localhost:3030/v1/auth/logout', {
                 withCredentials: true,
             });
             setUser(null);

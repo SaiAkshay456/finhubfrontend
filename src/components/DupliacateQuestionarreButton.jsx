@@ -10,7 +10,7 @@ export default function DupliacateQuestionarreButton({ questionId }) {
 
     const handleDuplicate = async () => {
         try {
-            const res = await fetch(`http://localhost:3030/api/v1/riskprofile/duplicate-questionarre/${questionId}`, {
+            const res = await fetch(`http://localhost:3030/v1/riskprofile/duplicate-questionarre/${questionId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

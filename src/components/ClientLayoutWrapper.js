@@ -26,28 +26,20 @@
 
 //     );
 // }
-// the above is for /login no landing
+// the above is for /login no landing page
 
 'use client';
 import { useAuth } from '@/providers/AuthProvider';
 import Sidebar from './Sidebar';
 
-export default function ClientLayoutWrapper({ children }) {
+export default function ClientLayoutWrapper({ children, token }) {
     const { isAuthorized, user } = useAuth();
 
     if (!isAuthorized) {
-        // No sidebar for unauthorized users
-        return <>{children}</>;
+        return <>{children}</>; // No sidebar for unauthorized users
     }
-
     // Show sidebar for all pages when authorized
     return (
-        // <div className="flex h-screen">
-        //     <Sidebar user={user} />
-        //     <main className="flex-1 p-6 overflow-y-auto">
-        //         {children}
-        //     </main>
-        // </div>
         <div className="flex h-screen w-screen overflow-hidden">
             <Sidebar user={user} />
             <main className="flex-1 overflow-y-auto">

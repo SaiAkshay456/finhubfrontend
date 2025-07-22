@@ -13,7 +13,7 @@ export default async function UserDetailsPage({ params }) {
 
     try {
         loading = true;
-        const res = await fetch(`http://localhost:3030/api/v1/adminuse/users/${id}`, {
+        const res = await fetch(`http://localhost:3030/v1/users/user/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
             cache: "no-store",
         });

@@ -1,4 +1,5 @@
 'use client';
+import axiosInstance from '@/helpers/axios';
 import { useState } from 'react';
 
 export default function CreateUserForm() {
@@ -141,36 +142,29 @@ export default function CreateUserForm() {
         e.preventDefault();
         if (validateStep2()) {
             try {
-                const res = await fetch('http://localhost:3030/api/v1/adminuse/create-user', {
-                    method: 'POST',
+                const { data } = await axiosInstance.post('/v1/users/create-user', form, {
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(form),//also other way Authorizaton Bearer
-                    credentials: "include",
                 });
-
-                const data = await res.json();
                 setMsg(data.message);
-
-                if (res.ok) {
-                    setForm({
-                        username: '',
-                        email: '',
-                        password: '',
-                        phoneNumber: '',
-                        role: 'user',
-                        gender: '',
-                        sidebar: [
-                            { label: 'Users', access: false },
-                            { label: 'Dashboard', access: false },
-                            { label: 'Create User', access: false },
-                            { label: 'Model Basket', access: false },
-                            { label: 'KYC Verification', access: false }
-                        ]
-                    });
-                    setErrors({});
-                    setStep(1);
-                }
-            } catch (err) {
+                setForm({
+                    username: '',
+                    email: '',
+                    password: '',
+                    phoneNumber: '',
+                    role: 'user',
+                    gender: '',
+                    sidebar: [
+                        { label: 'Users', access: false },
+                        { label: 'Dashboard', access: false },
+                        { label: 'Create User', access: false },
+                        { label: 'Model Basket', access: false },
+                        { label: 'KYC Verification', access: false }
+                    ]
+                });
+                setErrors({});
+                setStep(1);
+            }
+            catch (err) {
                 console.error(err);
                 setMsg(err.response?.data?.message || 'An unknown error occurred');
             }

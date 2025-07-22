@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import PaginationLayout from '../../components/PaginationLayout';
 import BasketListClient from '../../components/BasketListClient';
 import BasketModalTrigger from '@/components/BasketModalTrigger';
+import axiosInstance from '@/helpers/axios';
 
 export default async function BasketsPage({ searchParams }) {
     const search = searchParams?.search || '';
@@ -16,20 +17,21 @@ export default async function BasketsPage({ searchParams }) {
     let totalCount = 0;
 
     if (search.trim()) {
-        const res = await fetch(
-            `http://localhost:3030/api/v1/model-basket/get-baskets?search=${search}&limit=${limit}&page=${page}`,
-            {
-                headers: { Authorization: `Bearer ${token}` },
-                cache: 'no-store',
-            }
-        );
-
-        if (res.ok) {
-            const data = await res.json();
+        try {
+            const { data } = await axiosInstance.get(
+                `/v1/model-basket/get-baskets?search=${search}&limit=${limit}&page=${page}`,
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
             baskets = data.baskets || [];
             totalCount = data.totalCount || 0;
         }
+        catch (err) {
+            console.log(err)
+        }
     }
+
 
     const totalPages = Math.ceil(totalCount / limit);
 

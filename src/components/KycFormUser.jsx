@@ -42,7 +42,7 @@ export default function KycFormUser({ userId, token }) {
             formPayload.append('address', formData.address);
             formPayload.append('aadharFile', formData.aadharFile);
             formPayload.append('panFile', formData.panFile);
-            const res = await axios.put(`http://localhost:3030/api/v1/adminuse/users/kyc-form-submit/${userId}`,
+            const res = await axios.put(`http://localhost:3030/v1/users/user/kyc-form-submit/${userId}`,
                 formPayload
                 , {
                     headers: {

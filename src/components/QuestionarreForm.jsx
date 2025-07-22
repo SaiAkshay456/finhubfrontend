@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { recommendedQuestions } from '@/constants/predefinedQuestions';
+import axiosInstance from '@/helpers/axios';
 
 export default function QuestionnaireForm() {
     const [title, setTitle] = useState("")
@@ -99,14 +100,11 @@ export default function QuestionnaireForm() {
         if (!isValidForm()) return;
 
         try {
-            const res = await fetch('http://localhost:3030/api/v1/riskprofile/create-questionarre', {
-                method: 'POST',
+            const { data } = await axiosInstance.post('/v1/riskprofile/create-questionarre', { questions, title }, {
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ questions, title }),
-                credentials: "include"
             });
 
-            if (res.ok) {
+            if (data.success) {
                 setMsg("✅ Questionnaire Created!");
                 setQuestions([{ text: '', options: [{ label: '' }] }]);
                 setCurrentSlide(0);

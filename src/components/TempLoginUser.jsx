@@ -10,7 +10,7 @@
 //     const handleSubmit = async (e) => {
 //         e.preventDefault();
 //         try {
-//             const res = await fetch('http://localhost:3030/api/v1/response-login/login-user', {
+//             const res = await fetch('http://localhost:3030/v1/response-login/login-user', {
 //                 method: 'POST',
 //                 headers: { 'Content-Type': 'application/json' },
 //                 credentials: 'include',
@@ -75,7 +75,7 @@ export default function TempLoginUser({ tokenId }) {
         setError('');
 
         try {
-            const res = await fetch('http://localhost:3030/api/v1/response-login/login-user', {
+            const res = await fetch('http://localhost:3030/v1/response-login/login-user', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',

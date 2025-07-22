@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-export default function AssignRiskCategory({ userId }) {
+export default function AssignRiskCategory({ userId, token }) {
     const [riskCategory, setRiskCategory] = useState('');
     const [msg, setMsg] = useState('');
     const [loading, setLoading] = useState(false);
@@ -16,9 +16,12 @@ export default function AssignRiskCategory({ userId }) {
 
         try {
             setLoading(true);
-            const res = await fetch(`http://localhost:3030/api/v1/riskprofile/assign-risk-category/${userId}`, {
+            const res = await fetch(`http://localhost:3030/v1/riskprofile/assign-risk-category/${userId}`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json', Authorization: `Bearer ${token}`
+
+                },
                 body: JSON.stringify({ riskCategory }),
                 credentials: 'include',
             });

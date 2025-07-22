@@ -4,7 +4,7 @@ import TempLoginUser from "../../../components/TempLoginUser";
 
 export async function getExpiryOfUUID(id) {
     try {
-        const res = await fetch(`http://localhost:3030/api/v1/response/fill-response/${id}`, {
+        const res = await fetch(`http://localhost:3030/v1/response/fill-response/${id}`, {
             credentials: "include",
             cache: "no-store",
         });
@@ -18,7 +18,7 @@ export async function getExpiryOfUUID(id) {
 }
 export async function getQuestionsById(questionnaireId) {
     try {
-        const res = await fetch(`http://localhost:3030/api/v1/response/get/questionarrie/${questionnaireId}`, {
+        const res = await fetch(`http://localhost:3030/v1/response/get/questionarrie/${questionnaireId}`, {
             credentials: "include",
             cache: "no-store",
         });

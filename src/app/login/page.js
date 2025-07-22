@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../../providers/AuthProvider';
 import axios from 'axios';
 import { Mail, Lock, EyeOff, Info, Eye } from "lucide-react";
+import axiosInstance from '@/helpers/axios';
 
 export default function LoginForm() {
     const { setUser, setIsAuthorized } = useAuth();
@@ -23,14 +24,13 @@ export default function LoginForm() {
         setIsLoading(true);
 
         try {
-            const res = await axios.post(
-                'http://localhost:3030/api/v1/auth/login',
+            const res = await axiosInstance.post(
+                '/v1/auth/login',
                 form,
                 {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    withCredentials: true,
                 }
             );
 
@@ -44,7 +44,6 @@ export default function LoginForm() {
             const callbackUrl = getCookie('callBackUrl') || "/";
             console.log(callbackUrl, "line 50");
             localStorage.setItem('clearCallBackCookie', 'true');
-
             // Redirect to the stored callback URL
             router.replace(callbackUrl);
             setIsLoading(false)

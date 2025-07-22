@@ -18,7 +18,7 @@ export default function ResponseUser({ questions, questionarieId, userId, tokenI
         e.preventDefault();
         setIsSubmitting(true);
         try {
-            const { data } = await axios.post("http://localhost:3030/api/v1/response/submit-response", {
+            const { data } = await axios.post("http://localhost:3030/v1/response/submit-response", {
                 userId,
                 questionarieId,
                 responses,
