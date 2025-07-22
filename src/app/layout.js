@@ -35,7 +35,7 @@ export default async function RootLayout({ children }) {
   let isAuthorized = false;
   if (token) {
     try {
-      const res = await fetch("http://localhost:3030/api/v1/auth/user/me", {
+      const res = await fetch("http://localhost:3030/v1/auth/login", {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
