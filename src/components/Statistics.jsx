@@ -46,7 +46,7 @@ export default function Statistics() {
                 {/* Total Customers Card */}
                 <div className={`rounded-xl p-4 flex flex-col justify-between border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                     <div className={`flex items-center ${darkMode ? 'text-gray-400' : 'text-gray-500'} text-sm mb-2`}>
-                        <Users className="h-4 w-4 mr-2" /> Total customers
+                        <Users className="h-4 w-4 mr-2" /> PF Value
                     </div>
                     <div className="flex items-center">
                         <span className="text-2xl font-bold mr-2">567,89</span>
@@ -58,7 +58,7 @@ export default function Statistics() {
                 {/* Total Revenue Card */}
                 <div className={`rounded-xl p-4 flex flex-col justify-between border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                     <div className={`flex items-center ${darkMode ? 'text-gray-400' : 'text-gray-500'} text-sm mb-2`}>
-                        <DollarSign className="h-4 w-4 mr-2" /> Total revenue
+                        <DollarSign className="h-4 w-4 mr-2" /> Invested
                     </div>
                     <div className="flex items-center">
                         <span className="text-2xl font-bold mr-2">$3.46M</span>
@@ -70,19 +70,19 @@ export default function Statistics() {
                 {/* Total Orders Card */}
                 <div className={`rounded-xl p-4 flex flex-col justify-between border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                     <div className={`flex items-center ${darkMode ? 'text-gray-400' : 'text-gray-500'} text-sm mb-2`}>
-                        <ShoppingBag className="h-4 w-4 mr-2" /> Total orders
+                        <ShoppingBag className="h-4 w-4 mr-2" /> Gain %
                     </div>
                     <div className="flex items-center">
-                        <span className="text-2xl font-bold mr-2">1,1 M</span>
+                        <span className="text-2xl font-bold mr-2">16 %</span>
                         <TrendingDown className="h-4 w-4 text-red-400 mr-1" />
-                        <span className="text-red-400 text-sm">0.2 %</span>
+                        <span className="text-red-400 text-sm">6.2 %</span>
                     </div>
                 </div>
 
                 {/* Total Returns Card */}
                 <div className={`rounded-xl p-4 flex flex-col justify-between border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                     <div className={`flex items-center ${darkMode ? 'text-gray-400' : 'text-gray-500'} text-sm mb-2`}>
-                        <RefreshCcw className="h-4 w-4 mr-2" /> Total returns
+                        <RefreshCcw className="h-4 w-4 mr-2" /> XIHHR %
                     </div>
                     <div className="flex items-center">
                         <span className="text-2xl font-bold mr-2">1,789</span>
@@ -101,7 +101,7 @@ export default function Statistics() {
             {/* Product Sales Chart */}
             <div className={`rounded-xl p-6 mb-8 border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                 <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold">Product sales</h2>
+                    <h2 className="text-xl font-bold">Portfolio Growth</h2>
                     <div className="flex items-center space-x-4 text-sm">
                         <div className="flex items-center">
                             <Circle className="h-3 w-3 fill-blue-500 text-blue-500 mr-1" /> Gross margin
@@ -181,7 +181,7 @@ export default function Statistics() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Sales by Product Category */}
                 <div className={`rounded-xl p-6 border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                    <h2 className="text-xl font-bold mb-6">Sales by product category</h2>
+                    <h2 className="text-xl font-bold mb-6">Portfolio across countries</h2>
                     <div className="flex flex-col md:flex-row items-center justify-center gap-6">
                         {/* Pie Chart */}
                         <div className="relative w-48 h-48 flex items-center justify-center">
@@ -220,7 +220,7 @@ export default function Statistics() {
 
                 {/* Sales by Countries */}
                 <div className={`rounded-xl p-6 border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                    <h2 className="text-xl font-bold mb-6">Sales by countries</h2>
+                    <h2 className="text-xl font-bold mb-6">Investments by countries</h2>
                     <div className="space-y-3">
                         <div className="flex items-center justify-between text-sm">
                             <div className="flex items-center">

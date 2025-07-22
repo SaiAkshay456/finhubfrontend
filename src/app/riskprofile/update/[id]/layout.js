@@ -8,7 +8,7 @@ export const metadata = {
     description: "Browse and add user here",
 };
 export default async function Layout({ children }) {
-    return <main className="min-h-screen flex justify-center items-center">
+    return <main className="min-h-screen px-4 py-8 bg-gray-50">
         {children}
     </main>
 }

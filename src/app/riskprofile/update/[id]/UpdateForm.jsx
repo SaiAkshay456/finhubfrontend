@@ -10,6 +10,19 @@ export default function UpdateQuestionnaireForm({ questionnaire, token }) {
     const [msg, setMsg] = useState('');
     const [title, setTitle] = useState(questionnaire.title);
     const router = useRouter();
+    const [suggestions, setSuggestions] = useState([]);
+
+    const handleQuestionChange = (index, value) => {
+        const updated = [...questions];
+        updated[index].text = value;
+        setQuestions(updated);
+
+        const input = value.toLowerCase();
+        const matches = recommendedQuestions.filter(
+            (q) => q.toLowerCase().includes(input) && input.length > 0
+        );
+        setSuggestions(matches);
+    };
 
     const isValidForm = () => {
         for (let i = 0; i < questions.length; i++) {
@@ -46,12 +59,13 @@ export default function UpdateQuestionnaireForm({ questionnaire, token }) {
         setCurrentSlide(Math.min(currentSlide, updated.length - 1));
         setMsg('');
     };
-
-    const handleQuestionChange = (index, value) => {
+    const applySuggestion = (suggestion) => {
         const updated = [...questions];
-        updated[index].text = value;
+        updated[currentSlide].text = suggestion;
         setQuestions(updated);
+        setSuggestions([]); // Hide suggestions
     };
+
 
     const addOption = (qIndex) => {
         const updated = [...questions];
@@ -112,10 +126,10 @@ export default function UpdateQuestionnaireForm({ questionnaire, token }) {
     };
 
     return (
-        <div className="min-h-screen p-4 md:p-8">
-            <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
+        <div className="min-h-screen p-4 md:p-8 bg-gray-50">
+            <div className="max-w-3xl w-full mx-auto bg-white rounded-xl shadow-md overflow-hidden">
                 {/* Header */}
-                <div className="bg-purple-600 px-6 py-4">
+                <div className="bg-gradient-to-r from-[#00d09c] to-[#00b98b] px-6 py-4">
                     <h1 className="text-xl font-bold text-white">Update Questionnaire</h1>
                 </div>
 
@@ -140,7 +154,7 @@ export default function UpdateQuestionnaireForm({ questionnaire, token }) {
                                     type="button"
                                     onClick={() => setCurrentSlide(index)}
                                     className={`px-4 py-3 text-sm font-medium border-b-2 ${currentSlide === index
-                                        ? 'border-purple-500 text-purple-600'
+                                        ? 'border-teal-500 text-teal-600'
                                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                         }`}
                                 >
@@ -150,7 +164,7 @@ export default function UpdateQuestionnaireForm({ questionnaire, token }) {
                             <button
                                 type="button"
                                 onClick={addQuestion}
-                                className="px-4 py-3 text-sm font-medium text-purple-600 hover:text-purple-800 flex items-center"
+                                className="px-4 py-3 text-sm font-medium text-teal-600 hover:text-purple-800 flex items-center"
                             >
                                 <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -177,15 +191,31 @@ export default function UpdateQuestionnaireForm({ questionnaire, token }) {
                                 </button>
                             )}
                         </div>
+                        <div className="mb-6 relative">
+                            <input
+                                type="text"
+                                value={questions[currentSlide].text}
+                                onChange={(e) => handleQuestionChange(currentSlide, e.target.value)}
+                                placeholder="Enter your question"
+                                className="w-full px-4 py-2 text-gray-800 border-b-2 border-gray-200 focus:border-teal-500 focus:outline-none"
+                                required
+                                autoFocus
+                            />
+                            {suggestions.length > 0 && (
+                                <ul className="absolute left-0 right-0 bg-white border border-gray-200 rounded-md shadow-md mt-1 max-h-60 overflow-y-auto z-20">
+                                    {suggestions.map((sugg, i) => (
+                                        <li
+                                            key={i}
+                                            onClick={() => applySuggestion(sugg)}
+                                            className="px-4 py-2 hover:bg-gray-100 text-sm cursor-pointer"
+                                        >
+                                            {sugg}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
 
-                        <input
-                            type="text"
-                            value={questions[currentSlide]?.text || ''}
-                            onChange={(e) => handleQuestionChange(currentSlide, e.target.value)}
-                            placeholder="Enter your question"
-                            className="w-full px-4 py-2 mb-6 text-gray-800 border-b-2 border-gray-200 focus:border-purple-500 focus:outline-none"
-                            required
-                        />
 
                         {/* Options */}
                         <div className="space-y-3">
@@ -220,7 +250,7 @@ export default function UpdateQuestionnaireForm({ questionnaire, token }) {
                             <button
                                 type="button"
                                 onClick={() => addOption(currentSlide)}
-                                className="mt-3 flex items-center text-sm text-purple-600 hover:text-purple-800"
+                                className="mt-3 flex items-center text-sm text-teal-600 hover:text-teal-800"
                             >
                                 <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -237,21 +267,21 @@ export default function UpdateQuestionnaireForm({ questionnaire, token }) {
                                 type="button"
                                 onClick={prevSlide}
                                 disabled={currentSlide === 0}
-                                className={`px-4 py-2 rounded-md ${currentSlide === 0 ? 'text-gray-400 cursor-not-allowed' : 'text-purple-600 hover:bg-purple-50'}`}
+                                className={`px-4 py-2 rounded-md ${currentSlide === 0 ? 'text-gray-400 cursor-not-allowed' : 'text-teal-600 hover:bg-purple-50'}`}
                             >
                                 Previous
                             </button>
                             <button
                                 type="button"
                                 onClick={nextSlide}
-                                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md"
+                                className="px-4 py-2 bg-black hover:bg-purple-700 text-white rounded-md"
                             >
                                 {currentSlide === questions.length - 1 ? 'Add Question' : 'Next'}
                             </button>
                         </div>
                         <button
                             type="submit"
-                            className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md shadow-sm"
+                            className="px-6 py-2 bg-gradient-to-r from-[#00d09c] to-[#00b98b] hover:bg-green-700 text-white rounded-md shadow-sm"
                         >
                             Update Questionnaire
                         </button>

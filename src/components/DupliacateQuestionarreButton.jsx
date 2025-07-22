@@ -46,7 +46,7 @@ export default function DupliacateQuestionarreButton({ questionId }) {
         <button
             onClick={handleDuplicate}
             disabled={isPending}
-            className="px-3 py-1 text-sm font-medium rounded-md text-white bg-black hover:bg-purple-700 transition"
+            className="px-3 py-1 text-sm font-medium rounded-md text-white bg-black hover:opacity-120 transition"
         >
             {isPending ? 'Duplicating...' : 'Duplicate'}
         </button>

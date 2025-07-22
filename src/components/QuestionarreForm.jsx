@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { recommendedQuestions } from '@/constants/predefinedQuestions';
 
 export default function QuestionnaireForm() {
+    const [title, setTitle] = useState("")
     const [questions, setQuestions] = useState([
         { text: '', options: [{ label: '' }] }
     ]);
@@ -101,7 +102,7 @@ export default function QuestionnaireForm() {
             const res = await fetch('http://localhost:3030/api/v1/riskprofile/create-questionarre', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ questions }),
+                body: JSON.stringify({ questions, title }),
                 credentials: "include"
             });
 
@@ -131,8 +132,9 @@ export default function QuestionnaireForm() {
     };
 
     return (
-        <div className="min-h-screen p-4 md:p-8">
-            <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
+        <div className="min-h-screen p-4 md:p-8 bg-gray-50">
+            <div className="max-w-3xl w-full mx-auto bg-white rounded-xl shadow-md overflow-hidden">
+
                 {/* Header */}
                 <div className="bg-gradient-to-r from-[#00d09c] to-[#00b98b] px-6 py-4">
                     <h1 className="text-xl font-bold text-white">Risk Assessment Questionnaire</h1>
@@ -156,6 +158,16 @@ export default function QuestionnaireForm() {
                     )}
 
                     {/* Tabs */}
+                    <div className="p-6">
+                        <input
+                            type="text"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            placeholder="Questionnaire Title"
+                            className="w-full px-4 py-2 mb-4 text-gray-800 border-b-2 border-gray-200 focus:border-purple-500 focus:outline-none"
+                            required
+                        />
+                    </div>
                     <div className="border-b border-gray-200">
                         <div className="flex overflow-x-auto">
                             {questions.map((_, index) => (
@@ -213,7 +225,7 @@ export default function QuestionnaireForm() {
                                 autoFocus
                             />
                         </div> */}
-                        <div className="mb-6">
+                        <div className="mb-6 relative">
                             <input
                                 type="text"
                                 value={questions[currentSlide].text}
@@ -223,9 +235,8 @@ export default function QuestionnaireForm() {
                                 required
                                 autoFocus
                             />
-
                             {suggestions.length > 0 && (
-                                <ul className="bg-white border border-gray-200 rounded-md shadow-md mt-1 max-h-60 overflow-y-auto z-20 absolute w-full">
+                                <ul className="absolute left-0 right-0 bg-white border border-gray-200 rounded-md shadow-md mt-1 max-h-60 overflow-y-auto z-20">
                                     {suggestions.map((sugg, i) => (
                                         <li
                                             key={i}

@@ -30,9 +30,6 @@ export default async function EditPage({ params }) {
     console.log(data.questions)//once clg and see
     const questionnaire = data.questions
     return (
-        <div className="max-w-4xl mx-auto mt-10">
-            <h1 className="text-2xl font-bold mb-4">Edit Questionnaire</h1>
-            <UpdateQuestionnaireForm questionnaire={questionnaire} token={token} id={id} />
-        </div>
+        <UpdateQuestionnaireForm questionnaire={questionnaire} token={token} />
     );
 }

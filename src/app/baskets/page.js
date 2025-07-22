@@ -1,7 +1,6 @@
 import BasketSearchDebounce from '../../components/BasketSearchDebounce';
 import { cookies } from 'next/headers';
 import PaginationLayout from '../../components/PaginationLayout';
-// import LinkComponent from '../../components/LinkComponent';
 import BasketListClient from '../../components/BasketListClient';
 import BasketModalTrigger from '@/components/BasketModalTrigger';
 

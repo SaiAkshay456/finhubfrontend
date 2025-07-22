@@ -6,14 +6,27 @@ export default async function UpdateUserPage({ params }) {
     const token1 = await cookies()
     const token = token1.get('token')?.value;
     if (!token) redirect('/login');
-    const { id } = await params;
+    const { id } = params;
+    let loading = false;
+    let data = null;
+    try {
+        loading = true;
+        const res = await fetch(`http://localhost:3030/api/v1/adminuse/users/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+            cache: "no-store",
+        });
+        data = await res.json();
+        loading = false;
+    } catch (err) {
+        loading = false
+        console.log(err);
+    }
 
-    const res = await fetch(`http://localhost:3030/api/v1/adminuse/users/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-        cache: "no-store",
-    });
-
-    const data = await res.json();
+    if (loading) {
+        return <div className="flex items-center justify-center h-screen">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+        </div>
+    }
 
     if (!data.success) {
         return (
