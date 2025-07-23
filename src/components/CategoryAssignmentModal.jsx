@@ -389,7 +389,7 @@ export default function CategoryAssignmentModal({
                                     onChange={handleChange}
                                     placeholder="Search AMFI category name..."
                                     list="categories"
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 transition"
                                     required
                                 />
                                 <datalist id="categories">
@@ -415,7 +415,7 @@ export default function CategoryAssignmentModal({
                             name="assetClass"
                             value={form.assetClass}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 transition"
                             required
                             disabled={loadingStates.assetClasses}
                         >
@@ -446,7 +446,7 @@ export default function CategoryAssignmentModal({
                             name="route"
                             value={form.route}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 transition"
                             required
                             disabled={
                                 !form.assetClassId || loadingStates.routes
@@ -479,7 +479,7 @@ export default function CategoryAssignmentModal({
                             name="instrumentCategory"
                             value={form.instrumentCategory}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 transition"
                             required
                             disabled={
                                 !form.routeId ||
@@ -530,8 +530,8 @@ export default function CategoryAssignmentModal({
                                 !form.assetClass ||
                                 !form.route ||
                                 !form.instrumentCategory
-                                    ? 'bg-blue-400 cursor-not-allowed'
-                                    : 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'
+                                    ? 'bg-emerald-400 cursor-not-allowed'
+                                    : 'bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-500'
                             }`}
                         >
                             {loading ? 'Linking...' : 'Link Category'}

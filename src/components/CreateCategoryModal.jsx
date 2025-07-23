@@ -163,7 +163,7 @@ export default function CreateCategoryModal({ isOpen, onClose, onCreated }) {
 
             const data = res.data
 
-            if (res.status === 200) {
+            if (res.status === 200 || res.status === 201) {
                 onCreated?.()
                 onClose()
                 // Reset form
@@ -229,7 +229,7 @@ export default function CreateCategoryModal({ isOpen, onClose, onCreated }) {
                                 name="assetClassId"
                                 value={form.assetClassId}
                                 onChange={handleAssetClassChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
                                 required
                             >
                                 <option value="">Select Asset Class</option>
@@ -254,7 +254,7 @@ export default function CreateCategoryModal({ isOpen, onClose, onCreated }) {
                                 value={form.routeID}
                                 onChange={handleRouteChange}
                                 disabled={!form.assetClassId || fetchingRoutes}
-                                className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition ${
+                                className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition ${
                                     !form.assetClassId || fetchingRoutes
                                         ? 'bg-gray-100 cursor-not-allowed opacity-60'
                                         : ''
@@ -291,7 +291,7 @@ export default function CreateCategoryModal({ isOpen, onClose, onCreated }) {
                                 onChange={handleChange}
                                 disabled={isNameDisabled}
                                 placeholder="Enter category name"
-                                className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition ${
+                                className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition ${
                                     isNameDisabled
                                         ? 'bg-gray-100 cursor-not-allowed opacity-60'
                                         : ''
@@ -313,7 +313,7 @@ export default function CreateCategoryModal({ isOpen, onClose, onCreated }) {
                                     onChange={handleChange}
                                     placeholder="Min"
                                     step="0.01"
-                                    className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                    className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
                                 />
                                 <input
                                     type="number"
@@ -322,7 +322,7 @@ export default function CreateCategoryModal({ isOpen, onClose, onCreated }) {
                                     onChange={handleChange}
                                     placeholder="Max"
                                     step="0.01"
-                                    className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                    className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
                                 />
                             </div>
                         </div>
@@ -350,8 +350,8 @@ export default function CreateCategoryModal({ isOpen, onClose, onCreated }) {
                                 !form.assetClass ||
                                 !form.routeID ||
                                 !form.name
-                                    ? 'bg-blue-400 cursor-not-allowed'
-                                    : 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'
+                                    ? 'bg-emerald-400 cursor-not-allowed'
+                                    : 'bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-500'
                             }`}
                         >
                             {loading ? 'Creating...' : 'Create Category'}

@@ -208,7 +208,7 @@ export default function CategoryManagement() {
                     </h1>
                     <button
                         onClick={() => setIsCreateModalOpen(true)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer"
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer"
                     >
                         Create Category
                     </button>
@@ -445,7 +445,7 @@ export default function CategoryManagement() {
                                                     >
                                                         Delete
                                                     </button>
-                                                    <button
+                                                    {/* <button
                                                         onClick={() => {
                                                             // Add assignment/reassignment logic here
                                                             console.log(
@@ -465,7 +465,7 @@ export default function CategoryManagement() {
                                                         {getActionButtonText(
                                                             category
                                                         )}
-                                                    </button>
+                                                    </button> */}
                                                 </div>
                                             </td>
                                         </tr>

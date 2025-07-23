@@ -8,7 +8,7 @@ const CustomButtonComponent = ({ item, onAssign }) => {
     return (
         <button
             onClick={() => onAssign(item)}
-            className="text-blue-600 hover:text-blue-800 font-medium transition-colors cursor-pointer"
+            className="text-emerald-600 hover:text-emerald-800 font-medium transition-colors cursor-pointer"
         >
             Assign
         </button>
@@ -248,7 +248,7 @@ export default function CategoryAssignment() {
                     </h1>
                     <button
                         onClick={handleBigAssignClick}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer"
+                        className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer"
                     >
                         {getCurrentButtonText()}
                     </button>
@@ -276,7 +276,7 @@ export default function CategoryAssignment() {
                                     placeholder="Search categories..."
                                     value={searchTerm}
                                     onChange={handleSearchChange}
-                                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600"
                                 />
                             </div>
                         </div>
@@ -414,7 +414,7 @@ export default function CategoryAssignment() {
                                                                         className={`px-2 py-1 text-xs font-semibold rounded-full ${
                                                                             item.marketCap ===
                                                                             'Large Cap'
-                                                                                ? 'text-blue-800 bg-blue-100'
+                                                                                ? 'text-emerald-800 bg-emerald-100'
                                                                                 : item.marketCap ===
                                                                                   'Mid Cap'
                                                                                 ? 'text-yellow-800 bg-yellow-100'

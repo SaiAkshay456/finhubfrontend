@@ -81,7 +81,7 @@ export default function CreateRouteModal({ isOpen, onClose, onCreated }) {
 
             const data = res.data
 
-            if (res.status === 200) {
+            if (res.status === 200 || res.status === 201) {
                 onCreated?.()
                 onClose()
                 // Reset form
@@ -139,7 +139,7 @@ export default function CreateRouteModal({ isOpen, onClose, onCreated }) {
                                 name="assetClassId"
                                 value={form.assetClassId}
                                 onChange={handleAssetClassChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
                                 required
                             >
                                 <option value="">Select Asset Class</option>
@@ -165,7 +165,7 @@ export default function CreateRouteModal({ isOpen, onClose, onCreated }) {
                                 value={form.name}
                                 onChange={handleChange}
                                 placeholder="Enter route name"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
                                 required
                             />
                         </div>
@@ -185,8 +185,8 @@ export default function CreateRouteModal({ isOpen, onClose, onCreated }) {
                             disabled={loading || !form.assetClass || !form.name}
                             className={`px-6 py-3 rounded-lg font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 transition ${
                                 loading || !form.assetClass || !form.name
-                                    ? 'bg-blue-400 cursor-not-allowed'
-                                    : 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'
+                                    ? 'bg-emerald-400 cursor-not-allowed'
+                                    : 'bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-500'
                             }`}
                         >
                             {loading ? 'Creating...' : 'Create Route'}
