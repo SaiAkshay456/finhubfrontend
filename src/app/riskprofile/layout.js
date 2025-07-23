@@ -2,16 +2,15 @@
 import { sidebarItems } from '../../constants/sidebarRoutes';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import axiosInstance from '@/helpers/axios';
 
-export default async function RiskProfileLayout({ children }) {
+export default async function BasketLayout({ children }) {
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
 
     if (!token) {
         redirect('/login');
     }
-
-    // Get current path from pathname (can also be hardcoded per layout)
     const currentPath = '/riskprofile'; // or get from route segment
 
     // Find label based on current path
@@ -23,24 +22,26 @@ export default async function RiskProfileLayout({ children }) {
     }
 
     // Send label to backend to check access
-    const res = await fetch('http://localhost:3030/api/v1/permission-route/check-access', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-        },
-        credentials: 'include',
-        body: JSON.stringify({ path: label }),
-        cache: 'no-store',
-    });
+    try {
+        const { data } = await axiosInstance.post('/v1/permission-route/check-access', { path: label }, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
 
-    const data = await res.json();
-
-    if (!data.success) {
-        redirect('/unauthorized');
+        if (!data.success) {
+            redirect('/unauthorized');
+        }
+    } catch (err) {
+        if (err.response?.status === 401) {
+            redirect('/unauthorized');
+        } else {
+            console.error('Access check failed:', err);
+        }
     }
 
-    return <main className="min-h-screen flex justify-center items-center">
+    return <main className="min-h-screen">
         {children}
     </main>
 }

@@ -1,26 +1,710 @@
-@import "tailwindcss";
+ @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+ /* @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"); */
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+ /* Your provided imports and root variables */
+ /* @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"); */
+
+
+
+ /* @import "tailwindcss";
+
+
+
+ /* @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"); */
+
+ /* Your provided imports and root variables */
+ /* @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"); */
+
+ /* @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"); */
+
+ /* Tailwind CSS directives - ESSENTIAL for Tailwind to work */
+
+ /* @import "tailwindcss/preflight"; layout got broke here*/
+ @import "tailwindcss/utilities";
+
+
+
+ :root {
+   --background: #ffffff;
+   --foreground: #171717;
+
+   /* Global UI colors */
+   --page-bg: #f8f9fa;
+   /* Light gray background for the entire page */
+   --card-bg: #ffffff;
+   /* Pure white for cards/containers */
+   --border-color: #e5e7eb;
+   /* Light gray border for elements */
+   --text-primary: #1f2937;
+   /* Dark text for titles and main content */
+   --text-muted: #6b7280;
+   /* Muted gray for labels and descriptions */
+   --icon-color: #6b7280;
+   /* Gray for icons */
+   --shadow-light: rgba(0, 0, 0, 0.05);
+   /* Subtle shadow */
+
+   /* Top Header Bar specific colors */
+   --header-bg: #ffffff;
+   --header-icon-bg-hover: #f3f4f6;
+   --header-icon-active: #e5e7eb;
+   --header-badge-bg: #ef4444;
+   /* Red for notification badge */
+   --header-badge-text: #ffffff;
+
+   /* Table specific colors */
+   --table-header-bg: #f9fafb;
+   /* Slightly darker gray for table header */
+   --table-row-hover-bg: #f9fafb;
+   /* Light gray for row hover state */
+
+   /* Status badge colors */
+   --status-success-bg: #dcfce7;
+   /* Light green */
+   --status-success-text: #16a34a;
+   /* Darker green */
+   --status-pending-bg: #fefce8;
+   /* Light yellow */
+   --status-pending-text: #ca8a04;
+   /* Darker yellow */
+   --status-failed-bg: #fee2e2;
+   /* Light red */
+   --status-failed-text: #dc2626;
+   /* Darker red */
+
+   /* New Status badge colors for user table */
+   --status-kyc-pending-bg: #fffbeb;
+   /* amber-50 */
+   --status-kyc-pending-text: #b45309;
+   /* amber-700 */
+   --status-kyc-pending-border: #fde68a;
+   /* amber-200 */
+
+   --status-questionnaire-pending-bg: #eff6ff;
+   /* blue-50 */
+   --status-questionnaire-pending-text: #1d4ed8;
+   /* blue-700 */
+   --status-questionnaire-pending-border: #bfdbfe;
+   /* blue-200 */
+
+   --status-risk-profile-pending-bg: #f5f3ff;
+   /* purple-50 */
+   --status-risk-profile-pending-text: #6d28d9;
+   /* purple-700 */
+   --status-risk-profile-pending-border: #ddd6fe;
+   /* purple-200 */
+
+   --status-risk-category-bg: #f0fdf4;
+   /* green-50 */
+   --status-risk-category-text: #15803d;
+   /* green-700 */
+   --status-risk-category-border: #bbf7d0;
+   /* green-200 */
+
+   /* Update Risk button colors */
+   --button-update-risk-bg: #e0e7ff;
+   /* indigo-100 */
+   --button-update-risk-text: #4f46e5;
+   /* indigo-700 */
+   --button-update-risk-border: #c7d2fe;
+   /* indigo-300 */
+   --button-update-risk-hover-bg: #c7d2fe;
+   /* indigo-200 */
+
+   /* Message display colors */
+   --message-success-bg: #f0fdf4;
+   /* green-50 */
+   --message-success-border: #bbf7d0;
+   /* green-400 */
+   --message-success-text: #15803d;
+   /* green-800 */
+   --message-success-icon-bg: #dcfce7;
+   /* green-100 */
+   --message-success-icon-text: #16a34a;
+   /* green-600 */
+
+   --message-error-bg: #fef2f2;
+   /* red-50 */
+   --message-error-border: #fca5a5;
+   /* red-400 */
+   --message-error-text: #991b1b;
+   /* red-800 */
+   --message-error-icon-bg: #fee2e2;
+   /* red-100 */
+   --message-error-icon-text: #dc2626;
+   /* red-600 */
+
+   /* Action Button colors */
+   --button-light-blue-bg: #e0f2fe;
+   /* Very light blue for Pay Now */
+   --button-light-blue-text: #2563eb;
+   /* Darker blue for Pay Now */
+   --button-dark-blue-start: #3b82f6;
+   /* Gradient start for Pay Now */
+   --button-dark-blue-end: #2563eb;
+   /* Gradient end for Pay Now */
+   --button-dark-blue-text: #ffffff;
+   /* White text for dark Pay Now */
+   --button-history-bg: #f3f4f6;
+   /* Light gray for History */
+   --button-history-text: #4b5563;
+   /* Dark gray for History */
+   --button-history-hover-bg: #e5e7eb;
+   /* Darker gray for History hover */
+   --button-add-recipient-bg: #2563eb;
+   /* Blue for Add New Recipient */
+   --button-add-recipient-text: #ffffff;
+   /* White text for Add New Recipient */
+
+   /* Dashboard Statistics specific colors */
+   --dashboard-page-bg: #f8f9fa;
+   --dashboard-card-bg: #ffffff;
+   --dashboard-border: #e5e7eb;
+   --dashboard-text-dark: #1f2937;
+   --dashboard-text-muted: #6b7280;
+   --dashboard-green-percent: #10b981;
+   --dashboard-red-percent: #ef4444;
+   --dashboard-gray-percent: #6b7280;
+   --dashboard-chart-blue: #3b82f6;
+   --dashboard-chart-orange: #f97316;
+
+   /* Pie chart colors */
+   --pie-color-1: #3b82f6;
+   /* blue-500 */
+   --pie-color-2: #f97316;
+   /* orange-500 */
+   --pie-color-3: #10b981;
+   /* green-500 */
+   --pie-color-4: #8b5cf6;
+   /* violet-500 */
+   --pie-color-5: #ef4444;
+   /* red-500 */
+   --pie-color-6: #6b7280;
+   /* gray-500 */
+
+   --header-search-bg: #ffffff;
+   --header-search-border: #e5e7eb;
+   --header-search-placeholder: #9ca3af;
+   --header-icon-border: #e5e7eb;
+   --header-icon-hover-bg: #f3f4f6;
+   --header-icon-active-bg: #e5e7eb;
+   --user-avatar-bg: #d1d5db;
+   --user-avatar-text: #4b5563;
+   --user-name-color: #1f2937;
+   --user-dropdown-icon: #6b7280;
+   --filter-button-bg: #ffffff;
+   --filter-button-border: #e5e7eb;
+   --filter-button-text: #6b7280;
+   --filter-button-hover-bg: #f3f4f6;
+   --add-recipient-button-bg: #2563eb;
+   --add-recipient-button-text: #ffffff;
+   --add-recipient-button-shadow: rgba(37, 99, 235, 0.2);
+
+   /* New Professional Bank Site Table Colors */
+   --bank-primary-text: #1a202c;
+   /* Darker text for main content */
+   --bank-secondary-text: #4a5568;
+   /* Muted text for labels */
+   --bank-border-light: #edf2f7;
+   /* Light border for table lines */
+   --bank-bg-card: #ffffff;
+   /* White background for table container */
+   --bank-bg-header: #f7fafc;
+   /* Light gray for table header */
+   --bank-bg-hover: #f7fafc;
+   /* Light gray for row hover */
+
+   --bank-status-success-bg: #e6fffa;
+   /* Light teal */
+   --bank-status-success-text: #38a169;
+   /* Darker teal */
+   --bank-status-success-border: #81e6d9;
+   /* Medium teal */
+
+   --bank-status-failed-bg: #fff5f5;
+   /* Light red */
+   --bank-status-failed-text: #e53e3e;
+   /* Darker red */
+   --bank-status-failed-border: #feb2b2;
+   /* Medium red */
+
+   --bank-status-pending-bg: #fefcbf;
+   /* Light yellow */
+   --bank-status-pending-text: #d69e2e;
+   /* Darker yellow */
+   --bank-status-pending-border: #faf089;
+   /* Medium yellow */
+
+   --bank-button-view-details-bg: #e0f2fe;
+   /* Light blue */
+   --bank-button-view-details-text: #2563eb;
+   /* Dark blue */
+   --bank-button-view-details-border: #93c5fd;
+   /* Medium blue */
+   --bank-button-view-details-hover-bg: #bfdbfe;
+   /* Lighter blue on hover */
+
+   --bank-button-history-bg: #f3f4f6;
+   /* Light gray */
+   --bank-button-history-text: #4b5563;
+   /* Dark gray */
+   --bank-button-history-border: #e5e7eb;
+   /* Medium gray */
+   --bank-button-history-hover-bg: #e5e7eb;
+   /* Darker gray on hover */
+
+   --bank-button-toggle-active-bg: #dcfce7;
+   /* Light green */
+   --bank-button-toggle-active-text: #16a34a;
+   /* Dark green */
+   --bank-button-toggle-active-border: #86efac;
+   /* Medium green */
+
+   --bank-button-toggle-inactive-bg: #fee2e2;
+   /* Light red */
+   --bank-button-toggle-inactive-text: #dc2626;
+   /* Dark red */
+   --bank-button-toggle-inactive-border: #fca5a5;
+   /* Medium red */
+ }
+
+ @theme inline {
+   --color-background: var(--background);
+   --color-foreground: var(--foreground);
+   --font-sans: var(--font-geist-sans);
+   --font-mono: var(--font-geist-mono);
+ }
+
+ @media (prefers-color-scheme: dark) {
+   :root {
+     --background: #0a0a0a;
+     --foreground: #ededed;
+
+     /* Dashboard Statistics specific colors for dark mode */
+     --dashboard-page-bg: #1a1a1a;
+     --dashboard-card-bg: #262626;
+     --dashboard-border: #3f3f46;
+     --dashboard-text-dark: #e5e7eb;
+     --dashboard-text-muted: #a1a1aa;
+     --dashboard-green-percent: #22c55e;
+     --dashboard-red-percent: #ef4444;
+     --dashboard-gray-percent: #a1a1aa;
+     --dashboard-chart-blue: #60a5fa;
+     --dashboard-chart-orange: #fb923c;
+
+     /* Pie chart colors for dark mode */
+     --pie-color-1: #60a5fa;
+     /* blue-400 */
+     --pie-color-2: #fb923c;
+     /* orange-400 */
+     --pie-color-3: #4ade80;
+     /* green-400 */
+     --pie-color-4: #a78bfa;
+     /* violet-400 */
+     --pie-color-5: #f87171;
+     /* red-400 */
+     --pie-color-6: #a1a1aa;
+     /* gray-400 */
+
+     --header-search-bg: #262626;
+     --header-search-border: #3f3f46;
+     --header-search-placeholder: #a1a1aa;
+     --header-icon-border: #3f3f46;
+     --header-icon-hover-bg: #3f3f46;
+     --header-icon-active-bg: #52525b;
+     --user-avatar-bg: #52525b;
+     --user-avatar-text: #d4d4d8;
+     --user-name-color: #e5e7eb;
+     --user-dropdown-icon: #a1a1aa;
+     --filter-button-bg: #262626;
+     --filter-button-border: #3f3f46;
+     --filter-button-text: #a1a1aa;
+     --filter-button-hover-bg: #3f3f46;
+     --add-recipient-button-bg: #60a5fa;
+     --add-recipient-button-text: #ffffff;
+     --add-recipient-button-shadow: rgba(96, 165, 250, 0.2);
+
+     /* New Professional Bank Site Table Colors for dark mode */
+     --bank-primary-text: #e2e8f0;
+     --bank-secondary-text: #a0aec0;
+     --bank-border-light: #2d3748;
+     --bank-bg-card: #1a202c;
+     --bank-bg-header: #2d3748;
+     --bank-bg-hover: #2d3748;
+
+     --bank-status-success-bg: #2c5282;
+     --bank-status-success-text: #63b3ed;
+     --bank-status-success-border: #4299e1;
+
+     --bank-status-failed-bg: #742a2a;
+     --bank-status-failed-text: #fc8181;
+     --bank-status-failed-border: #e53e3e;
+
+     --bank-status-pending-bg: #7b341e;
+     --bank-status-pending-text: #f6ad55;
+     --bank-status-pending-border: #ed8936;
+
+     --bank-button-view-details-bg: #2b6cb0;
+     --bank-button-view-details-text: #e0f2fe;
+     --bank-button-view-details-border: #4299e1;
+     --bank-button-view-details-hover-bg: #3182ce;
+
+     --bank-button-history-bg: #4a5568;
+     --bank-button-history-text: #e2e8f0;
+     --bank-button-history-border: #718096;
+     --bank-button-history-hover-bg: #6b7280;
+
+     --bank-button-toggle-active-bg: #2f855a;
+     --bank-button-toggle-active-text: #9ae6b4;
+     --bank-button-toggle-active-border: #48bb78;
+
+     --bank-button-toggle-inactive-bg: #c53030;
+     --bank-button-toggle-inactive-text: #feb2b2;
+     --bank-button-toggle-inactive-border: #e53e3e;
+   }
+ }
+
+ body {
+   background: var(--background);
+   color: var(--foreground);
+   font-family: Arial, Helvetica, sans-serif;
+ }
+
+ /* Custom classes for general UI elements */
+ .custom-button {
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   white-space: nowrap;
+   border-radius: 0.375rem;
+   /* rounded-md */
+   font-size: 0.875rem;
+   /* text-sm */
+   font-weight: 500;
+   /* font-medium */
+   height: 2.5rem;
+   /* h-10 */
+   padding-left: 1rem;
+   /* px-4 */
+   padding-right: 1rem;
+   /* px-4 */
+   transition: all 0.15s ease-in-out;
+   /* Smooth transitions */
+   outline: 2px solid transparent;
+   outline-offset: 2px;
+   cursor: pointer;
+   background-color: var(--filter-button-bg);
+   /* Use filter button background */
+   border: 1px solid var(--filter-button-border);
+   color: var(--filter-button-text);
+   box-shadow: 0 1px 2px 0 var(--shadow-light);
+   /* Subtle shadow */
+ }
+
+ .custom-button:hover {
+   background-color: var(--filter-button-hover-bg);
+ }
+
+ .custom-button:active {
+   background-color: var(--filter-button-hover-bg);
+ }
+
+ /* Specific styles for the search input's keyboard shortcut hint */
+ .search-shortcut {
+   position: absolute;
+   right: 0.75rem;
+   /* right-3 */
+   top: 50%;
+   transform: translateY(-50%);
+   font-size: 0.75rem;
+   /* text-xs */
+   color: var(--icon-color);
+   background-color: var(--card-bg);
+   /* Match input background */
+   padding: 0 0.25rem;
+   /* px-1 */
+   border-radius: 0.25rem;
+   /* rounded */
+   pointer-events: none;
+   /* Ensure it doesn't interfere with input focus */
+ }
+
+ /* Table specific classes */
+ .table-container {
+   background-color: var(--bank-bg-card);
+   /* Changed to bank-specific variable */
+   border: 1px solid var(--bank-border-light);
+   /* Changed to bank-specific variable */
+   border-radius: 0.5rem;
+   overflow: hidden;
+   /* Ensures rounded corners apply to content */
+   box-shadow: 0 1px 3px 0 var(--shadow-light), 0 1px 2px -1px var(--shadow-light);
+ }
+
+ .table-header-row {
+   display: grid;
+   grid-template-columns: 0.3fr 1.5fr 1fr 1fr 1fr 0.7fr 1.8fr;
+   /* Adjusted for exact UI */
+   gap: 1rem;
+   /* gap-x-4 */
+   background-color: var(--bank-bg-header);
+   /* Changed to bank-specific variable */
+   border-bottom: 1px solid var(--bank-border-light);
+   /* Changed to bank-specific variable */
+   padding: 0.75rem 1rem;
+   /* py-3 px-4 */
+ }
+
+ .table-header-cell {
+   display: flex;
+   align-items: center;
+   font-size: 0.875rem;
+   /* text-sm */
+   font-weight: 500;
+   /* font-medium */
+   color: var(--bank-secondary-text);
+   /* Changed to bank-specific variable */
+   white-space: nowrap;
+   /* Prevent text wrapping in headers */
+ }
+
+ .table-row-item {
+   display: grid;
+   grid-template-columns: 0.3fr 1.5fr 1fr 1fr 1fr 0.7fr 1.8fr;
+   /* Adjusted for exact UI */
+   gap: 1rem;
+   /* gap-x-4 */
+   align-items: center;
+   padding: 0.75rem 1rem;
+   /* py-3 px-4 */
+   border-bottom: 1px solid var(--bank-border-light);
+   /* Changed to bank-specific variable */
+   font-size: 0.875rem;
+   /* text-sm */
+   color: var(--bank-primary-text);
+   /* Changed to bank-specific variable */
+   min-height: 3.5rem;
+   /* Ensure consistent row height */
+ }
+
+ .table-row-item:last-child {
+   border-bottom: none;
+ }
+
+ .table-row-item:hover {
+   background-color: var(--bank-bg-hover);
+   /* Changed to bank-specific variable */
+ }
+
+ .status-badge {
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   padding: 0.25rem 0.5rem;
+   /* px-2 py-1 */
+   border-radius: 0.375rem;
+   /* rounded-md */
+   font-size: 0.75rem;
+   /* text-xs */
+   font-weight: 500;
+   /* font-medium */
+   white-space: nowrap;
+   /* Prevent badge text wrapping */
+   min-width: 4.5rem;
+   /* Ensure consistent width for badges */
+   border: 1px solid currentColor;
+   /* Add border matching text color */
+ }
+
+ /* Specific button styles for Quick Actions */
+ .action-button {
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   white-space: nowrap;
+   border-radius: 0.375rem;
+   /* rounded-md */
+   font-size: 0.75rem;
+   /* text-xs */
+   font-weight: 500;
+   /* font-medium */
+   height: 2rem;
+   /* h-8 */
+   padding: 0 0.75rem;
+   /* px-3 */
+   transition: all 0.15s ease-in-out;
+   outline: 2px solid transparent;
+   outline-offset: 2px;
+   cursor: pointer;
+   box-shadow: 0 1px 2px 0 var(--shadow-light);
+   /* Add shadow to all action buttons */
+ }
+
+ .pay-now-light {
+   background-color: var(--bank-button-view-details-bg);
+   /* Changed to bank-specific variable */
+   color: var(--bank-button-view-details-text);
+   /* Changed to bank-specific variable */
+   border: 1px solid var(--bank-button-view-details-border);
+   /* Changed to bank-specific variable */
+ }
+
+ .pay-now-light:hover {
+   background-color: var(--bank-button-view-details-hover-bg);
+   /* Changed to bank-specific variable */
+ }
+
+ .pay-now-dark {
+   background-image: linear-gradient(to right, var(--button-dark-blue-start), var(--button-dark-blue-end));
+   color: var(--button-dark-blue-text);
+   box-shadow: 0 1px 2px 0 rgba(37, 99, 235, 0.2);
+   /* Blue shadow */
+   border: 1px solid var(--button-dark-blue-end);
+   /* Add border */
+ }
+
+ .pay-now-dark:hover {
+   opacity: 0.9;
+   /* Slight opacity change on hover for gradient */
+ }
+
+ .history-button {
+   background-color: var(--bank-button-history-bg);
+   /* Changed to bank-specific variable */
+   color: var(--bank-button-history-text);
+   /* Changed to bank-specific variable */
+   border: 1px solid var(--bank-button-history-border);
+   /* Changed to bank-specific variable */
+ }
+
+ .history-button:hover {
+   background-color: var(--bank-button-history-hover-bg);
+   /* Changed to bank-specific variable */
+ }
+
+ /* Pagination buttons */
+ .pagination-button {
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   white-space: nowrap;
+   border-radius: 0.375rem;
+   /* rounded-md */
+   font-size: 0.875rem;
+   /* text-sm */
+   font-weight: 500;
+   /* font-medium */
+   height: 2.5rem;
+   /* h-10 */
+   padding-left: 1rem;
+   /* px-4 */
+   padding-right: 1rem;
+   /* px-4 */
+   transition: all 0.15s ease-in-out;
+   outline: 2px solid transparent;
+   outline-offset: 2px;
+   cursor: pointer;
+   background-color: var(--filter-button-bg);
+   /* Use filter button background */
+   border: 1px solid var(--filter-button-border);
+   color: var(--filter-button-text);
+   box-shadow: 0 1px 2px 0 var(--shadow-light);
+ }
+
+ .pagination-button:hover {
+   background-color: var(--filter-button-hover-bg);
+ }
+
+ .pagination-button:active {
+   background-color: var(--filter-button-hover-bg);
+ }
+
+ /* Custom classes for dashboard elements */
+ .dashboard-card {
+   background-color: var(--dashboard-card-bg);
+   border: 1px solid var(--dashboard-border);
+   border-radius: 0.5rem;
+   /* rounded-lg */
+   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+ }
+
+ .dashboard-button {
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   white-space: nowrap;
+   border-radius: 0.375rem;
+   /* rounded-md */
+   font-size: 0.875rem;
+   /* text-sm */
+   font-weight: 500;
+   /* font-medium */
+   height: 2.5rem;
+   /* h-10 */
+   padding-left: 1rem;
+   /* px-4 */
+   padding-right: 1rem;
+   /* px-4 */
+   transition: all 0.15s ease-in-out;
+   /* Smooth transitions */
+   outline: 2px solid transparent;
+   outline-offset: 2px;
+   cursor: pointer;
+ }
+
+ .dashboard-button-outline {
+   background-color: var(--dashboard-card-bg);
+   border: 1px solid var(--dashboard-border);
+   color: var(--dashboard-text-muted);
+ }
+
+ .dashboard-button-outline:hover {
+   background-color: var(--button-history-hover-bg);
+   /* Reusing existing hover color */
+ }
+
+ .dashboard-button-outline:active {
+   background-color: var(--button-history-hover-bg);
+ }
+
+ /* ToggleUserStatusButton specific styles */
+ .toggle-status-button {
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   white-space: nowrap;
+   border-radius: 0.375rem;
+   /* rounded-md */
+   font-size: 0.75rem;
+   /* text-xs */
+   font-weight: 500;
+   /* font-medium */
+   height: 2rem;
+   /* h-8 */
+   padding: 0 0.75rem;
+   /* px-3 */
+   transition: all 0.15s ease-in-out;
+   outline: 2px solid transparent;
+   outline-offset: 2px;
+   cursor: pointer;
+   box-shadow: 0 1px 2px 0 var(--shadow-light);
+ }
+
+ .toggle-status-button.active {
+   background-color: var(--bank-button-toggle-active-bg);
+   color: var(--bank-button-toggle-active-text);
+   border: 1px solid var(--bank-button-toggle-active-border);
+ }
+
+ .toggle-status-button.inactive {
+   background-color: var(--bank-button-toggle-inactive-bg);
+   color: var(--bank-button-toggle-inactive-text);
+   border: 1px solid var(--bank-button-toggle-inactive-border);
+ }
+
+ .toggle-status-button:hover {
+   opacity: 0.9;
+ }

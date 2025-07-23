@@ -8,8 +8,12 @@ export default function CreateBasketModal({ isOpen, onClose }) {
     const [stockIds, setStockIds] = useState([]);
     const [currentStock, setCurrentStock] = useState("");
     const [category, setCategory] = useState("technology");
+    const [threeYearReturn, setThreeYearReturn] = useState("");
+    const [threeYearRisk, setThreeYearRisk] = useState("");
+    const [assetClass, setAssetClass] = useState("")
+    const [route, setRoute] = useState("")
+    // const [threeYearReturn, setThreeYearReturn] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
-
     const categories = [
         { value: "technology", label: "Technology" },
         { value: "healthcare", label: "Healthcare" },
@@ -84,11 +88,7 @@ export default function CreateBasketModal({ isOpen, onClose }) {
                     ×
                 </button>
 
-                <h2 className="text-2xl font-bold mb-1 text-center">Create Basket</h2>
-                <p className="text-center text-gray-600 mb-6">
-                    Curate your perfect portfolio with stocks and categories.
-                </p>
-
+                <h2 className="text-2xl font-bold mb-2 text-center">Create Basket</h2>
                 <form className="space-y-6" onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                         {/* Name */}
@@ -104,6 +104,28 @@ export default function CreateBasketModal({ isOpen, onClose }) {
                             />
                         </div>
                         {/* Category */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">3Y Return *</label>
+                            <input
+                                type="text"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                placeholder="e.g. Tech Innovators"
+                                value={threeYearReturn}
+                                onChange={(e) => setThreeYearReturn(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">3Y Return Risk*</label>
+                            <input
+                                type="text"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                placeholder="e.g. Tech Innovators"
+                                value={threeYearRisk}
+                                onChange={(e) => setThreeYearRisk(e.target.value)}
+                                required
+                            />
+                        </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
                             <select
@@ -126,15 +148,13 @@ export default function CreateBasketModal({ isOpen, onClose }) {
                         <textarea
                             rows={3}
                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                            placeholder="Describe your investment strategy..."
+                            placeholder="Describe your strategy..."
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                         />
                     </div>
-
-                    {/* Stocks */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Add Stocks</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Add Recommendations</label>
                         <div className="flex space-x-2">
                             <input
                                 type="text"
@@ -196,3 +216,4 @@ export default function CreateBasketModal({ isOpen, onClose }) {
         </div>
     );
 }
+

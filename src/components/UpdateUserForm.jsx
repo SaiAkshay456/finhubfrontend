@@ -21,7 +21,7 @@ export default function UpdateUserForm({ user, token }) {
     });
     const [msg, setMsg] = useState('');
     const [errors, setErrors] = useState({});
-    const [editMode, setEditMode] = useState('visual');
+    // const [editMode, setEditMode] = useState('visual');
 
     const handleChange = (e) => {
         const { name, value, type, files } = e.target;
@@ -45,7 +45,6 @@ export default function UpdateUserForm({ user, token }) {
         setFormData({ ...formData, sidebar: updatedSidebar });
     };
 
-
     const validateForm = () => {
         const newErrors = {};
         let isValid = true;
@@ -63,7 +62,7 @@ export default function UpdateUserForm({ user, token }) {
         });
 
         // KYC fields if KYC is completed
-        if (user.isKycCompleted) {
+        if (user.status?.isKycCompleted) {
             const kycFields = [
                 'firstName', 'lastName', 'dob', 'address'
             ];
@@ -111,7 +110,7 @@ export default function UpdateUserForm({ user, token }) {
 
         try {
             const { data } = await axios.put(
-                `http://localhost:3030/api/v1/adminuse/users/update-user/${user._id}`,
+                `http://localhost:3030/v1/users/user/update-user/${user._id}`,
                 sendData,
                 {
                     headers: {
@@ -130,188 +129,308 @@ export default function UpdateUserForm({ user, token }) {
     };
 
     return (
-        <div className="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-lg">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">Update User Details</h2>
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {[
-                        { name: 'username', label: 'Username', required: true },
-                        { name: 'email', label: 'Email', required: true },
-                        { name: 'role', label: 'Role', required: true },
-                        { name: 'gender', label: 'Gender', required: true },
-                        { name: 'phoneNumber', label: 'Phone Number', required: true }
-                    ].map((field) => (
-                        <div key={field.name} className="space-y-2">
-                            <label className="block text-sm font-medium text-gray-700">
-                                {field.label} {field.required && <span className="text-red-500">*</span>}
-                            </label>
-                            {field.name === 'role' ? (
-                                <div>
-                                    <select
-                                        name="role"
-                                        value={formData.role}
-                                        onChange={handleChange}
-                                        className={`w-full px-4 py-2.5 rounded-lg border ${errors.role ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white shadow-sm`}
-                                    >
-                                        <option value="">Select Role</option>
-                                        <option value="user">User</option>
-                                        <option value="advisor">Advisor</option>
-                                        <option value="admin">Admin</option>
-                                    </select>
-                                    {errors.role && <p className="mt-1 text-sm text-red-600">{errors.role}</p>}
+        <div className="min-h-screen bg-gray-50">
+            {/* Header Section */}
+            <div className="bg-white shadow-sm border-b border-gray-200">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                            <div className="flex-shrink-0">
+                                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
                                 </div>
-                            ) : (
-                                <div>
-                                    <input
-                                        name={field.name}
-                                        value={formData[field.name]}
-                                        onChange={handleChange}
-                                        className={`w-full px-3 py-2.5 border ${errors[field.name] ? 'border-red-500' : 'border-gray-300'} rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
-                                    />
-                                    {errors[field.name] && <p className="mt-1 text-sm text-red-600">{errors[field.name]}</p>}
-                                </div>
-                            )}
-                        </div>
-                    ))}
-                </div>
-
-                {/* Sidebar Editor Section */}
-                <div className="bg-gray-50 p-5 rounded-xl border border-gray-200">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-                        <h3 className="text-lg font-semibold text-gray-800">Sidebar Permissions</h3>
-                        <div className="flex space-x-2">
-                            <button
-                                type="button"
-                                onClick={() => setEditMode('visual')}
-                                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${editMode === 'visual' ?
-                                    'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-                            >
-                                Visual Editor
-                            </button>
-
-                        </div>
-                    </div>
-
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                        {formData.sidebar.map((item, index) => (
-                            <div key={index} className="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-                                <input
-                                    type="checkbox"
-                                    id={`sidebar-item-${index}`}
-                                    checked={item.access}
-                                    onChange={() => toggleSidebarItem(index)}
-                                    className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-                                />
-                                <label
-                                    htmlFor={`sidebar-item-${index}`}
-                                    className="ml-3 block text-sm font-medium text-gray-700"
-                                >
-                                    {item.label}
-                                </label>
                             </div>
-                        ))}
+                            <div>
+                                <h1 className="text-2xl font-semibold text-gray-900">Client Profile Management</h1>
+                                <p className="text-sm text-gray-600">Update client information and access permissions</p>
+                            </div>
+                        </div>
+                        <div className="hidden md:flex items-center space-x-4">
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                Financial Advisory System
+                            </span>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                {user.isKycCompleted && (
-                    <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-4">KYC Details <span className="text-sm font-normal text-gray-500">(Required)</span></h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {[
-                                { name: 'firstName', label: 'First Name', required: true },
-                                { name: 'lastName', label: 'Last Name', required: true },
-                                { name: 'dob', label: 'Date of Birth', type: 'date', required: true },
-                                { name: 'address', label: 'Address', required: true }
-                            ].map((field) => (
-                                <div key={field.name} className="space-y-2">
-                                    <label className="block text-sm font-medium text-gray-700">
-                                        {field.label} {field.required && <span className="text-red-500">*</span>}
-                                    </label>
-                                    {field.type === 'date' ? (
-                                        <div>
-                                            <input
-                                                type="date"
-                                                name={field.name}
-                                                value={formData[field.name]}
-                                                onChange={handleChange}
-                                                className={`w-full px-3 py-2.5 border ${errors[field.name] ? 'border-red-500' : 'border-gray-300'} rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
-                                            />
-                                            {errors[field.name] && <p className="mt-1 text-sm text-red-600">{errors[field.name]}</p>}
-                                        </div>
-                                    ) : (
-                                        <div>
-                                            <input
-                                                name={field.name}
-                                                value={formData[field.name]}
-                                                onChange={handleChange}
-                                                className={`w-full px-3 py-2.5 border ${errors[field.name] ? 'border-red-500' : 'border-gray-300'} rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
-                                            />
-                                            {errors[field.name] && <p className="mt-1 text-sm text-red-600">{errors[field.name]}</p>}
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                            {[
-                                { name: 'aadharFile', label: 'Aadhar Card', required: !user.aadharFile },
-                                { name: 'panFile', label: 'PAN Card', required: !user.panFile }
-                            ].map((field) => (
-                                <div key={field.name} className="space-y-2">
-                                    <label className="block text-sm font-medium text-gray-700">
-                                        {field.label} {field.required && <span className="text-red-500">*</span>}
-                                    </label>
-                                    <div>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <form onSubmit={handleSubmit} className="space-y-6">
+
+                    {/* Personal Information */}
+                    <div className="bg-white shadow rounded-lg">
+                        <div className="px-6 py-4 border-b border-gray-200">
+                            <div className="flex items-center">
+                                <svg className="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                <h3 className="text-lg font-medium text-gray-900">Personal Information</h3>
+                            </div>
+                        </div>
+                        <div className="px-6 py-6">
+                            <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2 lg:grid-cols-3">
+                                {[
+                                    { name: 'username', label: 'Username', required: true },
+                                    { name: 'email', label: 'Email Address', required: true, type: 'email' },
+                                    { name: 'phoneNumber', label: 'Phone Number', required: true, type: 'tel' },
+                                    { name: 'gender', label: 'Gender', required: true }
+                                ].map((field) => (
+                                    <div key={field.name}>
+                                        <label htmlFor={field.name} className="block text-sm font-medium text-gray-700 mb-1">
+                                            {field.label}
+                                            {field.required && <span className="text-red-500 ml-1">*</span>}
+                                        </label>
                                         <input
-                                            type="file"
+                                            type={field.type || 'text'}
                                             name={field.name}
+                                            id={field.name}
+                                            value={formData[field.name]}
                                             onChange={handleChange}
-                                            className="block w-full text-sm text-gray-500
-                                              file:mr-4 file:py-2 file:px-4
-                                              file:rounded-lg file:border-0
-                                              file:text-sm file:font-medium
-                                              file:bg-blue-50 file:text-blue-700
-                                              hover:file:bg-blue-100
-                                              file:transition-colors"
-                                            accept="application/pdf"
+                                            className={`block w-full px-3 py-2 border ${errors[field.name]
+                                                ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                                                : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                                                } rounded-md shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm`}
+                                            placeholder={`Enter ${field.label.toLowerCase()}`}
                                         />
-                                        {errors[field.name] && <p className="mt-1 text-sm text-red-600">{errors[field.name]}</p>}
-                                        {user[field.name] && (
-                                            <p className="mt-1 text-sm text-green-600">
-                                                File already uploaded: {user[field.name]}
-                                            </p>
+                                        {errors[field.name] && (
+                                            <p className="mt-1 text-sm text-red-600">{errors[field.name]}</p>
                                         )}
                                     </div>
+                                ))}
+
+                                <div>
+                                    <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
+                                        Role <span className="text-red-500 ml-1">*</span>
+                                    </label>
+                                    <select
+                                        name="role"
+                                        id="role"
+                                        value={formData.role}
+                                        onChange={handleChange}
+                                        className={`block w-full px-3 py-2 border ${errors.role
+                                            ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                                            : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                                            } rounded-md shadow-sm focus:outline-none sm:text-sm bg-white`}
+                                    >
+                                        <option value="">Select role</option>
+                                        <option value="user">Client</option>
+                                        <option value="advisor">Financial Advisor</option>
+                                        <option value="admin">Administrator</option>
+                                    </select>
+                                    {errors.role && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.role}</p>
+                                    )}
                                 </div>
-                            ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* System Permissions */}
+                    <div className="bg-white shadow rounded-lg">
+                        <div className="px-6 py-4 border-b border-gray-200">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center">
+                                    <svg className="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                    </svg>
+                                    <h3 className="text-lg font-medium text-gray-900">System Access Permissions</h3>
+                                </div>
+                                <span className="text-sm text-gray-500">
+                                    {formData.sidebar.filter(item => item.access).length} of {formData.sidebar.length} enabled
+                                </span>
+                            </div>
+                        </div>
+                        <div className="px-6 py-6">
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                {formData.sidebar.map((item, index) => (
+                                    <div key={index} className="relative flex items-start">
+                                        <div className="flex items-center h-5">
+                                            <input
+                                                type="checkbox"
+                                                id={`sidebar-item-${index}`}
+                                                checked={item.access}
+                                                onChange={() => toggleSidebarItem(index)}
+                                                className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
+                                            />
+                                        </div>
+                                        <div className="ml-3 text-sm">
+                                            <label
+                                                htmlFor={`sidebar-item-${index}`}
+                                                className="font-medium text-gray-700 cursor-pointer"
+                                            >
+                                                {item.label}
+                                            </label>
+                                            {item.access && (
+                                                <p className="text-green-600 text-xs mt-1">Access granted</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* KYC Information */}
+                    {user?.status?.isKycCompleted && (
+                        <div className="bg-white shadow rounded-lg">
+                            <div className="px-6 py-4 border-b border-gray-200">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center">
+                                        <svg className="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        <h3 className="text-lg font-medium text-gray-900">KYC Documentation</h3>
+                                    </div>
+                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        Verified Client
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="px-6 py-6">
+                                <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                                    {[
+                                        { name: 'firstName', label: 'First Name', required: true },
+                                        { name: 'lastName', label: 'Last Name', required: true },
+                                        { name: 'dob', label: 'Date of Birth', type: 'date', required: true },
+                                        { name: 'address', label: 'Residential Address', required: true }
+                                    ].map((field) => (
+                                        <div key={field.name} className={field.name === 'address' ? 'sm:col-span-2' : ''}>
+                                            <label htmlFor={field.name} className="block text-sm font-medium text-gray-700 mb-1">
+                                                {field.label}
+                                                {field.required && <span className="text-red-500 ml-1">*</span>}
+                                            </label>
+                                            {field.name === 'address' ? (
+                                                <textarea
+                                                    name={field.name}
+                                                    id={field.name}
+                                                    rows={3}
+                                                    value={formData[field.name]}
+                                                    onChange={handleChange}
+                                                    className={`block w-full px-3 py-2 border ${errors[field.name]
+                                                        ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                                                        : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                                                        } rounded-md shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm`}
+                                                    placeholder="Enter complete address"
+                                                />
+                                            ) : (
+                                                <input
+                                                    type={field.type || 'text'}
+                                                    name={field.name}
+                                                    id={field.name}
+                                                    value={formData[field.name]}
+                                                    onChange={handleChange}
+                                                    className={`block w-full px-3 py-2 border ${errors[field.name]
+                                                        ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                                                        : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                                                        } rounded-md shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm`}
+                                                    placeholder={`Enter ${field.label.toLowerCase()}`}
+                                                />
+                                            )}
+                                            {errors[field.name] && (
+                                                <p className="mt-1 text-sm text-red-600">{errors[field.name]}</p>
+                                            )}
+                                        </div>
+                                    ))}
+
+                                    {/* Document Upload */}
+                                    <div className="sm:col-span-2">
+                                        <h4 className="text-sm font-medium text-gray-900 mb-4">Identity Documents</h4>
+                                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                                            {[
+                                                { name: 'aadharFile', label: 'Aadhar Card Verification', required: !user.aadharFile },
+                                                { name: 'panFile', label: 'PAN Card Verification', required: !user.panFile }
+                                            ].map((field) => (
+                                                <div key={field.name} className="space-y-2">
+                                                    <label className="block text-sm font-semibold text-slate-700">
+                                                        {field.label} {field.required && <span className="text-red-500">*</span>}
+                                                    </label>
+                                                    <div className="space-y-2">
+                                                        <input
+                                                            type="file"
+                                                            name={field.name}
+                                                            onChange={handleChange}
+                                                            className="block w-full text-sm text-slate-500
+                                                  file:mr-4 file:py-3 file:px-6
+                                                  file:rounded-xl file:border-0
+                                                  file:text-sm file:font-semibold
+                                                  file:bg-emerald-50 file:text-emerald-700
+                                                  hover:file:bg-emerald-100
+                                                  file:transition-colors file:cursor-pointer
+                                                  border-2 border-dashed border-slate-300 rounded-xl p-4
+                                                  hover:border-emerald-400 transition-colors"
+                                                            accept="application/pdf"
+                                                        />
+                                                        {errors[field.name] && <p className="mt-1 text-sm text-red-600 font-medium">{errors[field.name]}</p>}
+                                                        {user[field.name] && (
+                                                            <div className="flex items-center space-x-2 mt-2 p-3 bg-emerald-100 rounded-lg">
+                                                                <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                </svg>
+                                                                <p className="text-sm text-emerald-700 font-medium">
+                                                                    Document verified: {user[field.name]}
+                                                                </p>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Actions */}
+                    <div className="bg-gray-50 px-6 py-3 rounded-lg">
+                        <div className="flex justify-end space-x-3">
+                            <button
+                                type="button"
+                                onClick={() => router.back()}
+                                className="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            >
+                                Update Client Profile
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                {/* Status Message */}
+                {msg && (
+                    <div className={`mt-6 rounded-md p-4 ${msg.toLowerCase().includes('success') ?
+                        'bg-green-50 border border-green-200' :
+                        'bg-red-50 border border-red-200'
+                        }`}>
+                        <div className="flex">
+                            <div className="flex-shrink-0">
+                                {msg.toLowerCase().includes('success') ? (
+                                    <svg className="h-5 w-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                ) : (
+                                    <svg className="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                )}
+                            </div>
+                            <div className="ml-3">
+                                <p className={`text-sm font-medium ${msg.toLowerCase().includes('success') ? 'text-green-800' : 'text-red-800'
+                                    }`}>
+                                    {msg}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 )}
-
-                <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
-                    <button
-                        type="button"
-                        onClick={() => router.back()}
-                        className="px-5 py-2.5 border cursor-pointer border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="submit"
-                        className="px-5 py-2.5 cursor-pointer border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-                    >
-                        Update User
-                    </button>
-                </div>
-            </form>
-            {msg && (
-                <div className={`mt-6 p-4 rounded-lg ${msg.toLowerCase().includes('success') ?
-                    'bg-green-50 text-green-800 border border-green-200' :
-                    'bg-red-50 text-red-800 border border-red-200'}`}
-                >
-                    <p className="font-medium">{msg}</p>
-                </div>
-            )}
+            </div>
         </div>
     );
 }
