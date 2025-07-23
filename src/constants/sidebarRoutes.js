@@ -21,7 +21,7 @@ export const sidebarItems = [
         label: "Dashboard",
         path: "/",
         icon: MdDashboard,
-        description: "Dasboard page",
+        description: "Dashboard page",
     },
     {
         label: "Users",
@@ -29,7 +29,6 @@ export const sidebarItems = [
         icon: FaUsers,
         description: "User dashboard with summary and insights",
     },
-
     {
         label: "Create User",
         path: "/createuser",
@@ -52,7 +51,7 @@ export const sidebarItems = [
         label: "Risk Profiling",
         path: "/riskprofile",
         icon: FaShieldAlt,
-        description: "Risk Profiling"
+        description: "Risk Profiling",
     },
     {
         label: "Portfolio Upload",
@@ -61,13 +60,27 @@ export const sidebarItems = [
         description: "Upload protfolio"
     },
     {
+        label: "Recommendations",
+        path: "/recommendations",
+        icon: MdOutlineRecommend,
+        description: "Fund or asset recommendations based on risk profile",
+    },
+    {
+        label: "Benchmarks",                     
+        path: "/benchmarks",
+        icon: HiOutlineViewGrid,
+        description: "Benchmark portfolio performance with indices",
+    },
+    {
         label: "Fill Response",
         path: "/fill-response",
         icon: FaFileUpload,
         description: "Upload protfolio"
-    }
+    },
+    
 
 ];
+
 // try {
 //     isLoading = true;
 //     if(searchTerm.length>0){
