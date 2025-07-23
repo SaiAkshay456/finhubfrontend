@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import debounce from 'lodash.debounce';
 
-export default function BasketSearchDebounce() {
+export default function BasketSearchDebounce({ placeHolder = "Search baskets by title, description..." }) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [search, setSearch] = useState(searchParams.get('search') || '');
@@ -13,26 +13,26 @@ export default function BasketSearchDebounce() {
         const params = new URLSearchParams(window.location.search);
         if (value.trim()) {
             params.set('search', value.trim());
-            params.set('page', '1'); // Reset to page 1 when search changes
+            params.set('page', '1');
         } else {
             params.delete('search');
             params.set('page', '1');
         }
-        console.log(params, "line 21")
-        router.push(`baskets?${params.toString()}`);
+        router.push(`?${params.toString()}`);
     }, 300);
 
     useEffect(() => {
         debouncedSearchUpdate(search);
-        return () => debouncedSearchUpdate.cancel(); // Cleanup on unmount
+        return () => debouncedSearchUpdate.cancel();
     }, [search]);
 
     return (
         <form
             onSubmit={(e) => e.preventDefault()}
-            className="mb-6 flex flex-col sm:flex-row gap-3 items-center"
+            className="flex flex-col sm:flex-row gap-4"
         >
-            <div className="relative w-full sm:max-w-md">
+            {/* <div className="flex flex-col sm:flex-row gap-4 w-full"> */}
+            <div className="relative flex-1">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <svg
                         className="h-5 w-5 text-gray-500"
@@ -50,16 +50,16 @@ export default function BasketSearchDebounce() {
                 </div>
                 <input
                     type="text"
-                    placeholder="Search baskets..."
+                    placeholder={placeHolder}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="block w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500 text-gray-900 transition-all duration-200"
+                    className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500 text-gray-900 transition-all duration-200 text-base"
                 />
                 {search && (
                     <button
                         type="button"
                         onClick={() => setSearch('')}
-                        className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer rounded-r-lg px-2 transition-colors"
                     >
                         <svg
                             className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors"
@@ -88,7 +88,7 @@ export default function BasketSearchDebounce() {
                         params.set('page', '1');
                         router.push(`?${params.toString()}`);
                     }}
-                    className="px-4 py-2.5 text-sm font-medium cursor-pointer text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 shadow-sm whitespace-nowrap"
+                    className="px-3 py-2 text-base font-medium cursor-pointer text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 shadow-sm whitespace-nowrap"
                 >
                     Clear Search
                 </button>
