@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-
+import axiosInstance from "../helpers/axios"
 
 export default function BenchmarkModal({ isOpen, onClose, onCreated }) {
   const [category, setCategory] = useState("")
@@ -14,8 +14,7 @@ export default function BenchmarkModal({ isOpen, onClose, onCreated }) {
     if (!isOpen) return
     const fetchStocks = async () => {
       try {
-        const res = await fetch("http://localhost:3030/api/v1/getStocks/getStocks")
-        const data = await res.json()
+        const {data} = await axiosInstance.get("/v1/getStocks/getStocks")
         setStocks(data.data || data)
         console.log(stocks)
       } catch (err) {
@@ -32,12 +31,9 @@ export default function BenchmarkModal({ isOpen, onClose, onCreated }) {
     }
     setLoading(true)
     try {
-      const res = await fetch("http://localhost:3030/api/v1/benchmark/create", {
-        method: "POST",
+      const {data} = await axiosInstance.post("/v1/benchmark/create", { category, stock },{
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ category, stock }),
       })
-      const data = await res.json()
       if (data.success) {
         onCreated()
         onClose()

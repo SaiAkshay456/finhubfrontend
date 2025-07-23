@@ -1,0 +1,20 @@
+export const recommendedQuestions = [
+    "What is your age group?",
+    "What is your annual income?",
+    "How much risk can you tolerate?",
+    "What is your investment horizon?",
+    "What are your financial goals?",
+    "What is your investment experience?",
+    "Do you prefer fixed income or equity?",
+    "Are you comfortable with market fluctuations?",
+    "Do you have any existing investments?",
+    "Do you require liquidity in your investments?",
+    "What percentage of income can you invest?",
+    "Do you prefer long-term or short-term investments?",
+    "How often do you review your portfolio?",
+    "Have you invested in mutual funds before?",
+    "Do you prefer low risk, moderate, or high risk options?",
+    "What is your retirement planning stage?",
+    "Do you have dependents relying on your income?",
+    "Would you prefer capital appreciation or regular income?"
+];

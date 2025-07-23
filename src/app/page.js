@@ -1,17 +1,23 @@
+'use client';
+import Header from '@/components/Header';
+import HeroLanding from '@/components/HeroLanding';
+import { useAuth } from '@/providers/AuthProvider';
+import Statistics from '@/components/Statistics';
+export default function HomePage() {
+  const { isAuthorized, user } = useAuth();
 
-// import { redirect } from "next/navigation";
-// import { Hero } from "../components/Hero";
-import { cookies } from "next/headers";
-// import { useAuth } from "../providers/AuthProvider";
-import Statistics from "../components/Statistics";
+  if (isAuthorized) {
+    return (
+      <div>
+        <Statistics />
+      </div>
+    );
+  }
 
-export default async function Home() {
-  const cookieStore = await cookies();
-  // const token = cookieStore.get("token")?.value;
   return (
     <>
-      <Statistics />
-
+      <Header />
+      <HeroLanding />
     </>
   );
 }

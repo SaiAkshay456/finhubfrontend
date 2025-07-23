@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { X } from "lucide-react"
 import Select from "react-select"
-
+import axiosInstance from "../helpers/axios"
 export default function CreateRecommendationModal({ isOpen, onClose, onCreated }) {
   const [form, setForm] = useState({
     assetType: "Stock",
@@ -32,6 +32,8 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
   const [fieldErrors, setFieldErrors] = useState({})
   const [selectedAssetOption, setSelectedAssetOption] = useState(null)
   const [isCategoryPrefilled, setIsCategoryPrefilled] = useState(false)
+  const [categoryOptions, setCategoryOptions] = useState([]);
+
 
 
 
@@ -39,9 +41,8 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
     if (!isOpen) return
     const fetchInitialAssets = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/mutualfund/list-mf?page=1&limit=50")
-        const result = await res.json()
-        setInitialAssets(result.data)
+        const {data}= await axiosInstance.get("v1/mutual-funds/list-mf?page=1&limit=50")
+        setInitialAssets(data.data)
       } catch (err) {
         console.error("Error fetching initial assets:", err)
       }
@@ -57,16 +58,16 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
 
     const fetchAssets = async () => {
       try {
-        const res = await fetch(
-          `http://localhost:5000/api/mutualfund/list-mf?page=${page}&limit=50&search=${searchTerm}`,
+        const {data} = await axiosInstance.get(
+          `/v1/mutual-funds/list-mf?page=${page}&limit=50&search=${searchTerm}`,
           { signal: controller.signal },
         )
-        const result = await res.json()
+        
 
-        setFilteredAssets(result.data)
-        setAssets(result.data)
-        setHasNext(result.pagination?.hasNext)
-        setHasPrev(result.pagination?.hasPrev)
+        setFilteredAssets(data.data)
+        setAssets(data.data)
+        setHasNext(data.data.pagination?.hasNext)
+        setHasPrev(data.data.pagination?.hasPrev)
       } catch (err) {
         if (err.name !== "AbortError") {
           console.error("Error fetching assets:", err)
@@ -90,30 +91,70 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
     }
   }
 
-  const handleAssetSelect = (asset) => {
-  const selectedOption = {
-    value: asset._id,
-    label: asset.name,
-    data: asset,
-  }
-
-  setSelectedAssetOption(selectedOption)
-
-  setForm((prev) => ({
-    ...prev,
-    name: asset.name,
-    sector: asset.sector || "",
-    mutualFundId: asset._id,
-    assetType: asset.assetType,
-    category: prev.category || asset.category || "", // only overwrite if empty
-    cmp: asset.nav || "",
-  }))
-  setIsCategoryPrefilled(!form.category && !!asset.category)
-  setSearchTerm("")
-  if (fieldErrors.mutualFundId) {
-    setFieldErrors((prev) => ({ ...prev, mutualFundId: false }))
-  }
-}
+  const handleAssetSelect = async (asset) => {
+    const selectedOption = {
+      value: asset._id,
+      label: asset.name,
+      data: asset,
+    };
+  
+    setSelectedAssetOption(selectedOption);
+  
+    // Default form setup
+    let categoryName = "";
+    let assetType = "";
+  
+    // Fetch category name if categories field is present
+    if (asset.categories) {
+      try {
+        const {data}= await axiosInstance.get(`/v1/category/instrument-categories/${asset.categories}`);
+  
+        if (data?.name) {
+          categoryName = data.name;
+          assetType = data.assetClass || "";
+        }
+      } catch (err) {
+        console.error("Error fetching category:", err);
+      }
+    }
+  
+    setForm((prev) => ({
+      ...prev,
+      name: asset.name,
+      sector: asset.sector || "",
+      mutualFundId: asset._id,
+      assetType,
+      category: categoryName || prev.category || "",
+      cmp: asset.nav || "",
+    }));
+  
+    setIsCategoryPrefilled(!!categoryName);
+    setSearchTerm("");
+  
+    if (fieldErrors.mutualFundId) {
+      setFieldErrors((prev) => ({ ...prev, mutualFundId: false }));
+    }
+  };
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const {data} = await axiosInstance.get("/v1/category/instrument-categories/all");
+        const options = data.map(cat => ({
+          value: cat.name,
+          label: cat.name,
+        }));
+        setCategoryOptions(options);
+      } catch (err) {
+        console.error("Failed to load categories", err);
+      }
+    };
+  
+    if (!form.category) {
+      fetchCategories();
+    }
+  }, [form.category]);
+  
+  
 
 
   const handleSubmit = async () => {
@@ -140,26 +181,25 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
     setError("")
     setLoading(true)
     try {
-      const res = await fetch("http://localhost:3030/api/v1/recommendations/create", {
-        method: "POST",
+      const {data} = await axiosInstance.post("/v1/recommendations/create",{
+        mutualFundId,
+        sector,
+        rmp: Number.parseFloat(rmp),
+        cmp: Number.parseFloat(cmp),
+        riskProfile,
+        action,
+        remark,
+        validTill,
+        category,
+      }, {
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          mutualFundId,
-          sector,
-          rmp: Number.parseFloat(rmp),
-          cmp: Number.parseFloat(cmp),
-          riskProfile,
-          action,
-          remark,
-          validTill,
-          category,
-        }),
       })
 
-      if (!res.ok) throw new Error("Failed to create recommendation")
+      // if (!res.ok) throw new Error("Failed to create recommendation")
+      console.log(data)
 
-      const data = await res.json()
-      onCreated(data)
+      // const data = await res.json()
+      onCreated(data.data)
       onClose()
       setForm({
         assetType: "Stock",
@@ -304,20 +344,30 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
                 </div>
               )} */}
             </div>
-
             {/* Category */}
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-gray-700">Category</label>
-              <input
-                type="text"
-                name="category"
-                value={form.category}
-                onChange={handleChange}
-                className={inputClass("category")}
-                placeholder="Enter category"
-                disabled={isCategoryPrefilled}
-              />
-            </div>
+<div className="space-y-2">
+  <label className="block text-sm font-semibold text-gray-700">Category</label>
+  {isCategoryPrefilled ? (
+    <input
+      type="text"
+      name="category"
+      value={form.category}
+      className={inputClass("category")}
+      disabled
+    />
+  ) : (
+    <Select
+      options={categoryOptions}
+      value={categoryOptions.find(opt => opt.value === form.category)}
+      onChange={(selected) =>
+        setForm((prev) => ({ ...prev, category: selected?.value || "" }))
+      }
+      placeholder="Select a category"
+      className="text-sm"
+    />
+  )}
+</div>
+
 
             {/* Valid Till */}
             <div className="space-y-2">

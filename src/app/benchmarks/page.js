@@ -3,14 +3,14 @@
 import { useEffect, useState } from "react"
 import BenchmarkModal from "../../components/BenchmarkModal"
 import { format } from "date-fns"
+import axiosInstance from "../../helpers/axios"
 export default function BenchmarkPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [benchmarks, setBenchmarks] = useState([])
 
   const fetchBenchmarks = async () => {
     try {
-      const res = await fetch("http://localhost:3030/api/v1/benchmark")
-      const data = await res.json()
+      const {data} = await axiosInstance.get("/v1/benchmark")
       setBenchmarks(data.data || [])
     } catch (err) {
       console.error("Error fetching benchmarks:", err)

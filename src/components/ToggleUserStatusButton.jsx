@@ -9,7 +9,7 @@ export default function ToggleUserStatusButton({ userId, isActive }) {
     const handleToggle = async () => {
         try {
             setLoading(true);
-            const res = await fetch(`http://localhost:3030/api/v1/adminuse/user-status-update/${userId}`, {
+            const res = await fetch(`http://localhost:3030/v1/users/user-status-update/${userId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',

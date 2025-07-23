@@ -6,7 +6,7 @@ import * as Popover from '@radix-ui/react-popover';
 import { MoreHorizontal } from 'lucide-react';
 import { AgGridReact } from 'ag-grid-react';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'; 
-
+import axiosInstance from '../../helpers/axios';
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 
@@ -18,8 +18,9 @@ export default function RecommendationTable() {
   // Fetch all recommendations
   const fetchRecommendations = async () => {
     try {
-      const res = await fetch('http://localhost:3030/api/v1/recommendations/getRecommendations');
-      const data = await res.json();
+      const {data} = await axiosInstance.get('/v1/recommendations/getRecommendations');
+      
+      console.log(data)
       if (data.success) {
         setRecommendations(data.data);
       }
@@ -30,20 +31,30 @@ export default function RecommendationTable() {
 
   const handleStatusToggle = async (id, currentStatus) => {
     const newStatus = currentStatus === 'Active' ? 'Closed' : 'Active';
+  
+    const confirmed = window.confirm(
+      `Are you sure you want to change the status to "${newStatus}"?`
+    );
+  
+    if (!confirmed) return;
+  
     try {
-      const res = await fetch(`http://localhost:3030/api/v1/recommendations/updateStatus/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus }),
-      });
-      const data = await res.json();
+      const { data } = await axiosInstance.patch(
+        `/v1/recommendations/updateStatus/${id}`,
+        { status: newStatus },
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+  
       if (data.success) {
-        fetchRecommendations(); 
+        fetchRecommendations();
       }
     } catch (err) {
       console.error('Failed to update status:', err);
     }
   };
+  
   
   useEffect(() => {
     fetchRecommendations()
@@ -342,7 +353,7 @@ export default function RecommendationTable() {
           </div>
 
           {/* AG Grid Container */}
-          <div className="p-8">
+          <div className="p-2">
             {filtered.length === 0 ? (
               <div className="text-center py-16">
                 <div className="flex flex-col items-center justify-center">
