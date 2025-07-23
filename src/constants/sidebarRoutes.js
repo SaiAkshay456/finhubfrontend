@@ -65,7 +65,6 @@ export const sidebarItems = [
         label: "Portfolio Upload",
         path: "/upload-portfolio",
         icon: FaFileUpload,
-<<<<<<< HEAD
         description: "Upload user's portfolio file",
     },
     {
@@ -79,7 +78,6 @@ export const sidebarItems = [
         path: "/benchmarks",
         icon: HiOutlineViewGrid,
         description: "Benchmark portfolio performance with indices",
-=======
         description: "Upload protfolio"
     },
     {
@@ -87,7 +85,6 @@ export const sidebarItems = [
         path: "/fill-response",
         icon: FaFileUpload,
         description: "Upload protfolio"
->>>>>>> f-r/revamp
     }
 
 ];
