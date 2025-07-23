@@ -1,8 +1,9 @@
 'use client';
 
-import axios from 'axios';
 import { useState } from 'react';
 import { isAtLeast18 } from '../constants/dobValidation';
+import { API_BASE, USER_MANAGE_ROUTES } from '@/helpers/apiRoutes';
+import axiosInstance from '@/helpers/axios';
 
 export default function KycFormUser({ userId, token }) {
     const [formData, setFormData] = useState({
@@ -42,7 +43,7 @@ export default function KycFormUser({ userId, token }) {
             formPayload.append('address', formData.address);
             formPayload.append('aadharFile', formData.aadharFile);
             formPayload.append('panFile', formData.panFile);
-            const res = await axios.put(`http://localhost:3030/v1/users/user/kyc-form-submit/${userId}`,
+            const res = await axiosInstance.put(`${API_BASE}/${USER_MANAGE_ROUTES.KYC_VERIFY_USER}/${userId}`,
                 formPayload
                 , {
                     headers: {

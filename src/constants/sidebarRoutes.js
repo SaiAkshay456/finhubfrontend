@@ -65,7 +65,7 @@ export const sidebarItems = [
         label: 'Portfolio Upload',
         path: '/upload-portfolio',
         icon: FaFileUpload,
-        description: "Upload user's portfolio file",
+        description: "Upload protfolio"
     },
     {
         label: 'Recommendations',
@@ -77,16 +77,17 @@ export const sidebarItems = [
         label: 'Benchmarks',
         path: '/benchmarks',
         icon: HiOutlineViewGrid,
-        description: 'Benchmark portfolio performance with indices',
-        description: 'Upload protfolio',
+        description: "Benchmark portfolio performance with indices",
     },
     {
         label: 'Fill Response',
         path: '/fill-response',
         icon: FaFileUpload,
-        description: 'Upload protfolio',
+        description: "Upload protfolio"
     },
-]
+    
+
+];
 
 // try {
 //     isLoading = true;

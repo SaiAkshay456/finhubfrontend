@@ -14,11 +14,13 @@ export default function Sidebar({ user, children }) {
     const { setIsAuthorized, setUser } = useAuth();
 
     const toggleSidebar = () => setIsOpen(!isOpen);
-
+    console.log(sidebarItems)
     const allowedSidebar = sidebarItems.filter(route =>
         user?.sidebar?.some(item => item.label === route.label && item.access)
     );
+    // const allowedSidebar = sidebarItems;
 
+    console.log(allowedSidebar)
     const handleLogoutUser = async () => {
         try {
             const res = await axios.get('http://localhost:3030/v1/auth/logout', {

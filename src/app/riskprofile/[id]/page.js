@@ -1,12 +1,14 @@
 import { cookies } from 'next/headers';
 import AssignRiskCategory from '../../../components/AssignRiskCategory';
 import axiosInstance from '@/helpers/axios';
+import { API_BASE } from '@/helpers/apiRoutes';
+import { RISK_ROUTES } from '@/helpers/apiRoutes';
 
 export async function getResponsesForUsers(id) {
     const cookieStore = cookies();
     const token = cookieStore.get('token')?.value;
     try {
-        const { data } = await axiosInstance.get(`/v1/riskprofile/user-response/${id}`, {
+        const { data } = await axiosInstance.get(`${API_BASE}/${RISK_ROUTES.USER_RESPONSE}/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
 
         });

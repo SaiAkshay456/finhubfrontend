@@ -1,209 +1,273 @@
-'use client'
-import { useEffect, useState } from 'react'
-import { X } from 'lucide-react'
+"use client"
 
-export default function CreateRecommendationModal({
-    isOpen,
-    onClose,
-    onCreated,
-}) {
-    const [form, setForm] = useState({
-        assetType: 'Stock',
-        sector: '',
-        name: '',
-        mutualFundId: '',
-        category: '',
-        rmp: '',
-        cmp: '',
-        riskProfile: 'Low',
-        action: 'Buy',
-        remark: '',
-        validTill: '',
-    })
+import { useEffect, useState } from "react"
+import { X } from "lucide-react"
+import Select from "react-select"
+import axiosInstance from "../helpers/axios"
+export default function CreateRecommendationModal({ isOpen, onClose, onCreated }) {
+  const [form, setForm] = useState({
+    assetType: "Stock",
+    sector: "",
+    name: "",
+    mutualFundId: "",
+    category: "",
+    rmp: "",
+    cmp: "",
+    riskProfile: "Low",
+    action: "Buy",
+    remark: "",
+    validTill: "",
+  })
 
-    const [assets, setAssets] = useState([])
-    const [filteredAssets, setFilteredAssets] = useState([])
-    const [searchTerm, setSearchTerm] = useState('')
-    const [error, setError] = useState('')
-    const [loading, setLoading] = useState(false)
-    const [page, setPage] = useState(1)
-    const [hasNext, setHasNext] = useState(false)
-    const [hasPrev, setHasPrev] = useState(false)
-    const [initialAssets, setInitialAssets] = useState([])
-    const [showDropdown, setShowDropdown] = useState(false)
+  const [assets, setAssets] = useState([])
+  const [filteredAssets, setFilteredAssets] = useState([])
+  const [searchTerm, setSearchTerm] = useState("")
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [page, setPage] = useState(1)
+  const [hasNext, setHasNext] = useState(false)
+  const [hasPrev, setHasPrev] = useState(false)
+  const [initialAssets, setInitialAssets] = useState([])
+  const [showDropdown, setShowDropdown] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState({})
+  const [selectedAssetOption, setSelectedAssetOption] = useState(null)
+  const [isCategoryPrefilled, setIsCategoryPrefilled] = useState(false)
+  const [categoryOptions, setCategoryOptions] = useState([]);
 
-    useEffect(() => {
-        if (!isOpen) return
 
-        const fetchInitialAssets = async () => {
-            try {
-                const res = await fetch(
-                    'http://localhost:3030/v1/mutualfund/list-mf?page=1&limit=50'
-                )
-                const result = await res.json()
-                setInitialAssets(result.data)
-            } catch (err) {
-                console.error('Error fetching initial assets:', err)
-            }
+
+
+  useEffect(() => {
+    if (!isOpen) return
+    const fetchInitialAssets = async () => {
+      try {
+        const {data}= await axiosInstance.get("v1/mutual-funds/list-mf?page=1&limit=50")
+        setInitialAssets(data.data)
+      } catch (err) {
+        console.error("Error fetching initial assets:", err)
+      }
+    }
+    fetchInitialAssets()
+  }, [isOpen])
+
+  useEffect(() => {
+    if (!isOpen) return
+    if (!isOpen || !searchTerm) return
+
+    const controller = new AbortController()
+
+    const fetchAssets = async () => {
+      try {
+        const {data} = await axiosInstance.get(
+          `/v1/mutual-funds/list-mf?page=${page}&limit=50&search=${searchTerm}`,
+          { signal: controller.signal },
+        )
+        
+
+        setFilteredAssets(data.data)
+        setAssets(data.data)
+        setHasNext(data.data.pagination?.hasNext)
+        setHasPrev(data.data.pagination?.hasPrev)
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          console.error("Error fetching assets:", err)
         }
-        fetchInitialAssets()
-    }, [isOpen])
-    useEffect(() => {
-        if (!isOpen) return
-        if (!isOpen || !searchTerm) return
-        const controller = new AbortController()
-
-        const fetchAssets = async () => {
-            try {
-                const res = await fetch(
-                    `http://localhost:3030/v1/mutualfund/list-mf?page=${page}&limit=50&search=${searchTerm}`,
-                    { signal: controller.signal }
-                )
-                const result = await res.json()
-
-                // console.log("Raw API Data:", result.data)
-
-                // setAssets(result.data)
-                setFilteredAssets(result.data)
-                // console.log("searchTerm", searchTerm);
-                // console.log("filteredAssets", filteredAssets);
-
-                setAssets(result.data)
-                // setFilteredAssets(filtered)
-                setHasNext(result.pagination?.hasNext)
-                setHasPrev(result.pagination?.hasPrev)
-            } catch (err) {
-                if (err.name !== 'AbortError') {
-                    console.error('Error fetching assets:', err)
-                }
-            }
-        }
-
-        const delayDebounce = setTimeout(fetchAssets, 300)
-        return () => {
-            clearTimeout(delayDebounce)
-            controller.abort()
-        }
-    }, [searchTerm, form.assetType, page, isOpen])
-
-    // useEffect(() => {
-    //   const filtered = assets.filter(
-    //     (item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()),
-    //   )
-    //   setFilteredAssets(filtered)
-    // }, [assets, form.assetType, searchTerm])
-
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value })
-        setError('')
+      }
     }
 
-    const handleAssetSelect = (asset) => {
-        setForm((prev) => ({
-            ...prev,
-            name: asset.name,
-            sector: asset.sector || '',
-            mutualFundId: asset._id,
-            assetType: asset.assetType,
-            category: asset.category || '',
-            cmp: asset.nav || '',
-        }))
-        setSearchTerm('')
+    const delayDebounce = setTimeout(fetchAssets, 300)
+    return () => {
+      clearTimeout(delayDebounce)
+      controller.abort()
+    }
+  }, [searchTerm, form.assetType, page, isOpen])
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value })
+    setError("")
+    // Clear field error when user starts typing
+    if (fieldErrors[e.target.name]) {
+      setFieldErrors((prev) => ({ ...prev, [e.target.name]: false }))
+    }
+  }
+
+  const handleAssetSelect = async (asset) => {
+    const selectedOption = {
+      value: asset._id,
+      label: asset.name,
+      data: asset,
+    };
+  
+    setSelectedAssetOption(selectedOption);
+  
+    // Default form setup
+    let categoryName = "";
+    let assetType = "";
+  
+    // Fetch category name if categories field is present
+    if (asset.categories) {
+      try {
+        const {data}= await axiosInstance.get(`/v1/category/instrument-categories/${asset.categories}`);
+  
+        if (data?.name) {
+          categoryName = data.name;
+          assetType = data.assetClass || "";
+        }
+      } catch (err) {
+        console.error("Error fetching category:", err);
+      }
+    }
+  
+    setForm((prev) => ({
+      ...prev,
+      name: asset.name,
+      sector: asset.sector || "",
+      mutualFundId: asset._id,
+      assetType,
+      category: categoryName || prev.category || "",
+      cmp: asset.nav || "",
+    }));
+  
+    setIsCategoryPrefilled(!!categoryName);
+    setSearchTerm("");
+  
+    if (fieldErrors.mutualFundId) {
+      setFieldErrors((prev) => ({ ...prev, mutualFundId: false }));
+    }
+  };
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const {data} = await axiosInstance.get("/v1/category/instrument-categories/all");
+        const options = data.map(cat => ({
+          value: cat.name,
+          label: cat.name,
+        }));
+        setCategoryOptions(options);
+      } catch (err) {
+        console.error("Failed to load categories", err);
+      }
+    };
+  
+    if (!form.category) {
+      fetchCategories();
+    }
+  }, [form.category]);
+  
+  
+
+
+  const handleSubmit = async () => {
+    const { mutualFundId, sector, rmp, cmp, riskProfile, action, remark, validTill, category } = form
+
+    const newErrors = {}
+    if (!mutualFundId) newErrors.mutualFundId = true
+    if (!sector) newErrors.sector = true
+    if (!category) newErrors.category = true
+    if (!validTill) newErrors.validTill = true
+    if (!rmp || Number.parseFloat(rmp) <= 0) newErrors.rmp = true
+    if (!cmp) newErrors.cmp = true
+    if (!riskProfile) newErrors.riskProfile = true
+    if (!action) newErrors.action = true
+    if (!remark) newErrors.remark = true
+
+    setFieldErrors(newErrors)
+
+    if (Object.keys(newErrors).length > 0) {
+      setError("Please correct the highlighted fields.")
+      return
     }
 
-    const handleSubmit = async () => {
-        const {
-            mutualFundId,
-            sector,
-            rmp,
-            cmp,
-            riskProfile,
-            action,
-            remark,
-            validTill,
-        } = form
+    setError("")
+    setLoading(true)
+    try {
+      const {data} = await axiosInstance.post("/v1/recommendations/create",{
+        mutualFundId,
+        sector,
+        rmp: Number.parseFloat(rmp),
+        cmp: Number.parseFloat(cmp),
+        riskProfile,
+        action,
+        remark,
+        validTill,
+        category,
+      }, {
+        headers: { "Content-Type": "application/json" },
+      })
 
-        if (
-            !mutualFundId ||
-            !sector ||
-            !rmp ||
-            !cmp ||
-            !riskProfile ||
-            !action ||
-            !remark ||
-            !validTill
-        ) {
-            setError('All fields are required.')
-            return
-        }
+      // if (!res.ok) throw new Error("Failed to create recommendation")
+      console.log(data)
 
-        setLoading(true)
-        try {
-            const res = await fetch(
-                'http://localhost:3030/api/v1/recommendations/create',
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        mutualFundId,
-                        sector,
-                        rmp: parseFloat(rmp),
-                        cmp: parseFloat(cmp),
-                        riskProfile,
-                        action,
-                        remark,
-                        validTill,
-                    }),
-                }
-            )
-
-            if (!res.ok) throw new Error('Failed to create recommendation')
-            const data = await res.json()
-            onCreated(data)
-            onClose()
-            setForm({
-                assetType: 'Stock',
-                sector: '',
-                name: '',
-                mutualFundId: '',
-                category: '',
-                rmp: '',
-                cmp: '',
-                riskProfile: 'Low',
-                action: 'Buy',
-                remark: '',
-                validTill: '',
-            })
-        } catch (err) {
-            console.error('Error:', err)
-            setError('Something went wrong.')
-        } finally {
-            setLoading(false)
-        }
+      // const data = await res.json()
+      onCreated(data.data)
+      onClose()
+      setForm({
+        assetType: "Stock",
+        sector: "",
+        name: "",
+        mutualFundId: "",
+        category: "",
+        rmp: "",
+        cmp: "",
+        riskProfile: "Low",
+        action: "Buy",
+        remark: "",
+        validTill: "",
+      })
+      setFieldErrors({})
+    } catch (err) {
+      console.error("Error:", err)
+      setError("Something went wrong.")
+    } finally {
+      setLoading(false)
     }
+  }
+
+  const inputClass = (field) =>
+    `w-full px-4 py-3 border ${
+      fieldErrors[field] ? "border-red-500 bg-red-50" : "border-gray-200 bg-gray-50"
+    } rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:bg-white`
+
+  const selectClass = (field) =>
+    `w-full px-4 py-3 border ${
+      fieldErrors[field] ? "border-red-500 bg-red-50" : "border-gray-200 bg-gray-50"
+    } rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:bg-white`
+
+  // Custom styles for React Select with error state
+  const getReactSelectStyles = (hasError) => ({
+    control: (provided, state) => ({
+      ...provided,
+      border: hasError ? "1px solid #ef4444" : "1px solid #e5e7eb",
+      backgroundColor: hasError ? "#fef2f2" : "#f9fafb",
+      borderRadius: "0.75rem",
+      padding: "0.5rem",
+      boxShadow: state.isFocused ? "0 0 0 2px #3b82f6" : "none",
+      "&:hover": {
+        backgroundColor: "#ffffff",
+        borderColor: hasError ? "#ef4444" : "#e5e7eb",
+      },
+    }),
+    placeholder: (provided) => ({
+      ...provided,
+      color: "#9ca3af",
+    }),
+  })
 
     if (!isOpen) return null
 
-    return (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl relative max-h-[90vh] overflow-y-auto">
-                {/* Header */}
-                <div className="sticky top-0 bg-white rounded-t-2xl border-b border-gray-100 px-8 py-6 flex items-center justify-between">
-                    <div>
-                        <h2 className="text-2xl font-bold text-gray-900">
-                            Create Recommendation
-                        </h2>
-                        <p className="text-sm text-gray-500 mt-1">
-                            Add a new investment recommendation
-                        </p>
-                    </div>
-                    <button
-                        onClick={onClose}
-                        className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
-                    >
-                        <X className="w-5 h-5 text-gray-500" />
-                    </button>
-                </div>
+  return (
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl relative max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="sticky top-0 bg-white rounded-t-2xl border-b border-gray-100 px-8 py-6 flex items-center justify-between z-100">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Create Recommendation</h2>
+            <p className="text-sm text-gray-500 mt-1">Add a new investment recommendation</p>
+          </div>
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200">
+            <X className="w-5 h-5 text-gray-500" />
+          </button>
+        </div>
 
                 {/* Content */}
                 <div className="px-8 py-6">
@@ -224,214 +288,167 @@ export default function CreateRecommendationModal({
                             </select>
                         </div>
 
-                        {/* Sector */}
-                        <div className="space-y-2">
-                            <label className="block text-sm font-semibold text-gray-700">
-                                Sector
-                            </label>
-                            <input
-                                type="text"
-                                name="sector"
-                                value={form.sector}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
-                                placeholder="Enter sector"
-                            />
-                        </div>
+            {/* Sector */}
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">Sector</label>
+              <input
+                type="text"
+                name="sector"
+                value={form.sector}
+                onChange={handleChange}
+                className={inputClass("sector")}
+                placeholder="Enter sector"
+              />
+            </div>
 
-                        {/* Asset Name Search */}
-                        <div className="md:col-span-2 space-y-2 relative">
-                            <label className="block text-sm font-semibold text-gray-700">
-                                Asset Name
-                            </label>
-                            <input
-                                type="text"
-                                name="search"
-                                value={searchTerm}
-                                onChange={(e) => {
-                                    setSearchTerm(e.target.value)
-                                    setPage(1)
-                                    setShowDropdown(false)
-                                }}
-                                onClick={() => {
-                                    if (!searchTerm) {
-                                        setShowDropdown(true)
-                                    }
-                                }}
-                                autoComplete="off"
-                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
-                                placeholder="Search for an asset..."
-                            />
-                            {(searchTerm || showDropdown) && (
-                                <div className="absolute top-full left-0 right-0 z-10 mt-1">
-                                    <ul className="max-h-60 overflow-y-auto bg-white border border-gray-200 rounded-t-xl shadow-lg">
-                                        {(searchTerm
-                                            ? filteredAssets
-                                            : showDropdown
-                                            ? initialAssets
-                                            : []
-                                        ).map((a) => (
-                                            <li
-                                                key={a._id}
-                                                className="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-colors duration-150 border-b border-gray-100"
-                                                onClick={() => {
-                                                    handleAssetSelect(a)
-                                                    setShowDropdown(false)
-                                                }}
-                                            >
-                                                <div className="font-medium text-gray-900">
-                                                    {a.name}
-                                                </div>
-                                                {a.sector && (
-                                                    <div className="text-sm text-gray-500">
-                                                        {a.sector}
-                                                    </div>
-                                                )}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                    {searchTerm && (hasNext || hasPrev) && (
-                                        <div className="flex items-center justify-between px-4 py-2 bg-white border border-t-0 border-gray-200 rounded-b-xl shadow">
-                                            <button
-                                                disabled={!hasPrev}
-                                                onClick={() =>
-                                                    setPage((p) =>
-                                                        Math.max(1, p - 1)
-                                                    )
-                                                }
-                                                className="text-blue-600 hover:underline disabled:text-gray-400 disabled:cursor-not-allowed"
-                                            >
-                                                Prev
-                                            </button>
-                                            <button
-                                                disabled={!hasNext}
-                                                onClick={() =>
-                                                    setPage((p) => p + 1)
-                                                }
-                                                className="text-blue-600 hover:underline disabled:text-gray-400 disabled:cursor-not-allowed"
-                                            >
-                                                Next
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                            {form.name && (
-                                <div className="mt-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg">
-                                    <span className="text-sm font-medium text-blue-800">
-                                        Selected: {form.name}
-                                    </span>
-                                </div>
-                            )}
-                        </div>
+            {/* Asset Name Search */}
+            <div className="md:col-span-2 space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">Asset</label>
+              <Select
+  inputValue={searchTerm}
+  onInputChange={(value) => {
+    setSearchTerm(value)
+    setPage(1)
+  }}
+  value={selectedAssetOption}
+  options={(searchTerm ? filteredAssets : initialAssets).map((a) => ({
+    value: a._id,
+    label: a.name,
+    data: a,
+  }))}
+  onChange={(selectedOption) => {
+    const asset = selectedOption?.data
+    if (asset) handleAssetSelect(asset)
+    else {
+      setSelectedAssetOption(null)
+      setForm((prev) => ({
+        ...prev,
+        name: "",
+        mutualFundId: "",
+        sector: "",
+        category: "",
+        cmp: "",
+      }))
+      setIsCategoryPrefilled(false)
+    }
+  }}
+  placeholder="Search and select an asset..."
+  isClearable
+  className="react-select-container"
+  classNamePrefix="react-select"
+  styles={getReactSelectStyles(fieldErrors.mutualFundId)}
+  noOptionsMessage={() => (searchTerm ? "No assets found" : "Start typing...")}
+/>
 
-                        {/* Category */}
-                        <div className="space-y-2">
-                            <label className="block text-sm font-semibold text-gray-700">
-                                Category
-                            </label>
-                            <input
-                                type="text"
-                                name="category"
-                                value={form.category}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
-                                placeholder="Enter category"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="block text-sm font-semibold text-gray-700">
-                                Valid Till
-                            </label>
-                            <input
-                                type="date"
-                                name="validTill"
-                                value={form.validTill}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
-                            />
-                        </div>
-                        {/* RMP */}
-                        <div className="space-y-2">
-                            <label className="block text-sm font-semibold text-gray-700">
-                                RMP (Recommended Price)
-                            </label>
-                            <input
-                                type="number"
-                                name="rmp"
-                                value={form.rmp}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
-                                placeholder="0.00"
-                                step="0.01"
-                            />
-                        </div>
+              {/* {form.name && (
+                <div className="mt-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg">
+                  <span className="text-sm font-medium text-blue-800">Selected: {form.name}</span>
+                </div>
+              )} */}
+            </div>
+            {/* Category */}
+<div className="space-y-2">
+  <label className="block text-sm font-semibold text-gray-700">Category</label>
+  {isCategoryPrefilled ? (
+    <input
+      type="text"
+      name="category"
+      value={form.category}
+      className={inputClass("category")}
+      disabled
+    />
+  ) : (
+    <Select
+      options={categoryOptions}
+      value={categoryOptions.find(opt => opt.value === form.category)}
+      onChange={(selected) =>
+        setForm((prev) => ({ ...prev, category: selected?.value || "" }))
+      }
+      placeholder="Select a category"
+      className="text-sm"
+    />
+  )}
+</div>
 
-                        {/* CMP */}
-                        <div className="space-y-2">
-                            <label className="block text-sm font-semibold text-gray-700">
-                                CMP (Current Market Price)
-                            </label>
-                            <input
-                                type="number"
-                                name="cmp"
-                                value={form.cmp}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
-                                placeholder="0.00"
-                                step="0.01"
-                            />
-                        </div>
 
-                        {/* Risk Level */}
-                        <div className="space-y-2">
-                            <label className="block text-sm font-semibold text-gray-700">
-                                Risk Level
-                            </label>
-                            <select
-                                name="riskProfile"
-                                value={form.riskProfile}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
-                            >
-                                <option>Low</option>
-                                <option>Medium</option>
-                                <option>High</option>
-                            </select>
-                        </div>
+            {/* Valid Till */}
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">Valid Till</label>
+              <input
+                type="date"
+                name="validTill"
+                value={form.validTill}
+                onChange={handleChange}
+                className={inputClass("validTill")}
+              />
+            </div>
 
-                        {/* Action */}
-                        <div className="space-y-2">
-                            <label className="block text-sm font-semibold text-gray-700">
-                                Action
-                            </label>
-                            <select
-                                name="action"
-                                value={form.action}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
-                            >
-                                <option>Buy</option>
-                                <option>Sell</option>
-                                <option>Hold</option>
-                            </select>
-                        </div>
+            {/* RMP */}
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">RMP (Recommended Price)</label>
+              <input
+                type="number"
+                name="rmp"
+                value={form.rmp}
+                onChange={handleChange}
+                className={inputClass("rmp")}
+                placeholder="0.00"
+                step="0.01"
+              />
+            </div>
 
-                        {/* remark */}
-                        <div className="md:col-span-2 space-y-2">
-                            <label className="block text-sm font-semibold text-gray-700">
-                                remark
-                            </label>
-                            <textarea
-                                name="remark"
-                                value={form.remark}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white resize-none"
-                                rows={4}
-                                placeholder="Add any additional notes or remark..."
-                            />
-                        </div>
-                    </div>
+            {/* CMP */}
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">CMP (Current Market Price)</label>
+              <input
+                type="number"
+                name="cmp"
+                value={form.cmp}
+                onChange={handleChange}
+                className={inputClass("cmp")}
+                placeholder="0.00"
+                step="0.01"
+              />
+            </div>
+
+            {/* Risk Profile */}
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">Risk Profile</label>
+              <select
+                name="riskProfile"
+                value={form.riskProfile}
+                onChange={handleChange}
+                className={selectClass("riskProfile")}
+              >
+                <option>Low</option>
+                <option>Medium</option>
+                <option>High</option>
+              </select>
+            </div>
+
+            {/* Action */}
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">Action</label>
+              <select name="action" value={form.action} onChange={handleChange} className={selectClass("action")}>
+                <option>Buy</option>
+                <option>Sell</option>
+                <option>Hold</option>
+              </select>
+            </div>
+
+            {/* Remark */}
+            <div className="md:col-span-2 space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">Remark</label>
+              <textarea
+                name="remark"
+                value={form.remark}
+                onChange={handleChange}
+                className={`${inputClass("remark")} resize-none`}
+                rows={4}
+                placeholder="Add any additional notes or remark..."
+              />
+            </div>
+          </div>
 
                     {/* Error Message */}
                     {error && (

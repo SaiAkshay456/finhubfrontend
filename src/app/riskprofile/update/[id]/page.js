@@ -1,5 +1,8 @@
 import { cookies } from 'next/headers';
 import UpdateQuestionnaireForm from './UpdateForm';
+import { AxiosError } from 'axios';
+import axiosInstance from '@/helpers/axios';
+import { API_BASE, RISK_ROUTES } from '@/helpers/apiRoutes';
 // import QuestionnaireEditClient from './QuestionnaireEditClient';
 // import { notFound } from 'next/navigation';
 
@@ -10,20 +13,21 @@ export default async function EditPage({ params }) {
     let data = null
     let error = null;
     try {
-        const res = await fetch(`http://localhost:3030/v1/riskprofile/get/questionarrie-user/${id}`, {
+        const res = await axiosInstance.get(`${API_BASE}/${RISK_ROUTES.GET_QUESTIONNARIE_OF_USER}/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
-            credentials: "include",
-            cache: 'no-store'
         });
-        if (!res.ok) {
-            const errData = await res.json();
-            error = errData?.message || 'Failed to load questionnaire';
-        } else {
-            data = await res.json();
-        }
+        data = res.data;
+        console.log(data); // Safe to log
     } catch (err) {
-        console.error('Fetch error:', err);
-        error = 'Something went wrong. Please try again later.';
+        if (axios.isAxiosError(err)) {
+            if (err.response?.status === 401) {
+                setError(err.response.data.message || 'Unauthorized access.');
+            } else {
+                setError('Server error. Try again later.');
+            }
+        } else {
+            setError('Unknown error. Please try again.');
+        }
     }
     console.log(error)
     console.log(data)

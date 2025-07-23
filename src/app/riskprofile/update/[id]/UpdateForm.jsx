@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import axiosInstance from '@/helpers/axios';
+import { API_BASE, RISK_ROUTES } from '@/helpers/apiRoutes';
 
 
 export default function UpdateQuestionnaireForm({ questionnaire, token }) {
@@ -90,26 +92,23 @@ export default function UpdateQuestionnaireForm({ questionnaire, token }) {
         if (!isValidForm()) return;
 
         try {
-            const res = await fetch(`http://localhost:3030/v1/riskprofile/update/questionarrie/${questionnaire._id}`, {
-                method: 'PUT',
+            const { data } = await axiosInstance.put(`${API_BASE}/${RISK_ROUTES.UPDATE_QUESTIONNARIE}/${questionnaire._id}`, { title, questions }, {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
                 },
-                body: JSON.stringify({ title, questions }),
             });
-            if (res.ok) {
-                // toast.success('✅ Questionnaire Updated!');
+            if (data.success) {
                 setMsg("Successfully updated")
                 setTimeout(() => {
                     router.push("/riskprofile")
                 }, 3000)
             } else {
-                throw new Error('❌ Failed to update questionnaire');
+                throw new Error(' Failed to update questionnaire');
             }
         } catch (err) {
             console.error(err.message);
-            setMsg("❌ Something went wrong.");
+            setMsg("Something went wrong.");
         }
     };
 

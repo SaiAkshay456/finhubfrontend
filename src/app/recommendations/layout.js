@@ -9,7 +9,7 @@ export const metadata = {
 
 export default function Layout({ children }) {
     return (
-        <main className="min-h-screen m-7">
+        <main className="min-h-screen m-3">
         {children}
     </main>
     );
