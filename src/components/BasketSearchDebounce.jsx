@@ -19,7 +19,7 @@ export default function BasketSearchDebounce({ placeHolder = "Search baskets by 
             params.set('page', '1');
         }
         router.push(`?${params.toString()}`);
-    }, 300);
+    }, 100);
 
     useEffect(() => {
         debouncedSearchUpdate(search);

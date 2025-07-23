@@ -1,67 +1,7 @@
-// 'use client';
-// import { useState } from 'react';
-// import { useRouter } from 'next/navigation';
-
-// export default function TempLoginUser({ tokenId }) {
-//     const [formData, setFormData] = useState({ username: '', password: '' });
-//     const [error, setError] = useState('');
-//     const router = useRouter();
-
-//     const handleSubmit = async (e) => {
-//         e.preventDefault();
-//         try {
-//             const res = await fetch('http://localhost:3030/v1/response-login/login-user', {
-//                 method: 'POST',
-//                 headers: { 'Content-Type': 'application/json' },
-//                 credentials: 'include',
-//                 body: JSON.stringify({ ...formData, tokenId }),
-//             });
-
-
-//             const data = await res.json();
-//             if (!data.success) {
-//                 setError(data.message || 'Invalid credentials');
-//             } else {
-//                 router.refresh(); // Refresh the server component
-//             }
-//         } catch (err) {
-//             console.log(err)
-//         }
-//     };
-
-//     return (
-//         <form onSubmit={handleSubmit} className="space-y-4">
-//             {error && <p className="text-red-600 text-sm">{error}</p>}
-//             <input
-//                 type="text"
-//                 placeholder="Username"
-//                 className="w-full p-2 border rounded"
-//                 value={formData.username}
-//                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-//                 required
-//             />
-//             <input
-//                 type="password"
-//                 placeholder="Password"
-//                 className="w-full p-2 border rounded"
-//                 value={formData.password}
-//                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-//                 required
-//             />
-//             <button
-//                 type="submit"
-//                 className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-//             >
-//                 Submit
-//             </button>
-//         </form>
-//     );
-// }
-
-
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import axiosInstance from '@/helpers/axios';
 
 export default function TempLoginUser({ tokenId }) {
     const [formData, setFormData] = useState({ username: '', password: '' });
@@ -73,16 +13,10 @@ export default function TempLoginUser({ tokenId }) {
         e.preventDefault();
         setIsLoading(true);
         setError('');
-
         try {
-            const res = await fetch('http://localhost:3030/v1/response-login/login-user', {
-                method: 'POST',
+            const { data } = await axiosInstance.post('/v1/response-login/login-user', { ...formData, tokenId }, {
                 headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ ...formData, tokenId }),
             });
-
-            const data = await res.json();
             if (!data.success) {
                 setError(data.message || 'Invalid credentials');
             } else {
@@ -90,12 +24,11 @@ export default function TempLoginUser({ tokenId }) {
             }
         } catch (err) {
             console.log(err);
-            setError('Connection error. Please try again.');
+            setError(err.response?.data?.message);
         } finally {
             setIsLoading(false);
         }
     };
-
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
             {/* Error Message */}

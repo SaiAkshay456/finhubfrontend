@@ -2,6 +2,8 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 // import UpdateUserForm from '@/components/UpdateUserForm'; // You'll create this next
 import UpdateUserForm from '../../../../components/UpdateUserForm';
+import axiosInstance from '@/helpers/axios';
+import { API_BASE, USER_MANAGE_ROUTES } from '@/helpers/apiRoutes';
 export default async function UpdateUserPage({ params }) {
     const token1 = await cookies()
     const token = token1.get('token')?.value;
@@ -11,11 +13,10 @@ export default async function UpdateUserPage({ params }) {
     let data = null;
     try {
         loading = true;
-        const res = await fetch(`http://localhost:3030/v1/users/user/${id}`, {
+        const res = await axiosInstance.get(`${API_BASE}/${USER_MANAGE_ROUTES.GET_USER_DETAILS}/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
-            cache: "no-store",
         });
-        data = await res.json();
+        data = res.data
         loading = false;
     } catch (err) {
         loading = false

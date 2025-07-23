@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import axiosInstance from '@/helpers/axios';
+import { API_BASE, USER_MANAGE_ROUTES } from '@/helpers/apiRoutes';
 
 export default function UpdateUserForm({ user, token }) {
     const router = useRouter();
@@ -109,8 +111,8 @@ export default function UpdateUserForm({ user, token }) {
         }
 
         try {
-            const { data } = await axios.put(
-                `http://localhost:3030/v1/users/user/update-user/${user._id}`,
+            const { data } = await axiosInstance.put(
+                `${API_BASE}/${USER_MANAGE_ROUTES.USER_UPDATE}/${user._id}`,
                 sendData,
                 {
                     headers: {

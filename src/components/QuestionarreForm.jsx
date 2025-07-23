@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { recommendedQuestions } from '@/constants/predefinedQuestions';
 import axiosInstance from '@/helpers/axios';
+import { RISK_ROUTES } from '@/helpers/apiRoutes';
+import { API_BASE } from '@/helpers/apiRoutes';
 
 export default function QuestionnaireForm() {
     const [title, setTitle] = useState("")
@@ -100,10 +102,9 @@ export default function QuestionnaireForm() {
         if (!isValidForm()) return;
 
         try {
-            const { data } = await axiosInstance.post('/v1/riskprofile/create-questionarre', { questions, title }, {
+            const { data } = await axiosInstance.post(`${API_BASE}/${RISK_ROUTES.CREATE_QUESTIONNARIE}`, { questions, title }, {
                 headers: { 'Content-Type': 'application/json' },
             });
-
             if (data.success) {
                 setMsg("✅ Questionnaire Created!");
                 setQuestions([{ text: '', options: [{ label: '' }] }]);

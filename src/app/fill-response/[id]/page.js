@@ -1,16 +1,16 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import ResponseUser from "../../../components/ResponseUser";
 import TempLoginUser from "../../../components/TempLoginUser";
+import axiosInstance from "@/helpers/axios";
 
 export async function getExpiryOfUUID(id) {
     try {
-        const res = await fetch(`http://localhost:3030/v1/response/fill-response/${id}`, {
-            credentials: "include",
-            cache: "no-store",
+        const { data } = await axiosInstance.get(`/v1/response/fill-response/${id}`, {
         });
 
-        const data = await res.json();
-        return data?.data || null;
+        const result = data
+        console.log(result.data)
+        return result?.data || null;
     } catch (err) {
         console.error("Error fetching link data:", err);
         return null;
@@ -18,11 +18,9 @@ export async function getExpiryOfUUID(id) {
 }
 export async function getQuestionsById(questionnaireId) {
     try {
-        const res = await fetch(`http://localhost:3030/v1/response/get/questionarrie/${questionnaireId}`, {
-            credentials: "include",
-            cache: "no-store",
+        const { data } = await axiosInstance.get(`/v1/response/get/questionarrie/${questionnaireId}`, {
         });
-        const data = await res.json();
+        console.log(data.questions)
         return data?.questions || [];
     } catch (err) {
         console.error("Error fetching questions:", err);

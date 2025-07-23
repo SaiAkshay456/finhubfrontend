@@ -3,13 +3,14 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import DupliacateQuestionarreButton from "../../components/DupliacateQuestionarreButton";
 import axiosInstance from "@/helpers/axios";
+import { API_BASE, RISK_ROUTES } from "@/helpers/apiRoutes";
 
 export default async function RiskPage() {
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
     let questionnaires = [];
     try {
-        const { data } = await axiosInstance.get(`/v1/riskprofile/get/questionarries`, {
+        const { data } = await axiosInstance.get(`${API_BASE}/${RISK_ROUTES.GET_QUESTIONNARIES}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

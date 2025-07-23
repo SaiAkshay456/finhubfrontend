@@ -1,5 +1,6 @@
 'use client';
 
+import axiosInstance from '@/helpers/axios';
 import { useState } from 'react';
 
 export default function AssignRiskCategory({ userId, token }) {
@@ -16,17 +17,14 @@ export default function AssignRiskCategory({ userId, token }) {
 
         try {
             setLoading(true);
-            const res = await fetch(`http://localhost:3030/v1/riskprofile/assign-risk-category/${userId}`, {
-                method: 'POST',
+            const { data } = await axiosInstance.post(`/v1/riskprofile/assign-risk-category/${userId}`, { riskCategory }, {
                 headers: {
                     'Content-Type': 'application/json', Authorization: `Bearer ${token}`
 
-                },
-                body: JSON.stringify({ riskCategory }),
-                credentials: 'include',
+                }
             });
 
-            if (!res.ok) throw new Error('❌ Failed to assign category');
+            if (!data.success) throw new Error('❌ Failed to assign category');
 
             setMsg('✅ Risk category assigned successfully.');
         } catch (error) {
