@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import CreateCategoryModal from '../../../components/CreateCategoryModal'
 import EditCategoryModal from '../../../components/EditCategoryModal'
+import axiosInstance from '@/helpers/axios'
 
 export default function CategoryManagement() {
     const [categories, setCategories] = useState([])
@@ -50,18 +51,18 @@ export default function CategoryManagement() {
             params.append('page', currentPage.toString())
 
             const queryString = params.toString()
-            const url = `http://localhost:3030/v1/category/list-instrument-categories${
+            const url = `/v1/category/list-instrument-categories${
                 queryString ? '?' + queryString : ''
             }`
 
-            const response = await fetch(url)
-            const data = await response.json()
+            const response = await axiosInstance.get(url)
+            const data = await response.data
 
-            if (response.ok) {
-                setCategories(data.categories)
-                setPagination(data.pagination)
+            if (response.status === 200) {
+                setCategories(data.categories || [])
+                setPagination(data.pagination || {})
             } else {
-                setError('Failed to fetch categories')
+                setError(data.message || 'Failed to fetch categories')
             }
         } catch (err) {
             setError('Error fetching categories: ' + err.message)
@@ -119,18 +120,14 @@ export default function CategoryManagement() {
         if (!deleteConfirm.category) return
 
         try {
-            const response = await fetch(
-                `http://localhost:3030/v1/category/delete-instrument-category/${deleteConfirm.category._id}`,
-                {
-                    method: 'DELETE',
-                }
+            const response = await axiosInstance.delete(
+                `/v1/category/delete-instrument-category/${deleteConfirm.category._id}`
             )
 
-            if (response.ok) {
+            if (response.status === 200) {
                 setDeleteConfirm({ show: false, category: null })
                 fetchCategories() // Refresh the list
             } else {
-                const data = await response.json()
                 setError(data.message || 'Failed to delete category')
             }
         } catch (err) {

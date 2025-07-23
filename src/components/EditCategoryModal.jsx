@@ -1,5 +1,6 @@
 'use client'
 
+import axiosInstance from '@/helpers/axios'
 import { useState, useEffect } from 'react'
 
 export default function EditCategoryModal({
@@ -44,10 +45,10 @@ export default function EditCategoryModal({
 
         const fetchAssetClasses = async () => {
             try {
-                const res = await fetch(
-                    'http://localhost:3030/v1/category/list-asset-classes'
+                const res = await axiosInstance.get(
+                    '/v1/category/list-asset-classes'
                 )
-                const data = await res.json()
+                const data = res.data
                 const classes = data.assetClasses || data.data || []
                 setAssetClasses(classes)
 
@@ -81,10 +82,10 @@ export default function EditCategoryModal({
         const fetchRoutes = async () => {
             try {
                 setFetchingRoutes(true)
-                const res = await fetch(
-                    `http://localhost:3030/v1/category/routes/asset-class/${form.assetClassId}`
+                const res = await axiosInstance.get(
+                    `/v1/category/routes/asset-class/${form.assetClassId}`
                 )
-                const data = await res.json()
+                const data = res.data
                 setRoutes(data.routes || data.data || [])
             } catch (err) {
                 console.error('Error fetching routes:', err)
@@ -186,18 +187,13 @@ export default function EditCategoryModal({
 
             console.log('Update payload being sent:', payload)
 
-            const res = await fetch(
-                `http://localhost:3030/v1/category/update-instrument-category/${category._id}`,
-                {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                }
+            const res = await axiosInstance.put(
+                `/v1/category/update-instrument-category/${category._id}`,
+                payload
             )
+            const data = res.data
 
-            const data = await res.json()
-
-            if (res.ok) {
+            if (res.status === 200) {
                 onUpdated?.()
             } else {
                 setError(data.message || 'Failed to update category')

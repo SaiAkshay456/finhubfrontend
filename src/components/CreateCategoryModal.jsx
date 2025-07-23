@@ -1,5 +1,6 @@
 'use client'
 
+import axiosInstance from '@/helpers/axios'
 import { useState, useEffect } from 'react'
 
 export default function CreateCategoryModal({ isOpen, onClose, onCreated }) {
@@ -24,10 +25,10 @@ export default function CreateCategoryModal({ isOpen, onClose, onCreated }) {
 
         const fetchAssetClasses = async () => {
             try {
-                const res = await fetch(
-                    'http://localhost:3030/v1/category/list-asset-classes'
+                const res = await axiosInstance.get(
+                    '/v1/category/list-asset-classes'
                 )
-                const data = await res.json()
+                const data = res.data
                 setAssetClasses(data.assetClasses || data.data || [])
             } catch (err) {
                 console.error('Error fetching asset classes:', err)
@@ -49,10 +50,10 @@ export default function CreateCategoryModal({ isOpen, onClose, onCreated }) {
         const fetchRoutes = async () => {
             try {
                 setFetchingRoutes(true)
-                const res = await fetch(
-                    `http://localhost:3030/v1/category/routes/asset-class/${form.assetClassId}`
+                const res = await axiosInstance.get(
+                    `/v1/category/routes/asset-class/${form.assetClassId}`
                 )
-                const data = await res.json()
+                const data = res.data
                 setRoutes(data.routes || data.data || [])
             } catch (err) {
                 console.error('Error fetching routes:', err)
@@ -155,18 +156,14 @@ export default function CreateCategoryModal({ isOpen, onClose, onCreated }) {
 
             console.log('Payload being sent:', payload) // Debug log
 
-            const res = await fetch(
-                'http://localhost:3030/v1/category/add-instrument-category',
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                }
+            const res = await axiosInstance.post(
+                '/v1/category/add-instrument-category',
+                payload
             )
 
-            const data = await res.json()
+            const data = res.data
 
-            if (res.ok) {
+            if (res.status === 200) {
                 onCreated?.()
                 onClose()
                 // Reset form

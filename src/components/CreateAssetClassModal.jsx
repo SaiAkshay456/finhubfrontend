@@ -1,5 +1,6 @@
 'use client'
 
+import axiosInstance from '@/helpers/axios'
 import { useState } from 'react'
 
 export default function CreateAssetClassModal({ isOpen, onClose, onCreated }) {
@@ -31,18 +32,14 @@ export default function CreateAssetClassModal({ isOpen, onClose, onCreated }) {
 
             console.log('Payload being sent:', payload)
 
-            const res = await fetch(
-                'http://localhost:3030/v1/category/add-asset-class',
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                }
+            const res = await axiosInstance.post(
+                '/v1/category/add-asset-class',
+                payload
             )
 
-            const data = await res.json()
+            const data = res.data
 
-            if (res.ok) {
+            if (res.status === 200) {
                 onCreated?.()
                 onClose()
                 // Reset form

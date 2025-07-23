@@ -1,5 +1,6 @@
 'use client'
 
+import axiosInstance from '@/helpers/axios'
 import { useState, useEffect } from 'react'
 
 export default function CategoryAssignmentModal({
@@ -94,12 +95,12 @@ export default function CategoryAssignmentModal({
     const fetchAssetClasses = async () => {
         try {
             setLoadingStates((prev) => ({ ...prev, assetClasses: true }))
-            const response = await fetch(
-                'http://localhost:3030/v1/category/list-asset-classes'
+            const response = await axiosInstance.get(
+                '/v1/category/list-asset-classes'
             )
-            const data = await response.json()
+            const data = response.data
 
-            if (response.ok) {
+            if (response.status === 200) {
                 setAssetClasses(data.assetClasses || data.data || [])
             } else {
                 setError('Failed to fetch asset classes')
@@ -116,21 +117,20 @@ export default function CategoryAssignmentModal({
         try {
             setLoadingStates((prev) => ({ ...prev, routes: true }))
             // Use asset class ID instead of name
-            const response = await fetch(
-                `http://localhost:3030/v1/category/routes/asset-class/${assetClassId}`
+            const response = await axiosInstance.get(
+                `/v1/category/routes/asset-class/${assetClassId}`
             )
-            const data = await response.json()
+            const data = response.data
 
-            if (response.ok) {
+            if (response.status === 200) {
                 setRoutes(data.routes || data.data || [])
             } else {
                 // Fallback to list all routes and filter client-side by asset class name
-                const allRoutesResponse = await fetch(
-                    'http://localhost:3030/v1/category/list-routes'
+                const allRoutesResponse = await axiosInstance.get(
+                    '/v1/category/list-routes'
                 )
-                const allRoutesData = await allRoutesResponse.json()
-
-                if (allRoutesResponse.ok) {
+                const allRoutesData = allRoutesResponse.data
+                if (allRoutesResponse.status === 200) {
                     const filteredRoutes = (allRoutesData.routes || []).filter(
                         (route) => route.assetClass === form.assetClass
                     )
@@ -154,12 +154,12 @@ export default function CategoryAssignmentModal({
                 instrumentCategories: true,
             }))
 
-            const response = await fetch(
-                `http://localhost:3030/v1/category/instrument-categories/route/${routeId}`
+            const response = await axiosInstance.get(
+                `/v1/category/instrument-categories/route/${routeId}`
             )
-            const data = await response.json()
+            const data = response.data
 
-            if (response.ok) {
+            if (response.status === 200) {
                 setInstrumentCategories(data.categories || data.data || [])
             } else {
                 setError('Failed to fetch instrument categories')
@@ -182,13 +182,13 @@ export default function CategoryAssignmentModal({
             setLoadingStates((prev) => ({ ...prev, categories: true }))
             const endpoint =
                 type === 'mutual-funds'
-                    ? 'http://localhost:3030/v1/category/list-amfi-categories'
-                    : 'http://localhost:3030/v1/category/list-stock-categories' // This might not exist yet
+                    ? '/v1/category/list-amfi-categories'
+                    : '/v1/category/list-stock-categories' // This might not exist yet
 
-            const response = await fetch(endpoint)
-            const data = await response.json()
+            const response = await axiosInstance.get(endpoint)
+            const data = response.data
 
-            if (response.ok) {
+            if (response.status === 200) {
                 setCategories(data.categories || data.data || [])
             } else {
                 if (type === 'stocks') {
@@ -302,18 +302,14 @@ export default function CategoryAssignmentModal({
             console.log('Assignment payload:', payload)
 
             // Use the link-instrument-category-to-amfi-category endpoint
-            const response = await fetch(
-                `http://localhost:3030/v1/category/link-instrument-category-to-amfi-category`,
-                {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                }
+            const response = await axiosInstance.put(
+                `/v1/category/link-instrument-category-to-amfi-category`,
+                payload
             )
 
-            const data = await response.json()
+            const data = await response.data
 
-            if (response.ok) {
+            if (response.status === 200) {
                 onAssigned?.()
                 onClose()
                 // Reset form

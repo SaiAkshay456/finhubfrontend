@@ -1,5 +1,7 @@
 'use client'
 
+import axiosInstance from '@/helpers/axios'
+import axios from 'axios'
 import { useState, useEffect } from 'react'
 
 export default function EditAssetClassModal({
@@ -45,20 +47,16 @@ export default function EditAssetClassModal({
 
             console.log('Update payload being sent:', payload)
 
-            const res = await fetch(
-                `http://localhost:3030/v1/category/update-asset-class/${
+            const res = await axiosInstance.put(
+                `/v1/category/update-asset-class/${
                     assetClass._id || assetClass.id
                 }`,
-                {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                }
+                payload
             )
 
-            const data = await res.json()
+            const data = res.data
 
-            if (res.ok) {
+            if (res.status === 200) {
                 onUpdated?.()
             } else {
                 setError(data.message || 'Failed to update asset class')

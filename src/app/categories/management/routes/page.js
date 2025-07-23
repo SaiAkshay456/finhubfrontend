@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import CreateRouteModal from '../../../../components/CreateRouteModal'
 import EditRouteModal from '../../../../components/EditRouteModal'
+import axiosInstance from '@/helpers/axios'
 
 export default function RoutesPage() {
     const [routes, setRoutes] = useState([])
@@ -48,14 +49,14 @@ export default function RoutesPage() {
             params.append('page', currentPage.toString())
 
             const queryString = params.toString()
-            const url = `http://localhost:3030/v1/category/list-routes${
+            const url = `/v1/category/list-routes${
                 queryString ? '?' + queryString : ''
             }`
 
-            const response = await fetch(url)
-            const data = await response.json()
+            const response = await axiosInstance.get(url)
+            const data = await response.data
 
-            if (response.ok) {
+            if (response.status === 200) {
                 setRoutes(data.routes || data.data || [])
                 setPagination(data.pagination || {})
             } else {
@@ -112,20 +113,16 @@ export default function RoutesPage() {
         if (!deleteConfirm.route) return
 
         try {
-            const response = await fetch(
-                `http://localhost:3030/v1/category/delete-route/${
+            const response = await axiosInstance.delete(
+                `/v1/category/delete-route/${
                     deleteConfirm.route._id || deleteConfirm.route.id
-                }`,
-                {
-                    method: 'DELETE',
-                }
+                }`
             )
 
-            if (response.ok) {
+            if (response.status === 200) {
                 setDeleteConfirm({ show: false, route: null })
                 fetchRoutes() // Refresh the list
             } else {
-                const data = await response.json()
                 setError(data.message || 'Failed to delete route')
             }
         } catch (err) {

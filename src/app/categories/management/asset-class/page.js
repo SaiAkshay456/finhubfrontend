@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import CreateAssetClassModal from '../../../../components/CreateAssetClassModal'
 import EditAssetClassModal from '../../../../components/EditAssetClassModal'
+import axiosInstance from '@/helpers/axios'
 
 export default function AssetClassPage() {
     const [assetClasses, setAssetClasses] = useState([])
@@ -46,21 +47,22 @@ export default function AssetClassPage() {
             params.append('page', currentPage.toString())
 
             const queryString = params.toString()
-            const url = `http://localhost:3030/v1/category/list-asset-classes${
+            const url = `/v1/category/list-asset-classes${
                 queryString ? '?' + queryString : ''
             }`
 
-            const response = await fetch(url)
-            const data = await response.json()
+            const response = await axiosInstance.get(url)
+            const data = await response.data
 
-            if (response.ok) {
+            if (response.status === 200) {
                 setAssetClasses(data.assetClasses || data.data || [])
                 setPagination(data.pagination || {})
             } else {
-                setError('Failed to fetch asset classes')
+                setError(data.message || 'Failed to fetch asset classes')
             }
         } catch (err) {
-            setError('Error fetching asset classes: ' + err.message)
+            console.error('Error fetching asset classes:', err)
+            setError('An error occurred while fetching asset classes')
         } finally {
             setLoading(false)
         }
@@ -105,28 +107,26 @@ export default function AssetClassPage() {
         if (!deleteConfirm.assetClass) return
 
         try {
-            const response = await fetch(
-                `http://localhost:3030/v1/category/delete-asset-class/${
+            const response = await axiosInstance.delete(
+                `/v1/category/delete-asset-class/${
                     deleteConfirm.assetClass._id || deleteConfirm.assetClass.id
-                }`,
-                {
-                    method: 'DELETE',
-                }
+                }`
             )
 
-            if (response.ok) {
+            if (response.status === 200) {
                 setDeleteConfirm({ show: false, assetClass: null })
                 fetchAssetClasses() // Refresh the list
             } else {
-                const data = await response.json()
-                setError(data.message || 'Failed to delete asset class')
+                setError(response.data.message || 'Failed to delete asset class')
             }
         } catch (err) {
             console.error('Error deleting asset class:', err)
             setError('An error occurred while deleting the asset class')
+        } finally {
+            setLoading(false)
         }
     }
-
+        
     const handleDeleteCancel = () => {
         setDeleteConfirm({ show: false, assetClass: null })
     }

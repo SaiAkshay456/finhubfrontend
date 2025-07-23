@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import SubTabBar from '../../components/SubTabBar'
 import CategoryAssignmentModal from '../../components/CategoryAssignmentModal'
+import axiosInstance from '@/helpers/axios'
 
 const CustomButtonComponent = ({ item, onAssign }) => {
     return (
@@ -75,14 +76,16 @@ export default function CategoryAssignment() {
             params.append('limit', '10')
 
             const queryString = params.toString()
-            const url = `http://localhost:3030/v1/category/list-amfi-categories${
+            const url = `/v1/category/list-amfi-categories${
                 queryString ? '?' + queryString : ''
             }`
 
-            const response = await fetch(url)
-            const result = await response.json()
+            const response = await axiosInstance.get(url)
+            const result = response.data
 
-            if (response.ok) {
+            console.log('Mutual Funds Data:', result)
+
+            if (response.status === 200) {
                 setMutualFundsData(result.categories || [])
                 setPagination(result.pagination || {})
             } else {

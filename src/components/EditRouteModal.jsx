@@ -1,5 +1,6 @@
 'use client'
 
+import axiosInstance from '@/helpers/axios'
 import { useState, useEffect } from 'react'
 
 export default function EditRouteModal({ isOpen, onClose, onUpdated, route }) {
@@ -29,10 +30,10 @@ export default function EditRouteModal({ isOpen, onClose, onUpdated, route }) {
 
         const fetchAssetClasses = async () => {
             try {
-                const res = await fetch(
-                    'http://localhost:3030/v1/category/list-asset-classes'
+                const res = await axiosInstance.get(
+                    '/v1/category/list-asset-classes'
                 )
-                const data = await res.json()
+                const data = res.data
                 const classes = data.assetClasses || data.data || []
                 setAssetClasses(classes)
 
@@ -97,20 +98,14 @@ export default function EditRouteModal({ isOpen, onClose, onUpdated, route }) {
 
             console.log('Update payload being sent:', payload)
 
-            const res = await fetch(
-                `http://localhost:3030/v1/category/update-route/${
-                    route._id || route.id
-                }`,
-                {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                }
+            const res = await axiosInstance.put(
+                `/v1/category/update-route/${route._id || route.id}`,
+                payload
             )
 
-            const data = await res.json()
+            const data = res.data
 
-            if (res.ok) {
+            if (res.status === 200) {
                 onUpdated?.()
             } else {
                 setError(data.message || 'Failed to update route')
