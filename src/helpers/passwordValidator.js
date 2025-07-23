@@ -3,5 +3,6 @@ export function isValidPassword(password) {
     const hasUpperCase = /[A-Z]/.test(password);
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
     const hasMinLength = password.length >= minLength;
+
     return hasUpperCase && hasSpecialChar && hasMinLength;
 }

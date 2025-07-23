@@ -21,7 +21,7 @@ export default async function PortfolioLayout({ children }) {
     }
 
     // Send label to backend to check access
-    const res = await fetch('http://localhost:3030/v1/permission-route/check-access', {
+    const res = await fetch('http://localhost:3030/api/v1/permission-route/check-access', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

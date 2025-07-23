@@ -1,17 +1,15 @@
 
 'use client';
 import { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '../../providers/AuthProvider';
 import axios from 'axios';
 
-
 export default function LoginForm() {
     const { setUser, setIsAuthorized } = useAuth();
-    const [form, setForm] = useState({ username: '', password: '' });
+    const [form, setForm] = useState({ username: '', email: '', password: '' });
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-
     const router = useRouter();
 
     const handleChange = (e) => {
@@ -25,7 +23,7 @@ export default function LoginForm() {
 
         try {
             const res = await axios.post(
-                'http://localhost:3030/v1/auth/login',
+                'http://localhost:3030/api/v1/auth/login',
                 form,
                 {
                     headers: {
@@ -37,18 +35,7 @@ export default function LoginForm() {
 
             setUser(res.data.user);
             setIsAuthorized(true);
-            const getCookie = (name) => {
-                const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-                return match ? decodeURIComponent(match[2]) : null;
-            };
-
-            const callbackUrl = getCookie('callBackUrl') || "/";
-            console.log(callbackUrl, "line 50");
-            localStorage.setItem('clearCallBackCookie', 'true');
-
-            // Redirect to the stored callback URL
-            router.replace(callbackUrl);
-
+            router.replace("/");
         } catch (err) {
             setError(err.response?.data.message || 'Login failed. Please try again.');
         } finally {
@@ -96,6 +83,22 @@ export default function LoginForm() {
                                     required
                                 />
                             </div>
+
+                            <div>
+                                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                                    Email
+                                </label>
+                                <input
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    value={form.email}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                    required
+                                />
+                            </div>
+
                             <div>
                                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                                     Password
@@ -147,7 +150,7 @@ export default function LoginForm() {
                                     <span>Signing in...</span>
                                 </>
                             ) : (
-                                <span>Access Dashoard</span>
+                                <span>Sign in</span>
                             )}
                         </button>
                     </form>
@@ -165,4 +168,3 @@ export default function LoginForm() {
         </div>
     );
 }
-
