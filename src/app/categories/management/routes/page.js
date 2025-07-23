@@ -1,33 +1,32 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import CreateCategoryModal from '../../../components/CreateCategoryModal'
-import EditCategoryModal from '../../../components/EditCategoryModal'
+import { useState, useEffect } from 'react'
+import CreateRouteModal from '../../../../components/CreateRouteModal'
+import EditRouteModal from '../../../../components/EditRouteModal'
 
-export default function CategoryManagement() {
-    const [categories, setCategories] = useState([])
+export default function RoutesPage() {
+    const [routes, setRoutes] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
     const [pagination, setPagination] = useState({})
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
     const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-    const [editingCategory, setEditingCategory] = useState(null)
+    const [editingRoute, setEditingRoute] = useState(null)
     const [deleteConfirm, setDeleteConfirm] = useState({
         show: false,
-        category: null,
+        route: null,
     })
 
     // Filter and search states
     const [searchTerm, setSearchTerm] = useState('')
     const [assetClassFilter, setAssetClassFilter] = useState('')
-    const [routeFilter, setRouteFilter] = useState('')
     const [currentPage, setCurrentPage] = useState(1)
 
     // Debounced search effect
     useEffect(() => {
         const delayedSearch = setTimeout(() => {
             setCurrentPage(1) // Reset to first page when searching
-            fetchCategories()
+            fetchRoutes()
         }, 1500) // 1500ms debounce
 
         return () => clearTimeout(delayedSearch)
@@ -35,10 +34,10 @@ export default function CategoryManagement() {
 
     // Effect for filter changes and pagination
     useEffect(() => {
-        fetchCategories()
-    }, [assetClassFilter, routeFilter, currentPage])
+        fetchRoutes()
+    }, [assetClassFilter, currentPage])
 
-    const fetchCategories = async () => {
+    const fetchRoutes = async () => {
         try {
             setLoading(true)
 
@@ -46,11 +45,10 @@ export default function CategoryManagement() {
             const params = new URLSearchParams()
             if (searchTerm) params.append('search', searchTerm)
             if (assetClassFilter) params.append('assetClass', assetClassFilter)
-            if (routeFilter) params.append('route', routeFilter)
             params.append('page', currentPage.toString())
 
             const queryString = params.toString()
-            const url = `http://localhost:3030/v1/category/list-instrument-categories${
+            const url = `http://localhost:3030/v1/category/list-routes${
                 queryString ? '?' + queryString : ''
             }`
 
@@ -58,13 +56,13 @@ export default function CategoryManagement() {
             const data = await response.json()
 
             if (response.ok) {
-                setCategories(data.categories)
-                setPagination(data.pagination)
+                setRoutes(data.routes || data.data || [])
+                setPagination(data.pagination || {})
             } else {
-                setError('Failed to fetch categories')
+                setError('Failed to fetch routes')
             }
         } catch (err) {
-            setError('Error fetching categories: ' + err.message)
+            setError('Error fetching routes: ' + err.message)
         } finally {
             setLoading(false)
         }
@@ -76,11 +74,6 @@ export default function CategoryManagement() {
 
     const handleAssetClassChange = (e) => {
         setAssetClassFilter(e.target.value)
-        setCurrentPage(1) // Reset to first page when filtering
-    }
-
-    const handleRouteChange = (e) => {
-        setRouteFilter(e.target.value)
         setCurrentPage(1) // Reset to first page when filtering
     }
 
@@ -96,70 +89,53 @@ export default function CategoryManagement() {
         }
     }
 
-    const handleCategoryCreated = () => {
-        fetchCategories() // Refresh the list after creating a new category
+    const handleRouteCreated = () => {
+        fetchRoutes() // Refresh the list after creating a new route
     }
 
-    const handleCategoryUpdated = () => {
-        fetchCategories() // Refresh the list after updating a category
+    const handleRouteUpdated = () => {
+        fetchRoutes() // Refresh the list after updating a route
         setIsEditModalOpen(false)
-        setEditingCategory(null)
+        setEditingRoute(null)
     }
 
-    const handleEditClick = (category) => {
-        setEditingCategory(category)
+    const handleEditClick = (route) => {
+        setEditingRoute(route)
         setIsEditModalOpen(true)
     }
 
-    const handleDeleteClick = (category) => {
-        setDeleteConfirm({ show: true, category })
+    const handleDeleteClick = (route) => {
+        setDeleteConfirm({ show: true, route })
     }
 
     const handleDeleteConfirm = async () => {
-        if (!deleteConfirm.category) return
+        if (!deleteConfirm.route) return
 
         try {
             const response = await fetch(
-                `http://localhost:3030/v1/category/delete-instrument-category/${deleteConfirm.category._id}`,
+                `http://localhost:3030/v1/category/delete-route/${
+                    deleteConfirm.route._id || deleteConfirm.route.id
+                }`,
                 {
                     method: 'DELETE',
                 }
             )
 
             if (response.ok) {
-                setDeleteConfirm({ show: false, category: null })
-                fetchCategories() // Refresh the list
+                setDeleteConfirm({ show: false, route: null })
+                fetchRoutes() // Refresh the list
             } else {
                 const data = await response.json()
-                setError(data.message || 'Failed to delete category')
+                setError(data.message || 'Failed to delete route')
             }
         } catch (err) {
-            console.error('Error deleting category:', err)
-            setError('An error occurred while deleting the category')
+            console.error('Error deleting route:', err)
+            setError('An error occurred while deleting the route')
         }
     }
 
     const handleDeleteCancel = () => {
-        setDeleteConfirm({ show: false, category: null })
-    }
-
-    // Helper function to get action button text
-    const getActionButtonText = (category) => {
-        return category.status === 'set' ? 'Reassign' : 'Assign'
-    }
-
-    // Helper function to get assigned AMFI category display
-    const getAssignedCategory = (category) => {
-        if (category.status === 'set' && category.amfiCategory) {
-            // If the category has an amfiCategory populated/referenced
-            if (typeof category.amfiCategory === 'object') {
-                return category.amfiCategory.name || 'Assigned Category'
-            } else {
-                // If it's just an ID, show a generic message
-                return 'Assigned Category'
-            }
-        }
-        return '-'
+        setDeleteConfirm({ show: false, route: null })
     }
 
     if (loading) {
@@ -167,7 +143,7 @@ export default function CategoryManagement() {
             <div className="p-6">
                 <div className="flex justify-center items-center h-64">
                     <div className="text-lg text-gray-600">
-                        Loading categories...
+                        Loading routes...
                     </div>
                 </div>
             </div>
@@ -185,123 +161,81 @@ export default function CategoryManagement() {
     }
 
     // Calculate stats for the overview cards
-    const equityCategories = categories.filter(
-        (category) => category.assetClass === 'Equity'
+    const activeRoutes = routes.filter(
+        (route) => route.isActive !== false
     ).length
-    const debtCategories = categories.filter(
-        (category) => category.assetClass === 'Debt'
-    ).length
-    const commodityCategories = categories.filter(
-        (category) => category.assetClass === 'Commodity'
-    ).length
-    const categoriesWithRange = categories.filter(
-        (category) => category.range && category.range.min && category.range.max
-    ).length
-    const totalCategories = categories.length
-    const assignedCategories = categories.filter(
-        (category) => category.status === 'set'
-    ).length
+    const inactiveRoutes = routes.length - activeRoutes
+    const totalRoutes = routes.length
 
     return (
         <div className="p-6">
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <h1 className="text-3xl font-bold text-gray-900">
-                        Instrument Categories
+                        Routes Management
                     </h1>
                     <button
                         onClick={() => setIsCreateModalOpen(true)}
                         className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer"
                     >
-                        Create Category
+                        Create Route
                     </button>
                 </div>
 
                 {/* Overview Cards */}
                 <div className="bg-white rounded-lg shadow p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                        Categories Overview
+                        Routes Overview
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="border border-gray-200 rounded-lg p-4">
                             <h4 className="font-medium text-gray-900">
-                                Equity Categories
-                            </h4>
-                            <p className="text-2xl font-bold text-blue-600">
-                                {equityCategories}
-                            </p>
-                            <p className="text-sm text-gray-500">
-                                Equity instruments
-                            </p>
-                        </div>
-                        <div className="border border-gray-200 rounded-lg p-4">
-                            <h4 className="font-medium text-gray-900">
-                                Debt Categories
+                                Active Routes
                             </h4>
                             <p className="text-2xl font-bold text-green-600">
-                                {debtCategories}
+                                {activeRoutes}
                             </p>
                             <p className="text-sm text-gray-500">
-                                Debt instruments
+                                Currently active
                             </p>
                         </div>
                         <div className="border border-gray-200 rounded-lg p-4">
                             <h4 className="font-medium text-gray-900">
-                                Commodity Categories
+                                Inactive Routes
                             </h4>
-                            <p className="text-2xl font-bold text-yellow-600">
-                                {commodityCategories}
+                            <p className="text-2xl font-bold text-red-600">
+                                {inactiveRoutes}
                             </p>
                             <p className="text-sm text-gray-500">
-                                Commodity instruments
+                                Currently inactive
                             </p>
                         </div>
                         <div className="border border-gray-200 rounded-lg p-4">
                             <h4 className="font-medium text-gray-900">
-                                With Range
+                                Total Routes
                             </h4>
-                            <p className="text-2xl font-bold text-purple-600">
-                                {categoriesWithRange}
+                            <p className="text-2xl font-bold text-blue-600">
+                                {totalRoutes}
                             </p>
                             <p className="text-sm text-gray-500">
-                                Categories with ranges
-                            </p>
-                        </div>
-                        <div className="border border-gray-200 rounded-lg p-4">
-                            <h4 className="font-medium text-gray-900">
-                                Assigned Categories
-                            </h4>
-                            <p className="text-2xl font-bold text-orange-600">
-                                {assignedCategories}
-                            </p>
-                            <p className="text-sm text-gray-500">
-                                Categories assigned
-                            </p>
-                        </div>
-                        <div className="border border-gray-200 rounded-lg p-4">
-                            <h4 className="font-medium text-gray-900">
-                                Total Categories
-                            </h4>
-                            <p className="text-2xl font-bold text-indigo-600">
-                                {totalCategories}
-                            </p>
-                            <p className="text-sm text-gray-500">
-                                All categories
+                                All configured routes
                             </p>
                         </div>
                     </div>
                 </div>
 
+                {/* Routes Table */}
                 <div className="bg-white rounded-lg shadow">
                     <div className="px-6 py-4 border-b border-gray-200">
                         <div className="flex items-center justify-between">
                             <h2 className="text-xl font-semibold text-gray-900">
-                                All Categories ({pagination.totalItems || 0})
+                                All Routes (
+                                {pagination.totalItems || routes.length})
                             </h2>
                             <div className="flex space-x-2">
                                 <input
                                     type="text"
-                                    placeholder="Search categories..."
+                                    placeholder="Search routes..."
                                     value={searchTerm}
                                     onChange={handleSearchChange}
                                     className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -315,22 +249,6 @@ export default function CategoryManagement() {
                                     <option value="Equity">Equity</option>
                                     <option value="Debt">Debt</option>
                                     <option value="Commodity">Commodity</option>
-                                </select>
-                                <select
-                                    value={routeFilter}
-                                    onChange={handleRouteChange}
-                                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                >
-                                    <option value="">All Routes</option>
-                                    <option value="Core Direct">
-                                        Core Direct
-                                    </option>
-                                    <option value="Mutual Funds">
-                                        Mutual Funds
-                                    </option>
-                                    <option value="Direct Debt">
-                                        Direct Debt
-                                    </option>
                                 </select>
                             </div>
                         </div>
@@ -346,15 +264,7 @@ export default function CategoryManagement() {
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Asset Class
                                     </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Route
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Range
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Assigned To
-                                    </th>
+
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Status
                                     </th>
@@ -364,66 +274,41 @@ export default function CategoryManagement() {
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
-                                {categories.length > 0 ? (
-                                    categories.map((category) => (
+                                {routes.length > 0 ? (
+                                    routes.map((route) => (
                                         <tr
-                                            key={category._id}
+                                            key={route._id || route.id}
                                             className="hover:bg-gray-50"
                                         >
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                {category.name}
+                                                {route.name || route.routeName}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span
                                                     className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                                                        category.assetClass ===
+                                                        route.assetClass ===
                                                         'Equity'
                                                             ? 'text-blue-800 bg-blue-100'
-                                                            : category.assetClass ===
+                                                            : route.assetClass ===
                                                               'Debt'
                                                             ? 'text-green-800 bg-green-100'
                                                             : 'text-yellow-800 bg-yellow-100'
                                                     }`}
                                                 >
-                                                    {category.assetClass}
+                                                    {route.assetClass}
                                                 </span>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {category.route}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {category.range &&
-                                                category.range.min &&
-                                                category.range.max
-                                                    ? `${category.range.min} - ${category.range.max}`
-                                                    : '-'}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                <div className="max-w-xs truncate">
-                                                    {getAssignedCategory(
-                                                        category
-                                                    )}
-                                                </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span
                                                     className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                                                        category.status ===
-                                                        'set'
+                                                        route.isActive !== false
                                                             ? 'text-green-800 bg-green-100'
-                                                            : category.status ===
-                                                              'unset'
-                                                            ? 'text-gray-800 bg-gray-100'
-                                                            : 'text-yellow-800 bg-yellow-100'
+                                                            : 'text-red-800 bg-red-100'
                                                     }`}
                                                 >
-                                                    {category.status === 'set'
-                                                        ? 'Assigned'
-                                                        : category.status ===
-                                                          'unset'
-                                                        ? 'Unassigned'
-                                                        : category.status ||
-                                                          'Unknown'}
+                                                    {route.isActive !== false
+                                                        ? 'Active'
+                                                        : 'Inactive'}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -431,7 +316,7 @@ export default function CategoryManagement() {
                                                     <button
                                                         onClick={() =>
                                                             handleEditClick(
-                                                                category
+                                                                route
                                                             )
                                                         }
                                                         className="text-blue-600 hover:text-blue-900 cursor-pointer"
@@ -441,33 +326,12 @@ export default function CategoryManagement() {
                                                     <button
                                                         onClick={() =>
                                                             handleDeleteClick(
-                                                                category
+                                                                route
                                                             )
                                                         }
                                                         className="text-red-600 hover:text-red-900 cursor-pointer"
                                                     >
                                                         Delete
-                                                    </button>
-                                                    <button
-                                                        onClick={() => {
-                                                            // Add assignment/reassignment logic here
-                                                            console.log(
-                                                                `${getActionButtonText(
-                                                                    category
-                                                                )} category:`,
-                                                                category
-                                                            )
-                                                        }}
-                                                        className={`cursor-pointer font-medium ${
-                                                            category.status ===
-                                                            'set'
-                                                                ? 'text-orange-600 hover:text-orange-900'
-                                                                : 'text-green-600 hover:text-green-900'
-                                                        }`}
-                                                    >
-                                                        {getActionButtonText(
-                                                            category
-                                                        )}
                                                     </button>
                                                 </div>
                                             </td>
@@ -476,10 +340,10 @@ export default function CategoryManagement() {
                                 ) : (
                                     <tr>
                                         <td
-                                            colSpan="7"
+                                            colSpan="5"
                                             className="px-6 py-4 text-center text-sm text-gray-500"
                                         >
-                                            No categories found
+                                            No routes found
                                         </td>
                                     </tr>
                                 )}
@@ -517,23 +381,23 @@ export default function CategoryManagement() {
                     )}
                 </div>
 
-                {/* Create Category Modal */}
-                <CreateCategoryModal
+                {/* Create Route Modal */}
+                <CreateRouteModal
                     isOpen={isCreateModalOpen}
                     onClose={() => setIsCreateModalOpen(false)}
-                    onCreated={handleCategoryCreated}
+                    onCreated={handleRouteCreated}
                 />
 
-                {/* Edit Category Modal */}
-                {editingCategory && (
-                    <EditCategoryModal
+                {/* Edit Route Modal */}
+                {editingRoute && (
+                    <EditRouteModal
                         isOpen={isEditModalOpen}
                         onClose={() => {
                             setIsEditModalOpen(false)
-                            setEditingCategory(null)
+                            setEditingRoute(null)
                         }}
-                        onUpdated={handleCategoryUpdated}
-                        category={editingCategory}
+                        onUpdated={handleRouteUpdated}
+                        route={editingRoute}
                     />
                 )}
 
@@ -542,12 +406,13 @@ export default function CategoryManagement() {
                     <div className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center z-50">
                         <div className="bg-white rounded-lg shadow-xl p-6 max-w-md mx-4">
                             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                                Delete Category
+                                Delete Route
                             </h3>
                             <p className="text-gray-600 mb-4">
                                 Are you sure you want to delete "
-                                {deleteConfirm.category?.name}"? This action
-                                cannot be undone.
+                                {deleteConfirm.route?.name ||
+                                    deleteConfirm.route?.routeName}
+                                "? This action cannot be undone.
                             </p>
                             <div className="flex justify-end space-x-3">
                                 <button

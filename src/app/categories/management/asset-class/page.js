@@ -1,56 +1,52 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import CreateCategoryModal from '../../../components/CreateCategoryModal'
-import EditCategoryModal from '../../../components/EditCategoryModal'
+import { useState, useEffect } from 'react'
+import CreateAssetClassModal from '../../../../components/CreateAssetClassModal'
+import EditAssetClassModal from '../../../../components/EditAssetClassModal'
 
-export default function CategoryManagement() {
-    const [categories, setCategories] = useState([])
+export default function AssetClassPage() {
+    const [assetClasses, setAssetClasses] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
     const [pagination, setPagination] = useState({})
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
     const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-    const [editingCategory, setEditingCategory] = useState(null)
+    const [editingAssetClass, setEditingAssetClass] = useState(null)
     const [deleteConfirm, setDeleteConfirm] = useState({
         show: false,
-        category: null,
+        assetClass: null,
     })
 
     // Filter and search states
     const [searchTerm, setSearchTerm] = useState('')
-    const [assetClassFilter, setAssetClassFilter] = useState('')
-    const [routeFilter, setRouteFilter] = useState('')
     const [currentPage, setCurrentPage] = useState(1)
 
     // Debounced search effect
     useEffect(() => {
         const delayedSearch = setTimeout(() => {
             setCurrentPage(1) // Reset to first page when searching
-            fetchCategories()
-        }, 1500) // 1500ms debounce
+            fetchAssetClasses()
+        }, 500) // 500ms debounce
 
         return () => clearTimeout(delayedSearch)
     }, [searchTerm])
 
-    // Effect for filter changes and pagination
+    // Effect for pagination
     useEffect(() => {
-        fetchCategories()
-    }, [assetClassFilter, routeFilter, currentPage])
+        fetchAssetClasses()
+    }, [currentPage])
 
-    const fetchCategories = async () => {
+    const fetchAssetClasses = async () => {
         try {
             setLoading(true)
 
             // Build query parameters
             const params = new URLSearchParams()
             if (searchTerm) params.append('search', searchTerm)
-            if (assetClassFilter) params.append('assetClass', assetClassFilter)
-            if (routeFilter) params.append('route', routeFilter)
             params.append('page', currentPage.toString())
 
             const queryString = params.toString()
-            const url = `http://localhost:3030/v1/category/list-instrument-categories${
+            const url = `http://localhost:3030/v1/category/list-asset-classes${
                 queryString ? '?' + queryString : ''
             }`
 
@@ -58,13 +54,13 @@ export default function CategoryManagement() {
             const data = await response.json()
 
             if (response.ok) {
-                setCategories(data.categories)
-                setPagination(data.pagination)
+                setAssetClasses(data.assetClasses || data.data || [])
+                setPagination(data.pagination || {})
             } else {
-                setError('Failed to fetch categories')
+                setError('Failed to fetch asset classes')
             }
         } catch (err) {
-            setError('Error fetching categories: ' + err.message)
+            setError('Error fetching asset classes: ' + err.message)
         } finally {
             setLoading(false)
         }
@@ -72,16 +68,6 @@ export default function CategoryManagement() {
 
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value)
-    }
-
-    const handleAssetClassChange = (e) => {
-        setAssetClassFilter(e.target.value)
-        setCurrentPage(1) // Reset to first page when filtering
-    }
-
-    const handleRouteChange = (e) => {
-        setRouteFilter(e.target.value)
-        setCurrentPage(1) // Reset to first page when filtering
     }
 
     const handlePrevPage = () => {
@@ -96,70 +82,53 @@ export default function CategoryManagement() {
         }
     }
 
-    const handleCategoryCreated = () => {
-        fetchCategories() // Refresh the list after creating a new category
+    const handleAssetClassCreated = () => {
+        fetchAssetClasses() // Refresh the list after creating a new asset class
     }
 
-    const handleCategoryUpdated = () => {
-        fetchCategories() // Refresh the list after updating a category
+    const handleAssetClassUpdated = () => {
+        fetchAssetClasses() // Refresh the list after updating an asset class
         setIsEditModalOpen(false)
-        setEditingCategory(null)
+        setEditingAssetClass(null)
     }
 
-    const handleEditClick = (category) => {
-        setEditingCategory(category)
+    const handleEditClick = (assetClass) => {
+        setEditingAssetClass(assetClass)
         setIsEditModalOpen(true)
     }
 
-    const handleDeleteClick = (category) => {
-        setDeleteConfirm({ show: true, category })
+    const handleDeleteClick = (assetClass) => {
+        setDeleteConfirm({ show: true, assetClass })
     }
 
     const handleDeleteConfirm = async () => {
-        if (!deleteConfirm.category) return
+        if (!deleteConfirm.assetClass) return
 
         try {
             const response = await fetch(
-                `http://localhost:3030/v1/category/delete-instrument-category/${deleteConfirm.category._id}`,
+                `http://localhost:3030/v1/category/delete-asset-class/${
+                    deleteConfirm.assetClass._id || deleteConfirm.assetClass.id
+                }`,
                 {
                     method: 'DELETE',
                 }
             )
 
             if (response.ok) {
-                setDeleteConfirm({ show: false, category: null })
-                fetchCategories() // Refresh the list
+                setDeleteConfirm({ show: false, assetClass: null })
+                fetchAssetClasses() // Refresh the list
             } else {
                 const data = await response.json()
-                setError(data.message || 'Failed to delete category')
+                setError(data.message || 'Failed to delete asset class')
             }
         } catch (err) {
-            console.error('Error deleting category:', err)
-            setError('An error occurred while deleting the category')
+            console.error('Error deleting asset class:', err)
+            setError('An error occurred while deleting the asset class')
         }
     }
 
     const handleDeleteCancel = () => {
-        setDeleteConfirm({ show: false, category: null })
-    }
-
-    // Helper function to get action button text
-    const getActionButtonText = (category) => {
-        return category.status === 'set' ? 'Reassign' : 'Assign'
-    }
-
-    // Helper function to get assigned AMFI category display
-    const getAssignedCategory = (category) => {
-        if (category.status === 'set' && category.amfiCategory) {
-            // If the category has an amfiCategory populated/referenced
-            if (typeof category.amfiCategory === 'object') {
-                return category.amfiCategory.name || 'Assigned Category'
-            } else {
-                // If it's just an ID, show a generic message
-                return 'Assigned Category'
-            }
-        }
-        return '-'
+        setDeleteConfirm({ show: false, assetClass: null })
     }
 
     if (loading) {
@@ -167,7 +136,7 @@ export default function CategoryManagement() {
             <div className="p-6">
                 <div className="flex justify-center items-center h-64">
                     <div className="text-lg text-gray-600">
-                        Loading categories...
+                        Loading asset classes...
                     </div>
                 </div>
             </div>
@@ -185,61 +154,53 @@ export default function CategoryManagement() {
     }
 
     // Calculate stats for the overview cards
-    const equityCategories = categories.filter(
-        (category) => category.assetClass === 'Equity'
+    const equityCount = assetClasses.filter(
+        (ac) => ac.name === 'Equity' || ac.assetClass === 'Equity'
     ).length
-    const debtCategories = categories.filter(
-        (category) => category.assetClass === 'Debt'
+    const debtCount = assetClasses.filter(
+        (ac) => ac.name === 'Debt' || ac.assetClass === 'Debt'
     ).length
-    const commodityCategories = categories.filter(
-        (category) => category.assetClass === 'Commodity'
+    const commodityCount = assetClasses.filter(
+        (ac) => ac.name === 'Commodity' || ac.assetClass === 'Commodity'
     ).length
-    const categoriesWithRange = categories.filter(
-        (category) => category.range && category.range.min && category.range.max
-    ).length
-    const totalCategories = categories.length
-    const assignedCategories = categories.filter(
-        (category) => category.status === 'set'
-    ).length
+    const totalAssetClasses = assetClasses.length
 
     return (
         <div className="p-6">
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <h1 className="text-3xl font-bold text-gray-900">
-                        Instrument Categories
+                        Asset Class Management
                     </h1>
                     <button
                         onClick={() => setIsCreateModalOpen(true)}
                         className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer"
                     >
-                        Create Category
+                        Create Asset Class
                     </button>
                 </div>
 
                 {/* Overview Cards */}
                 <div className="bg-white rounded-lg shadow p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                        Categories Overview
+                        Asset Classes Overview
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div className="border border-gray-200 rounded-lg p-4">
                             <h4 className="font-medium text-gray-900">
-                                Equity Categories
+                                Equity
                             </h4>
                             <p className="text-2xl font-bold text-blue-600">
-                                {equityCategories}
+                                {equityCount}
                             </p>
                             <p className="text-sm text-gray-500">
                                 Equity instruments
                             </p>
                         </div>
                         <div className="border border-gray-200 rounded-lg p-4">
-                            <h4 className="font-medium text-gray-900">
-                                Debt Categories
-                            </h4>
+                            <h4 className="font-medium text-gray-900">Debt</h4>
                             <p className="text-2xl font-bold text-green-600">
-                                {debtCategories}
+                                {debtCount}
                             </p>
                             <p className="text-sm text-gray-500">
                                 Debt instruments
@@ -247,91 +208,43 @@ export default function CategoryManagement() {
                         </div>
                         <div className="border border-gray-200 rounded-lg p-4">
                             <h4 className="font-medium text-gray-900">
-                                Commodity Categories
+                                Commodity
                             </h4>
                             <p className="text-2xl font-bold text-yellow-600">
-                                {commodityCategories}
+                                {commodityCount}
                             </p>
                             <p className="text-sm text-gray-500">
                                 Commodity instruments
                             </p>
                         </div>
                         <div className="border border-gray-200 rounded-lg p-4">
-                            <h4 className="font-medium text-gray-900">
-                                With Range
-                            </h4>
+                            <h4 className="font-medium text-gray-900">Total</h4>
                             <p className="text-2xl font-bold text-purple-600">
-                                {categoriesWithRange}
+                                {totalAssetClasses}
                             </p>
                             <p className="text-sm text-gray-500">
-                                Categories with ranges
-                            </p>
-                        </div>
-                        <div className="border border-gray-200 rounded-lg p-4">
-                            <h4 className="font-medium text-gray-900">
-                                Assigned Categories
-                            </h4>
-                            <p className="text-2xl font-bold text-orange-600">
-                                {assignedCategories}
-                            </p>
-                            <p className="text-sm text-gray-500">
-                                Categories assigned
-                            </p>
-                        </div>
-                        <div className="border border-gray-200 rounded-lg p-4">
-                            <h4 className="font-medium text-gray-900">
-                                Total Categories
-                            </h4>
-                            <p className="text-2xl font-bold text-indigo-600">
-                                {totalCategories}
-                            </p>
-                            <p className="text-sm text-gray-500">
-                                All categories
+                                All asset classes
                             </p>
                         </div>
                     </div>
                 </div>
 
+                {/* Asset Classes Table */}
                 <div className="bg-white rounded-lg shadow">
                     <div className="px-6 py-4 border-b border-gray-200">
                         <div className="flex items-center justify-between">
                             <h2 className="text-xl font-semibold text-gray-900">
-                                All Categories ({pagination.totalItems || 0})
+                                All Asset Classes (
+                                {pagination.totalItems || assetClasses.length})
                             </h2>
                             <div className="flex space-x-2">
                                 <input
                                     type="text"
-                                    placeholder="Search categories..."
+                                    placeholder="Search asset classes..."
                                     value={searchTerm}
                                     onChange={handleSearchChange}
                                     className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
-                                <select
-                                    value={assetClassFilter}
-                                    onChange={handleAssetClassChange}
-                                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                >
-                                    <option value="">All Asset Classes</option>
-                                    <option value="Equity">Equity</option>
-                                    <option value="Debt">Debt</option>
-                                    <option value="Commodity">Commodity</option>
-                                </select>
-                                <select
-                                    value={routeFilter}
-                                    onChange={handleRouteChange}
-                                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                >
-                                    <option value="">All Routes</option>
-                                    <option value="Core Direct">
-                                        Core Direct
-                                    </option>
-                                    <option value="Mutual Funds">
-                                        Mutual Funds
-                                    </option>
-                                    <option value="Direct Debt">
-                                        Direct Debt
-                                    </option>
-                                </select>
                             </div>
                         </div>
                     </div>
@@ -344,16 +257,7 @@ export default function CategoryManagement() {
                                         Name
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Asset Class
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Route
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Range
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Assigned To
+                                        Type
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Status
@@ -364,66 +268,50 @@ export default function CategoryManagement() {
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
-                                {categories.length > 0 ? (
-                                    categories.map((category) => (
+                                {assetClasses.length > 0 ? (
+                                    assetClasses.map((assetClass) => (
                                         <tr
-                                            key={category._id}
+                                            key={
+                                                assetClass._id || assetClass.id
+                                            }
                                             className="hover:bg-gray-50"
                                         >
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                {category.name}
+                                                {assetClass.name ||
+                                                    assetClass.className}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span
                                                     className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                                                        category.assetClass ===
+                                                        (assetClass.name ||
+                                                            assetClass.type) ===
                                                         'Equity'
                                                             ? 'text-blue-800 bg-blue-100'
-                                                            : category.assetClass ===
+                                                            : (assetClass.name ||
+                                                                  assetClass.type) ===
                                                               'Debt'
                                                             ? 'text-green-800 bg-green-100'
                                                             : 'text-yellow-800 bg-yellow-100'
                                                     }`}
                                                 >
-                                                    {category.assetClass}
+                                                    {assetClass.type ||
+                                                        assetClass.name ||
+                                                        'Unknown'}
                                                 </span>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {category.route}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {category.range &&
-                                                category.range.min &&
-                                                category.range.max
-                                                    ? `${category.range.min} - ${category.range.max}`
-                                                    : '-'}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                <div className="max-w-xs truncate">
-                                                    {getAssignedCategory(
-                                                        category
-                                                    )}
-                                                </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span
                                                     className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                                                        category.status ===
-                                                        'set'
+                                                        assetClass.isActive !==
+                                                        false
                                                             ? 'text-green-800 bg-green-100'
-                                                            : category.status ===
-                                                              'unset'
-                                                            ? 'text-gray-800 bg-gray-100'
-                                                            : 'text-yellow-800 bg-yellow-100'
+                                                            : 'text-red-800 bg-red-100'
                                                     }`}
                                                 >
-                                                    {category.status === 'set'
-                                                        ? 'Assigned'
-                                                        : category.status ===
-                                                          'unset'
-                                                        ? 'Unassigned'
-                                                        : category.status ||
-                                                          'Unknown'}
+                                                    {assetClass.isActive !==
+                                                    false
+                                                        ? 'Active'
+                                                        : 'Inactive'}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -431,7 +319,7 @@ export default function CategoryManagement() {
                                                     <button
                                                         onClick={() =>
                                                             handleEditClick(
-                                                                category
+                                                                assetClass
                                                             )
                                                         }
                                                         className="text-blue-600 hover:text-blue-900 cursor-pointer"
@@ -441,33 +329,12 @@ export default function CategoryManagement() {
                                                     <button
                                                         onClick={() =>
                                                             handleDeleteClick(
-                                                                category
+                                                                assetClass
                                                             )
                                                         }
                                                         className="text-red-600 hover:text-red-900 cursor-pointer"
                                                     >
                                                         Delete
-                                                    </button>
-                                                    <button
-                                                        onClick={() => {
-                                                            // Add assignment/reassignment logic here
-                                                            console.log(
-                                                                `${getActionButtonText(
-                                                                    category
-                                                                )} category:`,
-                                                                category
-                                                            )
-                                                        }}
-                                                        className={`cursor-pointer font-medium ${
-                                                            category.status ===
-                                                            'set'
-                                                                ? 'text-orange-600 hover:text-orange-900'
-                                                                : 'text-green-600 hover:text-green-900'
-                                                        }`}
-                                                    >
-                                                        {getActionButtonText(
-                                                            category
-                                                        )}
                                                     </button>
                                                 </div>
                                             </td>
@@ -476,10 +343,10 @@ export default function CategoryManagement() {
                                 ) : (
                                     <tr>
                                         <td
-                                            colSpan="7"
+                                            colSpan="4"
                                             className="px-6 py-4 text-center text-sm text-gray-500"
                                         >
-                                            No categories found
+                                            No asset classes found
                                         </td>
                                     </tr>
                                 )}
@@ -517,23 +384,23 @@ export default function CategoryManagement() {
                     )}
                 </div>
 
-                {/* Create Category Modal */}
-                <CreateCategoryModal
+                {/* Create Asset Class Modal */}
+                <CreateAssetClassModal
                     isOpen={isCreateModalOpen}
                     onClose={() => setIsCreateModalOpen(false)}
-                    onCreated={handleCategoryCreated}
+                    onCreated={handleAssetClassCreated}
                 />
 
-                {/* Edit Category Modal */}
-                {editingCategory && (
-                    <EditCategoryModal
+                {/* Edit Asset Class Modal */}
+                {editingAssetClass && (
+                    <EditAssetClassModal
                         isOpen={isEditModalOpen}
                         onClose={() => {
                             setIsEditModalOpen(false)
-                            setEditingCategory(null)
+                            setEditingAssetClass(null)
                         }}
-                        onUpdated={handleCategoryUpdated}
-                        category={editingCategory}
+                        onUpdated={handleAssetClassUpdated}
+                        assetClass={editingAssetClass}
                     />
                 )}
 
@@ -542,12 +409,13 @@ export default function CategoryManagement() {
                     <div className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center z-50">
                         <div className="bg-white rounded-lg shadow-xl p-6 max-w-md mx-4">
                             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                                Delete Category
+                                Delete Asset Class
                             </h3>
                             <p className="text-gray-600 mb-4">
                                 Are you sure you want to delete "
-                                {deleteConfirm.category?.name}"? This action
-                                cannot be undone.
+                                {deleteConfirm.assetClass?.name ||
+                                    deleteConfirm.assetClass?.className}
+                                "? This action cannot be undone.
                             </p>
                             <div className="flex justify-end space-x-3">
                                 <button

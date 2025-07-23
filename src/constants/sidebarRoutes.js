@@ -16,6 +16,8 @@ import { FaFileUpload } from "react-icons/fa";
 // import DashboardIcon from '@mui/icons-material/Dashboard';
 import { MdDashboard } from "react-icons/md";
 import { CiBank } from "react-icons/ci";
+import { BiCategory } from "react-icons/bi"; // Add category icon
+
 export const sidebarItems = [
     {
         label: "Dashboard",
@@ -40,6 +42,12 @@ export const sidebarItems = [
         path: "/baskets",
         icon: MdOutlineRecommend,
         description: "For employers to post new jobs or internships",
+    },
+    {
+        label: "Categories",
+        path: "/categories",
+        icon: BiCategory,
+        description: "Manage categories and assignments for financial instruments",
     },
     {
         label: "KYC Verification",
