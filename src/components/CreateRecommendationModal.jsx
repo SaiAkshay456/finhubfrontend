@@ -83,13 +83,32 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
   }, [searchTerm, form.assetType, page, isOpen])
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-    setError("")
-    // Clear field error when user starts typing
-    if (fieldErrors[e.target.name]) {
-      setFieldErrors((prev) => ({ ...prev, [e.target.name]: false }))
+    const { name, value } = e.target;
+  
+    if (name === "assetType") {
+      // Reset dependent fields when asset type changes
+      setForm((prev) => ({
+        ...prev,
+        assetType: value,
+        mutualFundId: "",
+        name: "",
+        sector: "",
+        category: "",
+        cmp: "",
+      }));
+      setSelectedAssetOption(null);
+      setIsCategoryPrefilled(false);
+      setSearchTerm("");
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
     }
-  }
+  
+    setError("");
+    if (fieldErrors[name]) {
+      setFieldErrors((prev) => ({ ...prev, [name]: false }));
+    }
+  };
+  
 
   const handleAssetSelect = async (asset) => {
     const selectedOption = {
@@ -121,7 +140,7 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
     setForm((prev) => ({
       ...prev,
       name: asset.name,
-      sector: asset.sector || "",
+      sector: prev.sector || asset.sector || "",
       mutualFundId: asset._id,
       assetType,
       category: categoryName || prev.category || "",
@@ -138,10 +157,10 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const {data} = await axiosInstance.get("/v1/category/instrument-categories/all");
+        const { data } = await axiosInstance.get("/v1/category/instrument-categories/all");
         const options = data.map(cat => ({
           value: cat.name,
-          label: cat.name,
+          label: `${cat.name} (${cat.route || "N/A"}, ${cat.assetClass || "N/A"})`,
         }));
         setCategoryOptions(options);
       } catch (err) {
@@ -153,6 +172,7 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
       fetchCategories();
     }
   }, [form.category]);
+  
   
   
 
@@ -359,14 +379,16 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
     />
   ) : (
     <Select
-      options={categoryOptions}
-      value={categoryOptions.find(opt => opt.value === form.category)}
-      onChange={(selected) =>
-        setForm((prev) => ({ ...prev, category: selected?.value || "" }))
-      }
-      placeholder="Select a category"
-      className="text-sm"
-    />
+  options={categoryOptions}
+  value={categoryOptions.find(opt => opt.value === form.category)}
+  onChange={(selected) =>
+    setForm((prev) => ({ ...prev, category: selected?.value || "" }))
+  }
+  placeholder="Select a Insturment category"
+  styles={getReactSelectStyles(fieldErrors.category)}
+  className="text-sm"
+/>
+
   )}
 </div>
 

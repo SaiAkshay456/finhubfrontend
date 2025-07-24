@@ -40,6 +40,7 @@ export default function BenchmarkPage() {
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  
                 >
                   <path d="M3 3v18h18"></path>
                   <path d="m19 9-5 5-4-4-3 3"></path>
