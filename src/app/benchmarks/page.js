@@ -28,8 +28,9 @@ export default function BenchmarkPage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-50 rounded-lg">
-                <svg
+            <div className="p-1.5 bg-[#00d09c]/10 rounded-md">
+  <svg
+    className="text-[#00b98b]"
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
                   height="24"
@@ -39,7 +40,6 @@ export default function BenchmarkPage() {
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="text-blue-600"
                 >
                   <path d="M3 3v18h18"></path>
                   <path d="m19 9-5 5-4-4-3 3"></path>
@@ -51,9 +51,10 @@ export default function BenchmarkPage() {
               </div>
             </div>
             <button
-              onClick={() => setIsModalOpen(true)}
-              className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 shadow-sm"
-            >
+  onClick={() => setIsModalOpen(true)}
+  className="inline-flex items-center gap-2 bg-gradient-to-r from-[#00d09c] to-[#00b98b] text-white px-4 py-2.5 rounded-lg font-medium hover:opacity-90 transition-colors focus:outline-none focus:ring-2 focus:ring-[#00d09c] focus:ring-offset-1 shadow-sm"
+>
+
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"

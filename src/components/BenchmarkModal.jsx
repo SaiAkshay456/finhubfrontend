@@ -176,7 +176,7 @@ export default function BenchmarkModal({ isOpen, onClose, onCreated }) {
           <button
             onClick={handleSubmit}
             disabled={loading || !category || !stock}
-            className={`px-5 py-2.5 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${loading || !category || !stock ? "opacity-60 cursor-not-allowed" : ""}`}
+            className={`px-5 py-2.5 rounded-lg bg-gradient-to-r from-[#00d09c] to-[#00b98b] text-white font-medium hover:gradient-to-r from-[#00d09c] to-[#00b98b] transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${loading || !category || !stock ? "opacity-60 cursor-not-allowed" : ""}`}
           >
             {loading ? (
               <div className="flex items-center gap-2">

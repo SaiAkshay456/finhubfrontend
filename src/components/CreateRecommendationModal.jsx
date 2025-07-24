@@ -465,19 +465,20 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
             Cancel
           </button>
           <button
-            onClick={handleSubmit}
-            disabled={loading}
-            className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
-          >
-            {loading ? (
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                Creating...
-              </div>
-            ) : (
-              "Create Recommendation"
-            )}
-          </button>
+  onClick={handleSubmit}
+  disabled={loading}
+  className="px-8 py-3 bg-gradient-to-r from-[#00d09c] to-[#00b98b] hover:opacity-90 text-white font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+>
+  {loading ? (
+    <div className="flex items-center gap-2">
+      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+      Creating...
+    </div>
+  ) : (
+    "Create Recommendation"
+  )}
+</button>
+
         </div>
       </div>
     </div>
