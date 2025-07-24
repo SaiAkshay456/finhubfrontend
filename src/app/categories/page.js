@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import SubTabBar from '../../components/SubTabBar'
 import CategoryAssignmentModal from '../../components/CategoryAssignmentModal'
 import axiosInstance from '@/helpers/axios'
@@ -42,7 +42,7 @@ export default function CategoryAssignment() {
     ]
 
     // Fetch instrument categories and create hash map
-    const fetchInstrumentCategories = async () => {
+    const fetchInstrumentCategories = useCallback(async () => {
         try {
             const response = await axiosInstance.get(
                 '/v1/category/instrument-categories/all'
@@ -64,33 +64,9 @@ export default function CategoryAssignment() {
             console.error('Error fetching instrument categories:', error)
             return {}
         }
-    }
+    }, [])
 
-    // Debounced search effect
-    useEffect(() => {
-        const delayedSearch = setTimeout(() => {
-            setCurrentPage(1) // Reset to first page when searching
-            fetchData()
-        }, 500) // 500ms debounce
-
-        return () => clearTimeout(delayedSearch)
-    }, [searchTerm])
-
-    // Effect for tab changes and pagination
-    useEffect(() => {
-        fetchData()
-    }, [activeSubTab, currentPage])
-
-    const fetchData = async () => {
-        if (activeSubTab === 'mutual-funds') {
-            await fetchMutualFunds()
-        } else if (activeSubTab === 'stocks') {
-            // For now, we'll use mock data for stocks since the API doesn't exist yet
-            fetchStocks()
-        }
-    }
-
-    const fetchMutualFunds = async () => {
+    const fetchMutualFunds = useCallback(async () => {
         try {
             setLoading(true)
             setError(null)
@@ -134,9 +110,9 @@ export default function CategoryAssignment() {
         } finally {
             setLoading(false)
         }
-    }
+    }, [searchTerm, currentPage, fetchInstrumentCategories])
 
-    const fetchStocks = async () => {
+    const fetchStocks = useCallback(async () => {
         try {
             setLoading(true)
 
@@ -214,7 +190,31 @@ export default function CategoryAssignment() {
             setError('Error fetching stocks data: ' + error.message)
             setLoading(false)
         }
-    }
+    }, [fetchInstrumentCategories])
+
+    const fetchData = useCallback(async () => {
+        if (activeSubTab === 'mutual-funds') {
+            await fetchMutualFunds()
+        } else if (activeSubTab === 'stocks') {
+            // For now, we'll use mock data for stocks since the API doesn't exist yet
+            fetchStocks()
+        }
+    }, [activeSubTab, fetchMutualFunds, fetchStocks])
+
+    // Debounced search effect
+    useEffect(() => {
+        const delayedSearch = setTimeout(() => {
+            setCurrentPage(1) // Reset to first page when searching
+            fetchData()
+        }, 500) // 500ms debounce
+
+        return () => clearTimeout(delayedSearch)
+    }, [searchTerm, fetchData])
+
+    // Effect for tab changes and pagination
+    useEffect(() => {
+        fetchData()
+    }, [activeSubTab, currentPage, fetchData])
 
     const handleSubTabChange = (tabId) => {
         setActiveSubTab(tabId)

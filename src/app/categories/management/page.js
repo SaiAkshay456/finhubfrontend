@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import CreateCategoryModal from '../../../components/CreateCategoryModal'
 import EditCategoryModal from '../../../components/EditCategoryModal'
 import axiosInstance from '@/helpers/axios'
@@ -23,29 +23,36 @@ export default function CategoryManagement() {
     const [assetClassFilter, setAssetClassFilter] = useState('')
     const [routeFilter, setRouteFilter] = useState('')
     const [currentPage, setCurrentPage] = useState(1)
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
 
-    // Debounced search effect
+    // Ref for search input to maintain focus
+    const searchInputRef = useRef(null)
+
+    // Debounce search term
     useEffect(() => {
-        const delayedSearch = setTimeout(() => {
-            setCurrentPage(1) // Reset to first page when searching
-            fetchCategories()
-        }, 1500) // 1500ms debounce
+        const timer = setTimeout(() => {
+            setDebouncedSearchTerm(searchTerm)
+        }, 500)
 
-        return () => clearTimeout(delayedSearch)
+        return () => clearTimeout(timer)
     }, [searchTerm])
 
-    // Effect for filter changes and pagination
+    // Reset to first page when search term changes
     useEffect(() => {
-        fetchCategories()
-    }, [assetClassFilter, routeFilter, currentPage])
+        setCurrentPage(1)
+    }, [debouncedSearchTerm])
 
-    const fetchCategories = async () => {
+    const fetchCategories = useCallback(async () => {
         try {
-            setLoading(true)
+            // Don't show loading spinner for search operations to prevent re-render
+            if (currentPage === 1 && !debouncedSearchTerm) {
+                setLoading(true)
+            }
 
             // Build query parameters
             const params = new URLSearchParams()
-            if (searchTerm) params.append('search', searchTerm)
+            if (debouncedSearchTerm)
+                params.append('search', debouncedSearchTerm)
             if (assetClassFilter) params.append('assetClass', assetClassFilter)
             if (routeFilter) params.append('route', routeFilter)
             params.append('page', currentPage.toString())
@@ -56,23 +63,45 @@ export default function CategoryManagement() {
             }`
 
             const response = await axiosInstance.get(url)
-            const data = await response.data
+            const data = response.data
 
             if (response.status === 200) {
                 setCategories(data.categories || [])
                 setPagination(data.pagination || {})
+                setError(null) // Clear any previous errors
             } else {
                 setError(data.message || 'Failed to fetch categories')
             }
         } catch (err) {
+            console.error('Error fetching categories:', err)
             setError('Error fetching categories: ' + err.message)
         } finally {
             setLoading(false)
         }
-    }
+    }, [debouncedSearchTerm, assetClassFilter, routeFilter, currentPage])
+
+    // Fetch data when debounced search term or filters change
+    useEffect(() => {
+        fetchCategories()
+    }, [fetchCategories])
 
     const handleSearchChange = (e) => {
-        setSearchTerm(e.target.value)
+        const value = e.target.value
+        setSearchTerm(value)
+
+        // Store cursor position
+        const cursorPosition = e.target.selectionStart
+
+        // Restore focus and cursor position after state update
+        setTimeout(() => {
+            if (searchInputRef.current) {
+                searchInputRef.current.focus()
+                searchInputRef.current.setSelectionRange(
+                    cursorPosition,
+                    cursorPosition
+                )
+            }
+        }, 0)
     }
 
     const handleAssetClassChange = (e) => {
@@ -128,7 +157,7 @@ export default function CategoryManagement() {
                 setDeleteConfirm({ show: false, category: null })
                 fetchCategories() // Refresh the list
             } else {
-                setError(data.message || 'Failed to delete category')
+                setError(response.data.message || 'Failed to delete category')
             }
         } catch (err) {
             console.error('Error deleting category:', err)
@@ -159,7 +188,8 @@ export default function CategoryManagement() {
         return '-'
     }
 
-    if (loading) {
+    // Show loading only for initial load or when no search is active
+    if (loading && currentPage === 1 && !debouncedSearchTerm && !searchTerm) {
         return (
             <div className="p-6">
                 <div className="flex justify-center items-center h-64">
@@ -171,7 +201,7 @@ export default function CategoryManagement() {
         )
     }
 
-    if (error) {
+    if (error && !categories.length) {
         return (
             <div className="p-6">
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -297,6 +327,7 @@ export default function CategoryManagement() {
                             </h2>
                             <div className="flex space-x-2">
                                 <input
+                                    ref={searchInputRef}
                                     type="text"
                                     placeholder="Search categories..."
                                     value={searchTerm}
@@ -332,6 +363,22 @@ export default function CategoryManagement() {
                             </div>
                         </div>
                     </div>
+
+                    {/* Show loading indicator for search operations */}
+                    {loading && (debouncedSearchTerm || currentPage > 1) && (
+                        <div className="px-6 py-4 border-b border-gray-200">
+                            <div className="text-sm text-gray-600">
+                                Searching...
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Show error message */}
+                    {error && categories.length > 0 && (
+                        <div className="px-6 py-4 border-b border-gray-200">
+                            <div className="text-sm text-red-600">{error}</div>
+                        </div>
+                    )}
 
                     <div className="overflow-x-auto">
                         <table className="w-full">
@@ -445,27 +492,6 @@ export default function CategoryManagement() {
                                                     >
                                                         Delete
                                                     </button>
-                                                    {/* <button
-                                                        onClick={() => {
-                                                            // Add assignment/reassignment logic here
-                                                            console.log(
-                                                                `${getActionButtonText(
-                                                                    category
-                                                                )} category:`,
-                                                                category
-                                                            )
-                                                        }}
-                                                        className={`cursor-pointer font-medium ${
-                                                            category.status ===
-                                                            'set'
-                                                                ? 'text-orange-600 hover:text-orange-900'
-                                                                : 'text-green-600 hover:text-green-900'
-                                                        }`}
-                                                    >
-                                                        {getActionButtonText(
-                                                            category
-                                                        )}
-                                                    </button> */}
                                                 </div>
                                             </td>
                                         </tr>
@@ -476,7 +502,9 @@ export default function CategoryManagement() {
                                             colSpan="7"
                                             className="px-6 py-4 text-center text-sm text-gray-500"
                                         >
-                                            No categories found
+                                            {loading
+                                                ? 'Loading...'
+                                                : 'No categories found'}
                                         </td>
                                     </tr>
                                 )}
@@ -542,9 +570,9 @@ export default function CategoryManagement() {
                                 Delete Category
                             </h3>
                             <p className="text-gray-600 mb-4">
-                                Are you sure you want to delete "
-                                {deleteConfirm.category?.name}"? This action
-                                cannot be undone.
+                                Are you sure you want to delete &quot;
+                                {deleteConfirm.category?.name}&quot;? This
+                                action cannot be undone.
                             </p>
                             <div className="flex justify-end space-x-3">
                                 <button
