@@ -4,7 +4,6 @@ import KycFormUser from "../../../components/KycFormUser";
 import Link from "next/link";
 import axiosInstance from "@/helpers/axios";
 import { API_BASE, USER_MANAGE_ROUTES } from "@/helpers/apiRoutes";
-
 export default async function UserDetailsPage({ params }) {
     const token = await cookies().get('token')?.value;
     if (!token) redirect('/login');

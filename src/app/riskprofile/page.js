@@ -9,7 +9,9 @@ export default async function RiskPage() {
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
     let questionnaires = [];
+    let loading = false;
     try {
+        loading = true
         const { data } = await axiosInstance.get(`${API_BASE}/${RISK_ROUTES.GET_QUESTIONNARIES}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -18,8 +20,14 @@ export default async function RiskPage() {
         questionnaires = data
     } catch (err) {
         console.log(err)
+    } finally {
+        loading = false
     }
-
+    if (loading) {
+        return <div className="flex items-center justify-center h-screen">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+        </div>
+    }
     return (
         <div className="min-h-screen px-0 py-4">
             <div className="w-full px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 2xl:px-16 mx-auto max-w-screen-2xl">

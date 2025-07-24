@@ -17,6 +17,7 @@ export default function QuestionnaireForm() {
 
     const [currentSlide, setCurrentSlide] = useState(0);
     const [msg, setMsg] = useState('');
+    const [loading, setLoading] = useState(false)
 
     const isValidForm = () => {
         for (let i = 0; i < questions.length; i++) {
@@ -97,6 +98,11 @@ export default function QuestionnaireForm() {
         updated[qIndex].options[oIndex][key] = value;
         setQuestions(updated);
     };
+    if (loading) {
+        return <div className="flex items-center justify-center h-screen">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+        </div>
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -104,6 +110,7 @@ export default function QuestionnaireForm() {
         if (!isValidForm()) return;
 
         try {
+            setLoading(true)
             const { data } = await axiosInstance.post(`${API_BASE}/${RISK_ROUTES.CREATE_QUESTIONNARIE}`, { questions, title }, {
                 headers: { 'Content-Type': 'application/json' },
             });
@@ -117,6 +124,8 @@ export default function QuestionnaireForm() {
         } catch (error) {
             console.error(error.message);
             setMsg("❌ Error occurred during submission.");
+        } finally {
+            setLoading(false)
         }
     };
 

@@ -48,8 +48,9 @@ export default async function AllUsersPage({ searchParams }) {
         totalSuspendedUsers: 0,
         totalKycPendingUsers: 0,
     }
-
+    let loading = false;
     try {
+        loading = true
         const sanitizedSearchTerm = search.trim()
         const isValidSearch =
             sanitizedSearchTerm.length > 0 && !sanitizedSearchTerm.includes('"') && !sanitizedSearchTerm.includes("'")
@@ -75,10 +76,16 @@ export default async function AllUsersPage({ searchParams }) {
     } catch (err) {
         console.error("Failed to fetch users:", err)
         error = "Failed to connect to server"
+    } finally {
+        loading = false
     }
 
     const questionarriesArray = await fetchQuestionnaires(token)
-
+    if (loading) {
+        <div className="flex items-center justify-center h-screen">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+        </div>
+    }
     const dashboardCardsData = [
         {
             label: "Totals Users",

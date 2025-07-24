@@ -15,9 +15,10 @@ export default async function BasketsPage({ searchParams }) {
 
     let baskets = [];
     let totalCount = 0;
-
+    let loading = false;
     if (search.trim()) {
         try {
+            loading = true;
             const { data } = await axiosInstance.get(
                 `/v1/model-basket/get-baskets?search=${search}&limit=${limit}&page=${page}`,
                 {
@@ -30,6 +31,14 @@ export default async function BasketsPage({ searchParams }) {
         catch (err) {
             console.log(err)
         }
+        finally {
+            loading = false
+        }
+    }
+    if (loading) {
+        return <div className="flex items-center justify-center h-screen">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+        </div>
     }
 
 

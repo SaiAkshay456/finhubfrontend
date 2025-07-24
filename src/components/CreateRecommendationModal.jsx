@@ -253,7 +253,7 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
     }),
   })
 
-  if (!isOpen) return null
+    if (!isOpen) return null
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -269,22 +269,24 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
           </button>
         </div>
 
-        {/* Content */}
-        <div className="px-8 py-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Asset Type */}
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-gray-700">Asset Type</label>
-              <select
-                name="assetType"
-                value={form.assetType}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
-              >
-                <option>Stock</option>
-                <option>Mutual Fund</option>
-              </select>
-            </div>
+                {/* Content */}
+                <div className="px-8 py-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Asset Type */}
+                        <div className="space-y-2">
+                            <label className="block text-sm font-semibold text-gray-700">
+                                Asset Type
+                            </label>
+                            <select
+                                name="assetType"
+                                value={form.assetType}
+                                onChange={handleChange}
+                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
+                            >
+                                <option>Stock</option>
+                                <option>Mutual Fund</option>
+                            </select>
+                        </div>
 
             {/* Sector */}
             <div className="space-y-2">
@@ -448,38 +450,40 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
             </div>
           </div>
 
-          {/* Error Message */}
-          {error && (
-            <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-xl">
-              <p className="text-red-700 text-sm font-medium">{error}</p>
-            </div>
-          )}
-        </div>
+                    {/* Error Message */}
+                    {error && (
+                        <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+                            <p className="text-red-700 text-sm font-medium">
+                                {error}
+                            </p>
+                        </div>
+                    )}
+                </div>
 
-        {/* Footer */}
-        <div className="sticky bottom-0 bg-white rounded-b-2xl border-t border-gray-100 px-8 py-6 flex items-center justify-end gap-3">
-          <button
-            onClick={onClose}
-            className="px-6 py-3 text-gray-700 font-medium rounded-xl hover:bg-gray-100 transition-colors duration-200"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
-          >
-            {loading ? (
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                Creating...
-              </div>
-            ) : (
-              "Create Recommendation"
-            )}
-          </button>
+                {/* Footer */}
+                <div className="sticky bottom-0 bg-white rounded-b-2xl border-t border-gray-100 px-8 py-6 flex items-center justify-end gap-3">
+                    <button
+                        onClick={onClose}
+                        className="px-6 py-3 text-gray-700 font-medium rounded-xl hover:bg-gray-100 transition-colors duration-200"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={handleSubmit}
+                        disabled={loading}
+                        className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+                    >
+                        {loading ? (
+                            <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                Creating...
+                            </div>
+                        ) : (
+                            'Create Recommendation'
+                        )}
+                    </button>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  )
+    )
 }

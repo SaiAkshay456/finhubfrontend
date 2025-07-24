@@ -1,89 +1,90 @@
-
-import { FaHome, FaUserCircle, FaEnvelope } from "react-icons/fa";
-import { FiSettings, FiLogOut, FiFileText } from "react-icons/fi";
-import { CiLogout } from "react-icons/ci";
-import { TiUserAdd } from "react-icons/ti";
-import { FaUsers } from "react-icons/fa";
-import { HiOutlineViewGrid } from "react-icons/hi";
-import { MdWorkOutline } from "react-icons/md";
-import { IoIosNotificationsOutline } from "react-icons/io";
-import { MdOutlineRecommend } from "react-icons/md";
-import { BsBank2 } from "react-icons/bs";
+import { FaHome, FaUserCircle, FaEnvelope } from 'react-icons/fa'
+import { FiSettings, FiLogOut, FiFileText } from 'react-icons/fi'
+import { CiLogout } from 'react-icons/ci'
+import { TiUserAdd } from 'react-icons/ti'
+import { FaUsers } from 'react-icons/fa'
+import { HiOutlineViewGrid } from 'react-icons/hi'
+import { MdWorkOutline } from 'react-icons/md'
+import { IoIosNotificationsOutline } from 'react-icons/io'
+import { MdOutlineRecommend } from 'react-icons/md'
+import { BsBank2 } from 'react-icons/bs'
 // import AssuredWorkloadIcon from '@mui/icons-material/AssuredWorkload';
-import { FaShieldAlt } from "react-icons/fa";
-import { FaFileUpload } from "react-icons/fa";
-// 
+import { FaShieldAlt } from 'react-icons/fa'
+import { FaFileUpload } from 'react-icons/fa'
+import { GrDocumentPerformance } from "react-icons/gr";
 // import DashboardIcon from '@mui/icons-material/Dashboard';
-import { MdDashboard } from "react-icons/md";
-import { CiBank } from "react-icons/ci";
+import { MdDashboard } from 'react-icons/md'
+import { CiBank } from 'react-icons/ci'
+import { BiCategory } from 'react-icons/bi' // Add category icon
+
 export const sidebarItems = [
     {
-        label: "Dashboard",
-        path: "/",
+        label: 'Dashboard',
+        path: '/',
         icon: MdDashboard,
-        description: "Dashboard page",
+        description: 'Dashboard page',
     },
     {
-        label: "Users",
-        path: "/users",
+        label: 'Users',
+        path: '/users',
         icon: FaUsers,
-        description: "User dashboard with summary and insights",
+        description: 'User dashboard with summary and insights',
     },
     {
-        label: "Create User",
-        path: "/createuser",
+        label: 'Create User',
+        path: '/createuser',
         icon: TiUserAdd,
-        description: "Track job or internship applications",
+        description: 'Track job or internship applications',
     },
     {
-        label: "Model Basket",
-        path: "/baskets",
+        label: 'Model Basket',
+        path: '/baskets',
         icon: MdOutlineRecommend,
-        description: "For employers to post new jobs or internships",
+        description: 'For employers to post new jobs or internships',
     },
     {
-        label: "KYC Verification",
-        path: "/kycverify",
+        label: 'Categories',
+        path: '/categories',
+        icon: BiCategory,
+        description:
+            'Manage categories and assignments for financial instruments',
+    },
+    {
+        label: 'KYC Verification',
+        path: '/kycverify',
         icon: BsBank2,
-        description: "Account and app preferences",
+        description: 'Account and app preferences',
     },
     {
-        label: "Risk Profiling",
-        path: "/riskprofile",
+        label: 'Risk Profiling',
+        path: '/riskprofile',
         icon: FaShieldAlt,
-        description: "Risk Profiling",
+        description: 'Risk Profiling',
     },
     {
-        label: "Portfolio Upload",
-        path: "/upload-portfolio",
+        label: 'Portfolio Upload',
+        path: '/upload-portfolio',
         icon: FaFileUpload,
         description: "Upload protfolio"
     },
     {
-        label: "Recommendations",
-        path: "/recommendations",
+        label: 'Recommendations',
+        path: '/recommendations',
         icon: MdOutlineRecommend,
-        description: "Fund or asset recommendations based on risk profile",
+        description: 'Fund or asset recommendations based on risk profile',
     },
     {
         label: "Benchmarks",
         path: "/benchmarks",
-        icon: HiOutlineViewGrid,
+        icon: GrDocumentPerformance,
         description: "Benchmark portfolio performance with indices",
     },
     {
-        label: "Fill Response",
-        path: "/fill-response",
+        label: 'Fill Response',
+        path: '/fill-response',
         icon: FaFileUpload,
         description: "Upload protfolio"
     },
-    {
-        label: "Categories",
-        path: "/categories",
-        icon: FaFileUpload,
-        description: "Categories"
-    }
-
 
 ];
 
@@ -100,7 +101,6 @@ export const sidebarItems = [
 //         // cache: 'no-store',
 //         credentials: 'include'
 //     });
-
 
 //     const data = await res.json();
 //     if (data.success) {
@@ -124,8 +124,6 @@ export const sidebarItems = [
 // }
 
 //try of users page.js
-
-
 
 // import { cookies } from 'next/headers';
 // import React from 'react';
@@ -165,7 +163,6 @@ export const sidebarItems = [
 // export default async function AllUsersPage({ searchParams }) {
 //     const cookieStore = await cookies();
 //     const token = cookieStore.get('token')?.value;
-
 
 //     const searchTerm = await searchParams?.search || '';
 //     const currentPage = parseInt(searchParams?.page) || 1;
