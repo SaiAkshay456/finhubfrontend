@@ -5,7 +5,7 @@ import CreateRecommendationModal from "../../components/CreateRecommendationModa
 import * as Popover from '@radix-ui/react-popover';
 import { MoreHorizontal } from 'lucide-react';
 import { AgGridReact } from 'ag-grid-react';
-import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'; 
+import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import axiosInstance from '../../helpers/axios';
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -18,8 +18,8 @@ export default function RecommendationTable() {
   // Fetch all recommendations
   const fetchRecommendations = async () => {
     try {
-      const {data} = await axiosInstance.get('/v1/recommendations/getRecommendations');
-      
+      const { data } = await axiosInstance.get('/v1/recommendations/getRecommendations');
+
       console.log(data)
       if (data.success) {
         setRecommendations(data.data);
@@ -31,13 +31,13 @@ export default function RecommendationTable() {
 
   const handleStatusToggle = async (id, currentStatus) => {
     const newStatus = currentStatus === 'Active' ? 'Closed' : 'Active';
-  
+
     const confirmed = window.confirm(
       `Are you sure you want to change the status to "${newStatus}"?`
     );
-  
+
     if (!confirmed) return;
-  
+
     try {
       const { data } = await axiosInstance.patch(
         `/v1/recommendations/updateStatus/${id}`,
@@ -46,7 +46,7 @@ export default function RecommendationTable() {
           headers: { 'Content-Type': 'application/json' },
         }
       );
-  
+
       if (data.success) {
         fetchRecommendations();
       }
@@ -54,8 +54,8 @@ export default function RecommendationTable() {
       console.error('Failed to update status:', err);
     }
   };
-  
-  
+
+
   useEffect(() => {
     fetchRecommendations()
   }, []);
@@ -128,13 +128,12 @@ export default function RecommendationTable() {
   const RiskLevelCellRenderer = (params) => {
     const risk = params.value;
     return (
-      <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-medium ${
-        risk === 'Low'
-          ? 'bg-green-100 text-green-700'
-          : risk === 'Medium'
+      <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-medium ${risk === 'Low'
+        ? 'bg-green-100 text-green-700'
+        : risk === 'Medium'
           ? 'bg-yellow-100 text-yellow-700'
           : 'bg-red-100 text-red-700'
-      }`}>
+        }`}>
         {getRiskIcon(risk)}
         {risk} Risk
       </span>
@@ -145,13 +144,12 @@ export default function RecommendationTable() {
   const ActionCellRenderer = (params) => {
     const action = params.value;
     return (
-      <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-medium ${
-        action === 'Buy' 
-          ? 'bg-green-100 text-green-700' 
-          : action === 'Sell'
+      <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-medium ${action === 'Buy'
+        ? 'bg-green-100 text-green-700'
+        : action === 'Sell'
           ? 'bg-red-100 text-red-700'
           : 'bg-yellow-100 text-yellow-700'
-      }`}>
+        }`}>
         {getActionIcon(action)}
         {action}
       </span>
@@ -164,11 +162,10 @@ export default function RecommendationTable() {
     return (
       <button
         onClick={() => handleStatusToggle(rec._id, rec.status)}
-        className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-medium transition-colors ${
-          rec.status === 'Active'
-            ? 'bg-green-100 text-green-700 hover:bg-green-200'
-            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-        }`}
+        className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-medium transition-colors ${rec.status === 'Active'
+          ? 'bg-green-100 text-green-700 hover:bg-green-200'
+          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          }`}
         title="Click to toggle status"
       >
         {rec.status === 'Active' ? (
@@ -313,7 +310,7 @@ export default function RecommendationTable() {
               <TrendingUp className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Investment Recommendations</h1>
+              <h1 className="text-3xl font-bold text-[var(--dashboard-text-dark)]">Investment Recommendations</h1>
               <p className="text-gray-600 mt-1">Manage and track your investment recommendations</p>
             </div>
           </div>
@@ -340,7 +337,7 @@ export default function RecommendationTable() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              
+
               {/* Create Button */}
               <button
                 className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-2xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"

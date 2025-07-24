@@ -5,12 +5,14 @@ import { recommendedQuestions } from '@/constants/predefinedQuestions';
 import axiosInstance from '@/helpers/axios';
 import { RISK_ROUTES } from '@/helpers/apiRoutes';
 import { API_BASE } from '@/helpers/apiRoutes';
+import { useRouter } from 'next/navigation';
 
 export default function QuestionnaireForm() {
     const [title, setTitle] = useState("")
     const [questions, setQuestions] = useState([
         { text: '', options: [{ label: '' }] }
     ]);
+    const router = useRouter();
     const [suggestions, setSuggestions] = useState([]);
 
     const [currentSlide, setCurrentSlide] = useState(0);
@@ -284,7 +286,7 @@ export default function QuestionnaireForm() {
                             <button
                                 type="button"
                                 onClick={() => addOption(currentSlide)}
-                                className="mt-3 flex items-center text-sm text-purple-600 hover:text-purple-800"
+                                className="mt-3 flex items-center text-sm text-teal-600 hover:text-teal-800"
                             >
                                 <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -301,16 +303,25 @@ export default function QuestionnaireForm() {
                                 type="button"
                                 onClick={prevSlide}
                                 disabled={currentSlide === 0}
-                                className={`px-4 py-2 rounded-md ${currentSlide === 0 ? 'text-gray-400 cursor-not-allowed' : 'text-purple-600 hover:bg-purple-50'}`}
+                                className={`px-4 py-2 rounded-md ${currentSlide === 0 ? 'text-gray-400 cursor-not-allowed' : 'text-teal-600 hover:bg-teal-50'}`}
                             >
                                 Previous
                             </button>
+                            {currentSlide < questions.length - 1 && (
+                                <button
+                                    type="button"
+                                    onClick={nextSlide}
+                                    className="px-4 py-2 bg-black text-white rounded-md"
+                                >
+                                    Next
+                                </button>
+                            )}
                             <button
                                 type="button"
-                                onClick={nextSlide}
-                                className="px-4 py-2 bg-black text-white rounded-md"
+                                onClick={() => router.push("/riskprofile")}
+                                className={`px-4 py-2 rounded-md text-teal-600`}
                             >
-                                {currentSlide === questions.length - 1 ? 'Add Question' : 'Next'}
+                                Back to Profile
                             </button>
                         </div>
                         <button

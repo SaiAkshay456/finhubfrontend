@@ -2,9 +2,8 @@ import { cookies } from "next/headers"
 import LinkComponent from "@/components/LinkComponent"
 import PaginationLayout from "@/components/PaginationLayout"
 import BasketSearchDebounce from "@/components/BasketSearchDebounce"
-import Link from "next/link"
 import TableOfUser from "@/components/TableOfUser"
-import { ArrowUp, ArrowDown } from "lucide-react" // Using specific icons for percentage change
+import { ArrowUp } from "lucide-react"
 import axiosInstance from "@/helpers/axios"
 import { API_BASE, RISK_ROUTES, USER_MANAGE_ROUTES } from "@/helpers/apiRoutes"
 export async function fetchQuestionnaires(token) {
@@ -80,18 +79,17 @@ export default async function AllUsersPage({ searchParams }) {
 
     const questionarriesArray = await fetchQuestionnaires(token)
 
-    // Data for the dashboard cards, adjusted to match the image
     const dashboardCardsData = [
         {
             label: "Totals Users",
-            value: stats.totalUsers, // Hardcoded to match image, replace with actual stat if available
+            value: stats.totalUsers,
             change: stats.totalUsers,
-            changeType: "increase", // 'increase' or 'decrease'
+            changeType: "increase",
             timeframe: "Views (7 Days)",
         },
         {
             label: "Active Users",
-            value: stats.totalActiveUsers, // Hardcoded to match image
+            value: stats.totalActiveUsers,
             change: "-1",
             changeType: "decrease",
             timeframe: "Past (7 Days)",
@@ -105,11 +103,11 @@ export default async function AllUsersPage({ searchParams }) {
         },
         {
             label: "KYC Pending",
-            value: stats.totalKycPendingUsers, // Hardcoded to match image
+            value: stats.totalKycPendingUsers,
             change: "0",
             changeType: "increase",
             timeframe: "(Past 5 days)",
-            valueColor: "text-black-600", // Specific color for this card's value
+            valueColor: "text-black-600",
             hasChart: true,
         },
     ]
@@ -117,8 +115,6 @@ export default async function AllUsersPage({ searchParams }) {
     return (
         <div className="min-h-screen">
             <div className="px-6 py-4 w-full">
-
-                {/* Header Section */}
                 <div className="mb-3">
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                         <div className="space-y-2">
@@ -132,9 +128,7 @@ export default async function AllUsersPage({ searchParams }) {
                         </div>
                     </div>
                 </div>
-                {/* Stats Cards - Dashboard Style (Tailwind CSS only) */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-2">
-                    {/* <div className="grid grid-cols-2 lg:grid-cols-4 gap-1 sm:gap-2 mb-2 max-w-[96%] mx-auto"> */}
                     {dashboardCardsData.map((card) => (
                         <div
                             key={card.label}
@@ -151,24 +145,18 @@ export default async function AllUsersPage({ searchParams }) {
 
                                             `}
                                     >
-                                        {/* {card.change} */}
-
                                         <ArrowUp className="ml-0.5 h-2.5 w-2.5" />
-
                                     </span>
                                 </div>
                                 <p className="text-xs text-gray-400">{card.timeframe}</p>
                             </div>
-
                         </div>
                     ))}
                 </div>
-                {/* Main Content Card - Wider Table Container */}
                 <div className="bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden">
                     <div className="bg-gradient-to-r from-gray-50 to-slate-50 p-6 border-b border-gray-200">
                         <BasketSearchDebounce placeHolder="Search users by name, email, or username..." />
                     </div>
-                    {/* Error State */}
                     {error && (
                         <div className="m-6">
                             <div className="bg-gradient-to-r from-red-50 to-pink-50 border-l-4 border-red-500 p-6 rounded-xl shadow-sm">
@@ -191,7 +179,6 @@ export default async function AllUsersPage({ searchParams }) {
                             </div>
                         </div>
                     )}
-                    {/* Content Area */}
                     {!error && users.length === 0 ? (
                         stats.totalUsers === 0 ? (
                             <div className="p-12 text-center">
@@ -228,13 +215,11 @@ export default async function AllUsersPage({ searchParams }) {
                         )
                     ) : (
                         <div className="overflow-x-auto">
-                            <div className="min-w-full">
-                                <TableOfUser users={users} token={token} questionnaires={questionarriesArray} />
-                            </div>
+
+                            <TableOfUser users={users} token={token} questionnaires={questionarriesArray} />
                         </div>
                     )}
                 </div>
-                {/* Pagination */}
                 <div className="mt-8">
                     <PaginationLayout currentPage={currentPage} totalPages={totalPages} search={search} />
                 </div>

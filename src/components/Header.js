@@ -84,19 +84,6 @@ export default function Header() {
 
                     {/* Search + Button */}
                     <div className="flex items-center space-x-4">
-                        <div className="hidden lg:block relative w-80">
-                            {/* Search icon */}
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Search className="h-4 w-4 text-emerald-500" />
-                            </div>
-                            <Input
-                                placeholder="Search Baskets..."
-                                className="pl-10 pr-16 w-full border border-emerald-300 focus:border-emerald-500 focus:ring-emerald-500 bg-white text-gray-800 placeholder-gray-400 rounded-md shadow-sm"
-                            />
-                            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                <span className="text-xs text-emerald-500 font-medium">Ctrl+K</span>
-                            </div>
-                        </div>
 
                         <Button onClick={() => router.push("/login")} className="bg-gradient-to-r from-[#00d09c] to-[#00b98b]">
                             Login/Sign In

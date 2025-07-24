@@ -66,7 +66,7 @@ export const sidebarItems = [
         description: "Fund or asset recommendations based on risk profile",
     },
     {
-        label: "Benchmarks",                     
+        label: "Benchmarks",
         path: "/benchmarks",
         icon: HiOutlineViewGrid,
         description: "Benchmark portfolio performance with indices",
@@ -77,7 +77,13 @@ export const sidebarItems = [
         icon: FaFileUpload,
         description: "Upload protfolio"
     },
-    
+    {
+        label: "Categories",
+        path: "/categories",
+        icon: FaFileUpload,
+        description: "Categories"
+    }
+
 
 ];
 
