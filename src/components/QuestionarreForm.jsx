@@ -3,16 +3,21 @@
 import { useState } from 'react';
 import { recommendedQuestions } from '@/constants/predefinedQuestions';
 import axiosInstance from '@/helpers/axios';
+import { RISK_ROUTES } from '@/helpers/apiRoutes';
+import { API_BASE } from '@/helpers/apiRoutes';
+import { useRouter } from 'next/navigation';
 
 export default function QuestionnaireForm() {
     const [title, setTitle] = useState("")
     const [questions, setQuestions] = useState([
         { text: '', options: [{ label: '' }] }
     ]);
+    const router = useRouter();
     const [suggestions, setSuggestions] = useState([]);
 
     const [currentSlide, setCurrentSlide] = useState(0);
     const [msg, setMsg] = useState('');
+    const [loading, setLoading] = useState(false)
 
     const isValidForm = () => {
         for (let i = 0; i < questions.length; i++) {
@@ -93,6 +98,11 @@ export default function QuestionnaireForm() {
         updated[qIndex].options[oIndex][key] = value;
         setQuestions(updated);
     };
+    if (loading) {
+        return <div className="flex items-center justify-center h-screen">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+        </div>
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -100,10 +110,10 @@ export default function QuestionnaireForm() {
         if (!isValidForm()) return;
 
         try {
-            const { data } = await axiosInstance.post('/v1/riskprofile/create-questionarre', { questions, title }, {
+            setLoading(true)
+            const { data } = await axiosInstance.post(`${API_BASE}/${RISK_ROUTES.CREATE_QUESTIONNARIE}`, { questions, title }, {
                 headers: { 'Content-Type': 'application/json' },
             });
-
             if (data.success) {
                 setMsg("✅ Questionnaire Created!");
                 setQuestions([{ text: '', options: [{ label: '' }] }]);
@@ -114,6 +124,8 @@ export default function QuestionnaireForm() {
         } catch (error) {
             console.error(error.message);
             setMsg("❌ Error occurred during submission.");
+        } finally {
+            setLoading(false)
         }
     };
 
@@ -283,7 +295,7 @@ export default function QuestionnaireForm() {
                             <button
                                 type="button"
                                 onClick={() => addOption(currentSlide)}
-                                className="mt-3 flex items-center text-sm text-purple-600 hover:text-purple-800"
+                                className="mt-3 flex items-center text-sm text-teal-600 hover:text-teal-800"
                             >
                                 <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -300,16 +312,25 @@ export default function QuestionnaireForm() {
                                 type="button"
                                 onClick={prevSlide}
                                 disabled={currentSlide === 0}
-                                className={`px-4 py-2 rounded-md ${currentSlide === 0 ? 'text-gray-400 cursor-not-allowed' : 'text-purple-600 hover:bg-purple-50'}`}
+                                className={`px-4 py-2 rounded-md ${currentSlide === 0 ? 'text-gray-400 cursor-not-allowed' : 'text-teal-600 hover:bg-teal-50'}`}
                             >
                                 Previous
                             </button>
+                            {currentSlide < questions.length - 1 && (
+                                <button
+                                    type="button"
+                                    onClick={nextSlide}
+                                    className="px-4 py-2 bg-black text-white rounded-md"
+                                >
+                                    Next
+                                </button>
+                            )}
                             <button
                                 type="button"
-                                onClick={nextSlide}
-                                className="px-4 py-2 bg-black text-white rounded-md"
+                                onClick={() => router.push("/riskprofile")}
+                                className={`px-4 py-2 rounded-md text-teal-600`}
                             >
-                                {currentSlide === questions.length - 1 ? 'Add Question' : 'Next'}
+                                Back to Profile
                             </button>
                         </div>
                         <button

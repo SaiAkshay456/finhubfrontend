@@ -2,6 +2,8 @@
 
 import { useTransition, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import axiosInstance from '@/helpers/axios';
+import { API_BASE, RISK_ROUTES } from '@/helpers/apiRoutes';
 
 export default function DupliacateQuestionarreButton({ questionId }) {
     const router = useRouter();
@@ -10,16 +12,11 @@ export default function DupliacateQuestionarreButton({ questionId }) {
 
     const handleDuplicate = async () => {
         try {
-            const res = await fetch(`http://localhost:3030/v1/riskprofile/duplicate-questionarre/${questionId}`, {
-                method: 'POST',
+            const { data } = await axiosInstance.post(`${API_BASE}/${RISK_ROUTES.DUPLICATE_QUESTIONNARIE}/${questionId}`, {
                 headers: {
                     'Content-Type': 'application/json',
-                },
-                credentials: 'include',
+                }
             });
-
-            if (!res.ok) throw new Error('Failed to duplicate');
-            const data = await res.json()
             // setMsg(data.message)
             // Refresh page to show new duplicated questionnaire
             startTransition(() => {

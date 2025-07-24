@@ -2,7 +2,8 @@ import { cookies } from "next/headers";
 import { redirect } from 'next/navigation';
 import KycFormUser from "../../../components/KycFormUser";
 import Link from "next/link";
-
+import axiosInstance from "@/helpers/axios";
+import { API_BASE, USER_MANAGE_ROUTES } from "@/helpers/apiRoutes";
 export default async function UserDetailsPage({ params }) {
     const token = await cookies().get('token')?.value;
     if (!token) redirect('/login');
@@ -13,11 +14,9 @@ export default async function UserDetailsPage({ params }) {
 
     try {
         loading = true;
-        const res = await fetch(`http://localhost:3030/v1/users/user/${id}`, {
+        const { data } = await axiosInstance.get(`${API_BASE}/${USER_MANAGE_ROUTES.GET_USER_DETAILS}/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
-            cache: "no-store",
         });
-        const data = await res.json();
         user = data.success ? data.user : null;
         // error = data.success ? null : data.message || 'Failed to fetch user';
         loading = false;
@@ -30,8 +29,6 @@ export default async function UserDetailsPage({ params }) {
             <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
         </div>
     }
-
-
     if (error) return (
         <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
             <div className="bg-white rounded-lg shadow-md border-l-4 border-red-500 p-6 max-w-md w-full">

@@ -1,12 +1,15 @@
 import { cookies } from 'next/headers';
 import AssignRiskCategory from '../../../components/AssignRiskCategory';
 import axiosInstance from '@/helpers/axios';
+import { API_BASE } from '@/helpers/apiRoutes';
+import { RISK_ROUTES } from '@/helpers/apiRoutes';
 
-export async function getResponsesForUsers(id) {
+export async function getResponsesForUsers(id, loading) {
     const cookieStore = cookies();
     const token = cookieStore.get('token')?.value;
     try {
-        const { data } = await axiosInstance.get(`/v1/riskprofile/user-response/${id}`, {
+        loading = true;
+        const { data } = await axiosInstance.get(`${API_BASE}/${RISK_ROUTES.USER_RESPONSE}/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
 
         });
@@ -15,13 +18,21 @@ export async function getResponsesForUsers(id) {
     } catch (err) {
         console.error(err);
         return null;
+    } finally {
+        loading = false
     }
 }
 
 export default async function RiskProfileOfUser({ params }) {
-    const responses = await getResponsesForUsers(params.id);
+    let loading = false
+    const responses = await getResponsesForUsers(params.id, loading);
     const cookieStore = cookies();
     const token = cookieStore.get('token')?.value;
+    if (loading) {
+        <div className="flex items-center justify-center h-screen">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+        </div>
+    }
 
     return (
         <div className="min-h-screen">

@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import ToggleUserStatusButton from './ToggleUserStatusButton';
-import { Clock, ListFilter, ChevronDown, User, Mail, Hash } from 'lucide-react';
+import { Clock, ListFilter, ChevronDown, User, Mail, Hash, MoreVertical } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import axiosInstance from '@/helpers/axios';
+import { API_BASE, RISK_ROUTES } from '@/helpers/apiRoutes';
 
 
 const getUserStatusLabel = (user) => {
@@ -31,9 +32,14 @@ const getUserPendingStepLink = (user) => {
     if (!s.riskProfileStatus) return `/riskprofile/${user._id}`;
     return ``;
 };
+const getColor = (isActive) => {
+    if (isActive) return "bg-green-100 text-green-800"
+    return "bg-red-100 text-red-800"
+}
 
 export default function TableOfUser({ users, questionnaires, token }) {
     const [selectedUsers, setSelectedUsers] = useState([]);
+    const [moreSelectedUsers, setMoreSelectedUsers] = useState([])
     const [selectedQuestionnaire, setSelectedQuestionnaire] = useState('');
     const [msg, setMsg] = useState('');
     const router = useRouter();
@@ -45,6 +51,7 @@ export default function TableOfUser({ users, questionnaires, token }) {
                 : [...prev, userId]
         );
     };
+
 
     const toggleAllUsers = () => {
         setSelectedUsers(
@@ -67,11 +74,9 @@ export default function TableOfUser({ users, questionnaires, token }) {
                 userId,
                 questionnaireId: selectedQuestionnaire,
             }));
-
             const { data } = await axiosInstance.post(
-                '/v1/riskprofile/send/questionaries-to-users', { assignments: payload },
+                `${API_BASE}/${RISK_ROUTES.SEND_TO_USERS_QUESTIONNAIRE}`, { assignments: payload },
                 {
-
                     headers: {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${token}`,
@@ -122,6 +127,7 @@ export default function TableOfUser({ users, questionnaires, token }) {
                                 </div>
                             </div>
                         </div>
+
 
                         {/* Send Button */}
                         <button
@@ -181,7 +187,9 @@ export default function TableOfUser({ users, questionnaires, token }) {
                                     Modify Risk Level
                                 </th>
                                 <th scope="col" className="px-6 py-3 border-b border-gray-200">
-                                    Actions
+                                    A/C Status
+                                </th>
+                                <th scope="col" className="px-6 py-3 border-b border-gray-200">
                                 </th>
                             </tr>
                         </thead>
@@ -260,6 +268,11 @@ export default function TableOfUser({ users, questionnaires, token }) {
                                         ) : "N/A"}
                                     </td>
                                     <td className="px-6 py-4 border-b border-gray-100">
+                                        <span className={` ${getColor(user.isActive)} inline-flex items-center px-3 py-1 rounded-md text-xs font-medium`}>
+                                            {user.isActive ? "Open" : "Closed"}
+                                        </span>
+                                    </td>
+                                    {/* <td className="px-6 py-4 border-b border-gray-100">
                                         <div className="flex items-center gap-2">
                                             <button onClick={() => router.push(`/users/${user._id}`)} className="flex items-center gap-1 cursor-pointer px-3 py-1.5 rounded-md text-xs font-medium bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors">
                                                 <ListFilter className="w-3.5 h-3.5" />
@@ -270,6 +283,89 @@ export default function TableOfUser({ users, questionnaires, token }) {
                                                 Update
                                             </button>
                                             <ToggleUserStatusButton userId={user._id} isActive={user.isActive} />
+                                        </div>
+                                    </td> */}
+                                    <td className="px-6 py-4 border-b border-gray-100 relative">
+                                        <div className="relative">
+                                            <button
+                                                className="p-1 rounded-md hover:bg-gray-100 transition-colors"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setMoreSelectedUsers(prev =>
+                                                        prev.includes(user._id)
+                                                            ? prev.filter(id => id !== user._id)
+                                                            : [...prev, user._id]
+                                                    );
+                                                }}
+                                                aria-expanded={moreSelectedUsers.includes(user._id)}
+                                                aria-label="More actions"
+                                            >
+                                                <MoreVertical className="w-4 h-4 text-gray-500" />
+                                            </button>
+                                            {moreSelectedUsers.includes(user._id) && (
+                                                <div
+                                                    className={`
+          absolute right-0 z-50 w-56 rounded-md bg-white shadow-lg ring-1 ring-gray-200 focus:outline-none
+          ${index < 2 ? 'top-full mt-1' : 'bottom-full mb-1'}
+        `}
+                                                    ref={(el) => {
+                                                        if (el) {
+                                                            const rect = el.getBoundingClientRect();
+                                                            const windowHeight = window.innerHeight;
+
+                                                            // For rows where we want dropdown below (first two rows)
+                                                            if (index < 2) {
+                                                                // If it would go off screen at bottom, show above instead
+                                                                if (rect.bottom > windowHeight) {
+                                                                    el.classList.add('bottom-full', 'mb-1');
+                                                                    el.classList.remove('top-full', 'mt-1');
+                                                                }
+                                                            }
+                                                            // For rows where we want dropdown above (rows 3+)
+                                                            else {
+                                                                // If it would go off screen at top, show below instead
+                                                                if (rect.top < 0) {
+                                                                    el.classList.add('top-full', 'mt-1');
+                                                                    el.classList.remove('bottom-full', 'mb-1');
+                                                                }
+                                                            }
+                                                        }
+                                                    }}
+                                                >
+                                                    <div className="py-1">
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                router.push(`/users/${user._id}`);
+                                                                setMoreSelectedUsers([]);
+                                                            }}
+                                                            className="flex w-full items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                                        >
+                                                            <ListFilter className="w-4 h-4 text-gray-400" />
+                                                            View Details
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                router.push(`/users/update/${user._id}`);
+                                                                setMoreSelectedUsers([]);
+                                                            }}
+                                                            className="flex w-full items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                                        >
+                                                            <Clock className="w-4 h-4 text-gray-400" />
+                                                            Update User
+                                                        </button>
+                                                        <div className="w-full">
+                                                            <ToggleUserStatusButton
+                                                                userId={user._id}
+                                                                isActive={user.isActive}
+                                                                onToggle={() => setMoreSelectedUsers([])}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+
                                         </div>
                                     </td>
                                 </tr>
