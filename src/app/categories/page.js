@@ -4,13 +4,13 @@ import SubTabBar from '../../components/SubTabBar'
 import CategoryAssignmentModal from '../../components/CategoryAssignmentModal'
 import axiosInstance from '@/helpers/axios'
 
-const CustomButtonComponent = ({ item, onAssign }) => {
+const CustomButtonComponent = ({ item, onAssign, hasAssignment }) => {
     return (
         <button
             onClick={() => onAssign(item)}
             className="text-emerald-600 hover:text-emerald-800 font-medium transition-colors cursor-pointer"
         >
-            Assign
+            {hasAssignment ? 'Reassign' : 'Assign'}
         </button>
     )
 }
@@ -19,6 +19,7 @@ export default function CategoryAssignment() {
     const [activeSubTab, setActiveSubTab] = useState('mutual-funds')
     const [mutualFundsData, setMutualFundsData] = useState([])
     const [stocksData, setStocksData] = useState([])
+    const [instrumentCategoriesMap, setInstrumentCategoriesMap] = useState({})
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
     const [pagination, setPagination] = useState({})
@@ -39,6 +40,31 @@ export default function CategoryAssignment() {
             label: 'Stocks',
         },
     ]
+
+    // Fetch instrument categories and create hash map
+    const fetchInstrumentCategories = async () => {
+        try {
+            const response = await axiosInstance.get(
+                '/v1/category/instrument-categories/all'
+            )
+            const instrumentCategories = response.data || []
+
+            // Create a hash map with ID as key and formatted name as value
+            const categoriesMap = {}
+            instrumentCategories.forEach((category) => {
+                const id = category._id || category.id
+                const formattedName = `${category.name} (${
+                    category.route || 'N/A'
+                } - ${category.assetClass || 'N/A'})`
+                categoriesMap[id] = formattedName
+            })
+
+            return categoriesMap
+        } catch (error) {
+            console.error('Error fetching instrument categories:', error)
+            return {}
+        }
+    }
 
     // Debounced search effect
     useEffect(() => {
@@ -80,14 +106,25 @@ export default function CategoryAssignment() {
                 queryString ? '?' + queryString : ''
             }`
 
-            const response = await axiosInstance.get(url)
-            const result = response.data
+            // Use Promise.all to fetch both mutual funds data and instrument categories
+            const [mutualFundsResponse, instrumentCategoriesMap] =
+                await Promise.all([
+                    axiosInstance.get(url),
+                    fetchInstrumentCategories(),
+                ])
+
+            const result = mutualFundsResponse.data
 
             console.log('Mutual Funds Data:', result)
+            console.log('Instrument Categories Map:', instrumentCategoriesMap)
 
-            if (response.status === 200) {
+            if (
+                mutualFundsResponse.status === 200 ||
+                mutualFundsResponse.status === 201
+            ) {
                 setMutualFundsData(result.categories || [])
                 setPagination(result.pagination || {})
+                setInstrumentCategoriesMap(instrumentCategoriesMap)
             } else {
                 setError('Failed to fetch mutual fund categories')
             }
@@ -99,63 +136,84 @@ export default function CategoryAssignment() {
         }
     }
 
-    const fetchStocks = () => {
-        setLoading(true)
-        // Mock data for stocks since API doesn't exist yet
-        setTimeout(() => {
-            const mockStocksData = [
-                {
-                    id: 1,
-                    name: 'Technology Stocks',
-                    sector: 'Technology',
-                    stockCount: 150,
-                    marketCap: 'Large Cap',
-                    status: 'active',
-                },
-                {
-                    id: 2,
-                    name: 'Healthcare Stocks',
-                    sector: 'Healthcare',
-                    stockCount: 89,
-                    marketCap: 'Mid Cap',
-                    status: 'active',
-                },
-                {
-                    id: 3,
-                    name: 'Financial Stocks',
-                    sector: 'Financial Services',
-                    stockCount: 120,
-                    marketCap: 'Large Cap',
-                    status: 'active',
-                },
-                {
-                    id: 4,
-                    name: 'Energy Stocks',
-                    sector: 'Energy',
-                    stockCount: 45,
-                    marketCap: 'Small Cap',
-                    status: 'inactive',
-                },
-                {
-                    id: 5,
-                    name: 'Consumer Goods',
-                    sector: 'Consumer Discretionary',
-                    stockCount: 78,
-                    marketCap: 'Mid Cap',
-                    status: 'active',
-                },
-            ]
+    const fetchStocks = async () => {
+        try {
+            setLoading(true)
 
-            setStocksData(mockStocksData)
-            setPagination({
-                currentPage: 1,
-                totalPages: 1,
-                totalItems: mockStocksData.length,
-                hasNextPage: false,
-                hasPrevPage: false,
-            })
+            // Use Promise.all to fetch both mock stocks data and instrument categories
+            const [instrumentCategoriesMap] = await Promise.all([
+                fetchInstrumentCategories(),
+            ])
+
+            // Mock data for stocks since API doesn't exist yet
+            setTimeout(() => {
+                const mockStocksData = [
+                    {
+                        id: 1,
+                        name: 'Technology Stocks',
+                        sector: 'Technology',
+                        stockCount: 150,
+                        marketCap: 'Large Cap',
+                        status: 'active',
+                        assignedInstrumentCategory:
+                            'Tech Instruments (Route A - Equity)',
+                    },
+                    {
+                        id: 2,
+                        name: 'Healthcare Stocks',
+                        sector: 'Healthcare',
+                        stockCount: 89,
+                        marketCap: 'Mid Cap',
+                        status: 'active',
+                        assignedInstrumentCategory: null,
+                    },
+                    {
+                        id: 3,
+                        name: 'Financial Stocks',
+                        sector: 'Financial Services',
+                        stockCount: 120,
+                        marketCap: 'Large Cap',
+                        status: 'active',
+                        assignedInstrumentCategory:
+                            'Banking Instruments (Route B - Equity)',
+                    },
+                    {
+                        id: 4,
+                        name: 'Energy Stocks',
+                        sector: 'Energy',
+                        stockCount: 45,
+                        marketCap: 'Small Cap',
+                        status: 'inactive',
+                        assignedInstrumentCategory: null,
+                    },
+                    {
+                        id: 5,
+                        name: 'Consumer Goods',
+                        sector: 'Consumer Discretionary',
+                        stockCount: 78,
+                        marketCap: 'Mid Cap',
+                        status: 'active',
+                        assignedInstrumentCategory:
+                            'Consumer Instruments (Route C - Equity)',
+                    },
+                ]
+
+                setStocksData(mockStocksData)
+                setPagination({
+                    currentPage: 1,
+                    totalPages: 1,
+                    totalItems: mockStocksData.length,
+                    hasNextPage: false,
+                    hasPrevPage: false,
+                })
+                setInstrumentCategoriesMap(instrumentCategoriesMap)
+                setLoading(false)
+            }, 500)
+        } catch (error) {
+            console.error('Error fetching stocks data:', error)
+            setError('Error fetching stocks data: ' + error.message)
             setLoading(false)
-        }, 500)
+        }
     }
 
     const handleSubTabChange = (tabId) => {
@@ -212,6 +270,44 @@ export default function CategoryAssignment() {
     const handleAssignmentComplete = () => {
         // Refresh data after assignment
         fetchData()
+    }
+
+    // Helper function to get assigned instrument category display text
+    const getAssignedInstrumentCategory = (item) => {
+        if (activeSubTab === 'mutual-funds') {
+            // For mutual funds, check if instrumentCategorySchema is populated
+            if (item.instrumentCategorySchema) {
+                const instrumentCategoryId = item.instrumentCategorySchema
+
+                if (typeof instrumentCategoryId === 'string') {
+                    // If it's an ID, look it up in the hash map
+                    return (
+                        instrumentCategoriesMap[instrumentCategoryId] ||
+                        `Assigned (ID: ${instrumentCategoryId.substring(
+                            0,
+                            8
+                        )}...)`
+                    )
+                } else if (
+                    typeof instrumentCategoryId === 'object' &&
+                    instrumentCategoryId.name
+                ) {
+                    // If populated with full object (fallback)
+                    return `${instrumentCategoryId.name} (${
+                        instrumentCategoryId.route || 'N/A'
+                    } - ${instrumentCategoryId.assetClass || 'N/A'})`
+                }
+            }
+            return null
+        } else {
+            // For stocks (mock data)
+            return item.assignedInstrumentCategory || null
+        }
+    }
+
+    // Helper function to check if item has an assignment
+    const hasInstrumentCategoryAssignment = (item) => {
+        return getAssignedInstrumentCategory(item) !== null
     }
 
     if (error) {
@@ -308,6 +404,10 @@ export default function CategoryAssignment() {
                                                         Status
                                                     </th>
                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Assigned Instrument
+                                                        Category
+                                                    </th>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                         Actions
                                                     </th>
                                                 </>
@@ -324,6 +424,10 @@ export default function CategoryAssignment() {
                                                     </th>
                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                         Market Cap
+                                                    </th>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Assigned Instrument
+                                                        Category
                                                     </th>
                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                         Actions
@@ -383,6 +487,24 @@ export default function CategoryAssignment() {
                                                                               'Unknown'}
                                                                     </span>
                                                                 </td>
+                                                                <td className="px-6 py-4 text-sm text-gray-900">
+                                                                    <div className="max-w-xs">
+                                                                        {getAssignedInstrumentCategory(
+                                                                            item
+                                                                        ) ? (
+                                                                            <span className="text-emerald-600 font-medium">
+                                                                                {getAssignedInstrumentCategory(
+                                                                                    item
+                                                                                )}
+                                                                            </span>
+                                                                        ) : (
+                                                                            <span className="text-gray-400 italic">
+                                                                                Not
+                                                                                assigned
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                </td>
                                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                                     <CustomButtonComponent
                                                                         item={
@@ -391,6 +513,9 @@ export default function CategoryAssignment() {
                                                                         onAssign={
                                                                             handleSmallAssignClick
                                                                         }
+                                                                        hasAssignment={hasInstrumentCategoryAssignment(
+                                                                            item
+                                                                        )}
                                                                     />
                                                                 </td>
                                                             </>
@@ -426,6 +551,24 @@ export default function CategoryAssignment() {
                                                                         }
                                                                     </span>
                                                                 </td>
+                                                                <td className="px-6 py-4 text-sm text-gray-900">
+                                                                    <div className="max-w-xs">
+                                                                        {getAssignedInstrumentCategory(
+                                                                            item
+                                                                        ) ? (
+                                                                            <span className="text-emerald-600 font-medium">
+                                                                                {getAssignedInstrumentCategory(
+                                                                                    item
+                                                                                )}
+                                                                            </span>
+                                                                        ) : (
+                                                                            <span className="text-gray-400 italic">
+                                                                                Not
+                                                                                assigned
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                </td>
                                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                                     <CustomButtonComponent
                                                                         item={
@@ -434,6 +577,9 @@ export default function CategoryAssignment() {
                                                                         onAssign={
                                                                             handleSmallAssignClick
                                                                         }
+                                                                        hasAssignment={hasInstrumentCategoryAssignment(
+                                                                            item
+                                                                        )}
                                                                     />
                                                                 </td>
                                                             </>
@@ -447,8 +593,8 @@ export default function CategoryAssignment() {
                                                     colSpan={
                                                         activeSubTab ===
                                                         'mutual-funds'
-                                                            ? 4
-                                                            : 5
+                                                            ? 5
+                                                            : 6
                                                     }
                                                     className="px-6 py-4 text-center text-sm text-gray-500"
                                                 >
