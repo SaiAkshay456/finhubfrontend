@@ -1,56 +1,77 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import axiosInstance from "../helpers/axios"
+import { useEffect, useState } from "react";
+import axiosInstance from "../helpers/axios";
+import Select from "react-select";
 
 export default function BenchmarkModal({ isOpen, onClose, onCreated }) {
-  const [category, setCategory] = useState("")
-  const [stock, setStock] = useState("")
-  const [stocks, setStocks] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
+  const [category, setCategory] = useState("");
+  const [stock, setStock] = useState("");
+  const [stocks, setStocks] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [categoryOptions, setCategoryOptions] = useState([]);
 
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) return;
     const fetchStocks = async () => {
       try {
-        const {data} = await axiosInstance.get("/v1/getStocks/getStocks")
-        setStocks(data.data || data)
-        console.log(stocks)
+        const { data } = await axiosInstance.get("/v1/getStocks/getStocks");
+        const stockList = Array.isArray(data) ?data : [];
+        setStocks(stockList);
       } catch (err) {
-        console.error("Error fetching stocks:", err)
+        console.error("Error fetching stocks:", err);
+        setStocks([]);
       }
-    }
-    fetchStocks()
-  }, [isOpen])
+    };
+    
+    fetchStocks();
+  }, [isOpen]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const { data } = await axiosInstance.get("/v1/category/instrument-categories/all");
+        const options = data.map((cat) => ({
+          value: cat.name,
+          label: `${cat.name} (${cat.route || "N/A"}, ${cat.assetClass || "N/A"})`,
+        }));
+        setCategoryOptions(options);
+      } catch (err) {
+        console.error("Failed to load categories", err);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const handleSubmit = async () => {
     if (!category || !stock) {
-      setError("Category and stock are required.")
-      return
+      setError("Category and stock are required.");
+      return;
     }
-    setLoading(true)
+    setLoading(true);
     try {
-      const {data} = await axiosInstance.post("/v1/benchmark/create", { category, stock },{
-        headers: { "Content-Type": "application/json" },
-      })
+      const { data } = await axiosInstance.post(
+        "/v1/benchmark/create",
+        { category, stock },
+        { headers: { "Content-Type": "application/json" } }
+      );
       if (data.success) {
-        onCreated()
-        onClose()
+        onCreated();
+        onClose();
       } else {
-        setError(data.message || "Failed to create benchmark.")
+        setError(data.message || "Failed to create benchmark.");
       }
     } catch (err) {
-      setError(err.message)
+      setError(err.message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
-  const categoryOptions = [...new Set(stocks.map((s) => s.category))]
-  const filteredStocks = stocks.filter((s) => s.category === category)
+  const filteredStocks = stocks.filter((s) => s.category === category);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px]">
@@ -64,17 +85,8 @@ export default function BenchmarkModal({ isOpen, onClose, onCreated }) {
             className="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors"
             aria-label="Close"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 6 6 18"></path>
               <path d="m6 6 12 12"></path>
             </svg>
@@ -87,39 +99,13 @@ export default function BenchmarkModal({ isOpen, onClose, onCreated }) {
             <label htmlFor="category" className="block text-sm font-medium text-gray-700">
               Category
             </label>
-            <div className="relative">
-              <select
-                id="category"
-                value={category}
-                onChange={(e) => {
-                  setCategory(e.target.value)
-                  setStock("")
-                }}
-                className="w-full h-11 px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-800 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-colors"
-              >
-                <option value="">Select Category</option>
-                {categoryOptions.map((c, idx) => (
-                  <option key={idx} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-500">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="m6 9 6 6 6-6"></path>
-                </svg>
-              </div>
-            </div>
+            <Select
+              options={categoryOptions}
+              value={categoryOptions.find((opt) => opt.value === category)}
+              onChange={(selected) => setCategory(selected?.value || "")}
+              placeholder="Select an Instrument Category"
+              className="text-sm"
+            />
           </div>
 
           <div className="space-y-2">
@@ -142,17 +128,9 @@ export default function BenchmarkModal({ isOpen, onClose, onCreated }) {
                 ))}
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-500">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                     strokeLinejoin="round">
                   <path d="m6 9 6 6 6-6"></path>
                 </svg>
               </div>
@@ -160,7 +138,9 @@ export default function BenchmarkModal({ isOpen, onClose, onCreated }) {
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">{error}</div>
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+              {error}
+            </div>
           )}
         </div>
 
@@ -176,22 +156,16 @@ export default function BenchmarkModal({ isOpen, onClose, onCreated }) {
           <button
             onClick={handleSubmit}
             disabled={loading || !category || !stock}
-            className={`px-5 py-2.5 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${loading || !category || !stock ? "opacity-60 cursor-not-allowed" : ""}`}
+            className={`px-5 py-2.5 rounded-lg bg-gradient-to-r from-[#00d09c] to-[#00b98b] text-white font-medium hover:from-[#00d09c] hover:to-[#00b98b] transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${loading || !category || !stock ? "opacity-60 cursor-not-allowed" : ""}`}
           >
             {loading ? (
               <div className="flex items-center gap-2">
-                <svg
-                  className="animate-spin h-4 w-4 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
+                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg"
+                     fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                          strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
                 <span>Creating...</span>
               </div>
@@ -202,5 +176,5 @@ export default function BenchmarkModal({ isOpen, onClose, onCreated }) {
         </div>
       </div>
     </div>
-  )
+  );
 }

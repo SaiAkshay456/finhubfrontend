@@ -83,13 +83,32 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
   }, [searchTerm, form.assetType, page, isOpen])
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-    setError("")
-    // Clear field error when user starts typing
-    if (fieldErrors[e.target.name]) {
-      setFieldErrors((prev) => ({ ...prev, [e.target.name]: false }))
+    const { name, value } = e.target;
+  
+    if (name === "assetType") {
+      // Reset dependent fields when asset type changes
+      setForm((prev) => ({
+        ...prev,
+        assetType: value,
+        mutualFundId: "",
+        name: "",
+        sector: "",
+        category: "",
+        cmp: "",
+      }));
+      setSelectedAssetOption(null);
+      setIsCategoryPrefilled(false);
+      setSearchTerm("");
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
     }
-  }
+  
+    setError("");
+    if (fieldErrors[name]) {
+      setFieldErrors((prev) => ({ ...prev, [name]: false }));
+    }
+  };
+  
 
   const handleAssetSelect = async (asset) => {
     const selectedOption = {
@@ -121,7 +140,7 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
     setForm((prev) => ({
       ...prev,
       name: asset.name,
-      sector: asset.sector || "",
+      sector: prev.sector || asset.sector || "",
       mutualFundId: asset._id,
       assetType,
       category: categoryName || prev.category || "",
@@ -138,10 +157,10 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const {data} = await axiosInstance.get("/v1/category/instrument-categories/all");
+        const { data } = await axiosInstance.get("/v1/category/instrument-categories/all");
         const options = data.map(cat => ({
           value: cat.name,
-          label: cat.name,
+          label: `${cat.name} (${cat.route || "N/A"}, ${cat.assetClass || "N/A"})`,
         }));
         setCategoryOptions(options);
       } catch (err) {
@@ -153,6 +172,7 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
       fetchCategories();
     }
   }, [form.category]);
+  
   
   
 
@@ -359,14 +379,16 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
     />
   ) : (
     <Select
-      options={categoryOptions}
-      value={categoryOptions.find(opt => opt.value === form.category)}
-      onChange={(selected) =>
-        setForm((prev) => ({ ...prev, category: selected?.value || "" }))
-      }
-      placeholder="Select a category"
-      className="text-sm"
-    />
+  options={categoryOptions}
+  value={categoryOptions.find(opt => opt.value === form.category)}
+  onChange={(selected) =>
+    setForm((prev) => ({ ...prev, category: selected?.value || "" }))
+  }
+  placeholder="Select a Insturment category"
+  styles={getReactSelectStyles(fieldErrors.category)}
+  className="text-sm"
+/>
+
   )}
 </div>
 
@@ -460,30 +482,31 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
                     )}
                 </div>
 
-                {/* Footer */}
-                <div className="sticky bottom-0 bg-white rounded-b-2xl border-t border-gray-100 px-8 py-6 flex items-center justify-end gap-3">
-                    <button
-                        onClick={onClose}
-                        className="px-6 py-3 text-gray-700 font-medium rounded-xl hover:bg-gray-100 transition-colors duration-200"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={handleSubmit}
-                        disabled={loading}
-                        className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
-                    >
-                        {loading ? (
-                            <div className="flex items-center gap-2">
-                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                Creating...
-                            </div>
-                        ) : (
-                            'Create Recommendation'
-                        )}
-                    </button>
-                </div>
-            </div>
+        {/* Footer */}
+        <div className="sticky bottom-0 bg-white rounded-b-2xl border-t border-gray-100 px-8 py-6 flex items-center justify-end gap-3">
+          <button
+            onClick={onClose}
+            className="px-6 py-3 text-gray-700 font-medium rounded-xl hover:bg-gray-100 transition-colors duration-200"
+          >
+            Cancel
+          </button>
+          <button
+  onClick={handleSubmit}
+  disabled={loading}
+  className="px-8 py-3 bg-gradient-to-r from-[#00d09c] to-[#00b98b] hover:opacity-90 text-white font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+>
+  {loading ? (
+    <div className="flex items-center gap-2">
+      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+      Creating...
+    </div>
+  ) : (
+    "Create Recommendation"
+  )}
+</button>
+
         </div>
-    )
+      </div>
+    </div>
+  )
 }

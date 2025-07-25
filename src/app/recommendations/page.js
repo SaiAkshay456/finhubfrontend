@@ -99,7 +99,7 @@ export default function RecommendationTable() {
           <TrendingUp className="w-5 h-5 text-blue-600" />
         </div>
         <div>
-          <p className="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors duration-200">{params.value}</p>
+          <p className="font-semibold text-gray-900 group-hover:text-[#00d09c] transition-colors duration-200">{params.value}</p>
           <p className="text-sm text-gray-500">Investment Asset</p>
         </div>
       </div>
@@ -305,7 +305,7 @@ export default function RecommendationTable() {
         {/* Header Section */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-lg">
+            <div className="p-2 bg-gradient-to-r from-[#00d09c] to-[#00b98b] rounded-xl shadow-lg">
               <TrendingUp className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -329,7 +329,7 @@ export default function RecommendationTable() {
                 <input
                   type="text"
                   placeholder="Search recommendations by name..."
-                  className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-2xl text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 shadow-sm hover:border-gray-300"
+                  className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-2xl text-gray-900 placeholder-gray-500 focus:border-[#00d09c] focus:ring-2 focus:ring-[#00d09c]/20 transition-all duration-200 shadow-sm hover:border-gray-300"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -337,7 +337,7 @@ export default function RecommendationTable() {
 
               {/* Create Button */}
               <button
-                className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-2xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className="flex items-center gap-2 bg-gradient-to-r from-[#00d09c] to-[#00b98b] text-white px-6 py-3 rounded-2xl font-semibold hover:from-[#00c08f] hover:to-[#00a67e] transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                 onClick={() => setIsModalOpen(true)}
               >
                 <Plus className="w-5 h-5" />
@@ -357,7 +357,7 @@ export default function RecommendationTable() {
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">No recommendations found</h3>
                   <p className="text-gray-500 mb-6">Get started by creating your first investment recommendation</p>
                   <button
-                    className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-2xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg"
+                    className="flex items-center gap-2 bg-gradient-to-r from-[#00d09c] to-[#00b98b] text-white px-6 py-3 rounded-2xl font-semibold hover:from-[#00c08f] hover:to-[#00a67e] transition-all duration-200 shadow-lg"
                     onClick={() => setIsModalOpen(true)}
                   >
                     <Plus className="w-5 h-5" />
@@ -384,7 +384,7 @@ export default function RecommendationTable() {
                   }
                   
                   .ag-row:hover {
-                    background: linear-gradient(to right, rgba(59, 130, 246, 0.05), rgba(99, 102, 241, 0.05)) !important;
+                    background: linear-gradient(to right, rgba(0, 208, 156, 0.05), rgba(0, 185, 139, 0.05)) !important;
                   }
                   
                   .ag-cell {
