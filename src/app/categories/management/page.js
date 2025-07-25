@@ -169,24 +169,6 @@ export default function CategoryManagement() {
         setDeleteConfirm({ show: false, category: null })
     }
 
-    // Helper function to get action button text
-    const getActionButtonText = (category) => {
-        return category.status === 'set' ? 'Reassign' : 'Assign'
-    }
-
-    // Helper function to get assigned AMFI category display
-    const getAssignedCategory = (category) => {
-        if (category.status === 'set' && category.amfiCategory) {
-            // If the category has an amfiCategory populated/referenced
-            if (typeof category.amfiCategory === 'object') {
-                return category.amfiCategory.name || 'Assigned Category'
-            } else {
-                // If it's just an ID, show a generic message
-                return 'Assigned Category'
-            }
-        }
-        return '-'
-    }
 
     // Show loading only for initial load or when no search is active
     if (loading && currentPage === 1 && !debouncedSearchTerm && !searchTerm) {
@@ -397,12 +379,6 @@ export default function CategoryManagement() {
                                         Range
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Assigned To
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Status
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Actions
                                     </th>
                                 </tr>
@@ -442,34 +418,7 @@ export default function CategoryManagement() {
                                                     ? `${category.range.min} - ${category.range.max}`
                                                     : '-'}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                <div className="max-w-xs truncate">
-                                                    {getAssignedCategory(
-                                                        category
-                                                    )}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <span
-                                                    className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                                                        category.status ===
-                                                        'set'
-                                                            ? 'text-green-800 bg-green-100'
-                                                            : category.status ===
-                                                              'unset'
-                                                            ? 'text-gray-800 bg-gray-100'
-                                                            : 'text-yellow-800 bg-yellow-100'
-                                                    }`}
-                                                >
-                                                    {category.status === 'set'
-                                                        ? 'Assigned'
-                                                        : category.status ===
-                                                          'unset'
-                                                        ? 'Unassigned'
-                                                        : category.status ||
-                                                          'Unknown'}
-                                                </span>
-                                            </td>
+                                            
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                 <div className="flex space-x-2">
                                                     <button
