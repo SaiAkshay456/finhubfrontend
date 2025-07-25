@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation'
 import SubTabBar from '../../../components/SubTabBar'
 
 export default function ManagementLayout({ children }) {
-    const [activeSubTab, setActiveSubTab] = useState('instrument-categories')
+    const [activeSubTab, setActiveSubTab] = useState('asset-class')
     const pathname = usePathname()
 
     const subTabs = [
@@ -21,7 +21,7 @@ export default function ManagementLayout({ children }) {
         {
             id: 'instrument-categories',
             label: 'Instrument Categories',
-            href: '/categories/management',
+            href: '/categories/management/instrument-categories',
         },
     ]
 
@@ -31,8 +31,12 @@ export default function ManagementLayout({ children }) {
             setActiveSubTab('asset-class')
         } else if (pathname === '/categories/management/routes') {
             setActiveSubTab('routes')
-        } else if (pathname === '/categories/management') {
+        } else if (
+            pathname === '/categories/management/instrument-categories'
+        ) {
             setActiveSubTab('instrument-categories')
+        } else if (pathname === '/categories/management') {
+            setActiveSubTab('asset-class') // Default to asset-class instead of instrument-categories
         }
     }, [pathname])
 

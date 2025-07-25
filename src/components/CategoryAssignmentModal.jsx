@@ -12,22 +12,13 @@ export default function CategoryAssignmentModal({
 }) {
     const [form, setForm] = useState({
         categoryName: '',
-        assetClass: '',
-        assetClassId: '', // Add asset class ID tracking
-        route: '',
-        routeId: '', // Add route ID tracking
-        instrumentCategory: '',
-        instrumentCategoryId: '', // Add instrument category ID tracking
+        instrumentCategoryId: '',
     })
-    const [assetClasses, setAssetClasses] = useState([])
-    const [routes, setRoutes] = useState([])
     const [instrumentCategories, setInstrumentCategories] = useState([])
     const [categories, setCategories] = useState([])
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
     const [loadingStates, setLoadingStates] = useState({
-        assetClasses: false,
-        routes: false,
         instrumentCategories: false,
         categories: false,
     })
@@ -44,110 +35,18 @@ export default function CategoryAssignmentModal({
         } else {
             setForm({
                 categoryName: '',
-                assetClass: '',
-                assetClassId: '',
-                route: '',
-                routeId: '',
-                instrumentCategory: '',
                 instrumentCategoryId: '',
             })
         }
 
-        // Fetch asset classes when modal opens
-        fetchAssetClasses()
+        // Fetch data when modal opens
+        fetchAllInstrumentCategories()
         if (!prefilledCategory) {
             fetchCategories()
         }
     }, [isOpen, prefilledCategory])
 
-    // Fetch routes when asset class ID changes
-    useEffect(() => {
-        if (form.assetClassId) {
-            fetchRoutes(form.assetClassId)
-            // Reset dependent fields
-            setForm((prev) => ({
-                ...prev,
-                route: '',
-                routeId: '',
-                instrumentCategory: '',
-                instrumentCategoryId: '',
-            }))
-        } else {
-            setRoutes([])
-        }
-    }, [form.assetClassId])
-
-    // Fetch instrument categories when route changes
-    useEffect(() => {
-        if (form.routeId) {
-            fetchInstrumentCategories(form.routeId)
-            // Reset dependent field
-            setForm((prev) => ({
-                ...prev,
-                instrumentCategory: '',
-                instrumentCategoryId: '',
-            }))
-        } else {
-            setInstrumentCategories([])
-        }
-    }, [form.routeId])
-
-    const fetchAssetClasses = async () => {
-        try {
-            setLoadingStates((prev) => ({ ...prev, assetClasses: true }))
-            const response = await axiosInstance.get(
-                '/v1/category/list-asset-classes'
-            )
-            const data = response.data
-
-            if (response.status === 200) {
-                setAssetClasses(data.assetClasses || data.data || [])
-            } else {
-                setError('Failed to fetch asset classes')
-            }
-        } catch (err) {
-            console.error('Error fetching asset classes:', err)
-            setError('Error fetching asset classes')
-        } finally {
-            setLoadingStates((prev) => ({ ...prev, assetClasses: false }))
-        }
-    }
-
-    const fetchRoutes = async (assetClassId) => {
-        try {
-            setLoadingStates((prev) => ({ ...prev, routes: true }))
-            // Use asset class ID instead of name
-            const response = await axiosInstance.get(
-                `/v1/category/routes/asset-class/${assetClassId}`
-            )
-            const data = response.data
-
-            if (response.status === 200) {
-                setRoutes(data.routes || data.data || [])
-            } else {
-                // Fallback to list all routes and filter client-side by asset class name
-                const allRoutesResponse = await axiosInstance.get(
-                    '/v1/category/list-routes'
-                )
-                const allRoutesData = allRoutesResponse.data
-                if (allRoutesResponse.status === 200) {
-                    const filteredRoutes = (allRoutesData.routes || []).filter(
-                        (route) => route.assetClass === form.assetClass
-                    )
-                    setRoutes(filteredRoutes)
-                } else {
-                    setError('Failed to fetch routes')
-                }
-            }
-        } catch (err) {
-            console.error('Error fetching routes:', err)
-            setError('Error fetching routes')
-        } finally {
-            setLoadingStates((prev) => ({ ...prev, routes: false }))
-        }
-    }
-
-    const fetchInstrumentCategories = async (routeId) => {
+    const fetchAllInstrumentCategories = async () => {
         try {
             setLoadingStates((prev) => ({
                 ...prev,
@@ -155,12 +54,12 @@ export default function CategoryAssignmentModal({
             }))
 
             const response = await axiosInstance.get(
-                `/v1/category/instrument-categories/route/${routeId}`
+                '/v1/category/instrument-categories/all'
             )
             const data = response.data
 
-            if (response.status === 200) {
-                setInstrumentCategories(data.categories || data.data || [])
+            if (response.status === 200 || response.status === 201) {
+                setInstrumentCategories(data || [])
             } else {
                 setError('Failed to fetch instrument categories')
             }
@@ -188,7 +87,7 @@ export default function CategoryAssignmentModal({
             const response = await axiosInstance.get(endpoint)
             const data = response.data
 
-            if (response.status === 200) {
+            if (response.status === 200 || response.status === 201) {
                 setCategories(data.categories || data.data || [])
             } else {
                 if (type === 'stocks') {
@@ -212,63 +111,15 @@ export default function CategoryAssignmentModal({
 
     const handleChange = (e) => {
         const { name, value } = e.target
-
-        // Special handling for asset class selection
-        if (name === 'assetClass') {
-            const selectedAssetClass = assetClasses.find(
-                (ac) => (ac.name || ac.className) === value
-            )
-            setForm((prev) => ({
-                ...prev,
-                [name]: value,
-                assetClassId: selectedAssetClass
-                    ? selectedAssetClass._id || selectedAssetClass.id
-                    : '',
-            }))
-        }
-        // Special handling for route selection
-        else if (name === 'route') {
-            const selectedRoute = routes.find(
-                (route) => (route.name || route.routeName) === value
-            )
-            setForm((prev) => ({
-                ...prev,
-                [name]: value,
-                routeId: selectedRoute
-                    ? selectedRoute._id || selectedRoute.id
-                    : '',
-            }))
-        }
-        // Special handling for instrument category selection
-        else if (name === 'instrumentCategory') {
-            const selectedInstrumentCategory = instrumentCategories.find(
-                (cat) => (cat.name || cat.categoryName) === value
-            )
-            setForm((prev) => ({
-                ...prev,
-                [name]: value,
-                instrumentCategoryId: selectedInstrumentCategory
-                    ? selectedInstrumentCategory._id ||
-                      selectedInstrumentCategory.id
-                    : '',
-            }))
-        } else {
-            setForm((prev) => ({ ...prev, [name]: value }))
-        }
-
+        setForm((prev) => ({ ...prev, [name]: value }))
         setError('')
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault()
 
-        if (
-            !form.categoryName ||
-            !form.assetClass ||
-            !form.route ||
-            !form.instrumentCategory
-        ) {
-            setError('All fields are required')
+        if (!form.categoryName || !form.instrumentCategoryId) {
+            setError('Both fields are required')
             return
         }
 
@@ -287,11 +138,6 @@ export default function CategoryAssignmentModal({
             return
         }
 
-        if (!form.instrumentCategoryId) {
-            setError('Invalid instrument category selected')
-            return
-        }
-
         setLoading(true)
         try {
             const payload = {
@@ -307,19 +153,14 @@ export default function CategoryAssignmentModal({
                 payload
             )
 
-            const data = await response.data
+            const data = response.data
 
-            if (response.status === 200) {
+            if (response.status === 200 || response.status === 201) {
                 onAssigned?.()
                 onClose()
                 // Reset form
                 setForm({
                     categoryName: '',
-                    assetClass: '',
-                    assetClassId: '',
-                    route: '',
-                    routeId: '',
-                    instrumentCategory: '',
                     instrumentCategoryId: '',
                 })
             } else {
@@ -339,7 +180,7 @@ export default function CategoryAssignmentModal({
 
     return (
         <div className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl p-6 relative mx-4 border border-gray-200 max-h-[90vh] overflow-y-auto">
+            <div className="bg-white w-full max-w-lg rounded-lg shadow-xl p-6 relative mx-4 border border-gray-200">
                 {/* Close Button */}
                 <button
                     onClick={onClose}
@@ -406,101 +247,31 @@ export default function CategoryAssignmentModal({
                         )}
                     </div>
 
-                    {/* Asset Class */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Asset Class *
-                        </label>
-                        <select
-                            name="assetClass"
-                            value={form.assetClass}
-                            onChange={handleChange}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 transition"
-                            required
-                            disabled={loadingStates.assetClasses}
-                        >
-                            <option value="">
-                                {loadingStates.assetClasses
-                                    ? 'Loading...'
-                                    : 'Select Asset Class'}
-                            </option>
-                            {assetClasses.map((assetClass) => (
-                                <option
-                                    key={assetClass._id || assetClass.id}
-                                    value={
-                                        assetClass.name || assetClass.className
-                                    }
-                                >
-                                    {assetClass.name || assetClass.className}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    {/* Route */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Route *
-                        </label>
-                        <select
-                            name="route"
-                            value={form.route}
-                            onChange={handleChange}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 transition"
-                            required
-                            disabled={
-                                !form.assetClassId || loadingStates.routes
-                            }
-                        >
-                            <option value="">
-                                {!form.assetClassId
-                                    ? 'Select Asset Class first'
-                                    : loadingStates.routes
-                                    ? 'Loading...'
-                                    : 'Select Route'}
-                            </option>
-                            {routes.map((route) => (
-                                <option
-                                    key={route._id || route.id}
-                                    value={route.name || route.routeName}
-                                >
-                                    {route.name || route.routeName}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
                     {/* Instrument Category */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Instrument Category *
                         </label>
                         <select
-                            name="instrumentCategory"
-                            value={form.instrumentCategory}
+                            name="instrumentCategoryId"
+                            value={form.instrumentCategoryId}
                             onChange={handleChange}
                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 transition"
                             required
-                            disabled={
-                                !form.routeId ||
-                                loadingStates.instrumentCategories
-                            }
+                            disabled={loadingStates.instrumentCategories}
                         >
                             <option value="">
-                                {!form.routeId
-                                    ? 'Select Route first'
-                                    : loadingStates.instrumentCategories
+                                {loadingStates.instrumentCategories
                                     ? 'Loading...'
                                     : 'Select Instrument Category'}
                             </option>
                             {instrumentCategories.map((category) => (
                                 <option
                                     key={category._id || category.id}
-                                    value={
-                                        category.name || category.categoryName
-                                    }
+                                    value={category._id || category.id}
                                 >
-                                    {category.name || category.categoryName}
+                                    {category.name} ({category.route} -{' '}
+                                    {category.assetClass})
                                 </option>
                             ))}
                         </select>
@@ -520,16 +291,12 @@ export default function CategoryAssignmentModal({
                             disabled={
                                 loading ||
                                 !form.categoryName ||
-                                !form.assetClass ||
-                                !form.route ||
-                                !form.instrumentCategory
+                                !form.instrumentCategoryId
                             }
                             className={`px-6 py-3 rounded-lg font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 transition ${
                                 loading ||
                                 !form.categoryName ||
-                                !form.assetClass ||
-                                !form.route ||
-                                !form.instrumentCategory
+                                !form.instrumentCategoryId
                                     ? 'bg-emerald-400 cursor-not-allowed'
                                     : 'bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-500'
                             }`}

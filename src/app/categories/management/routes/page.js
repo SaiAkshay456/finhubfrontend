@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import CreateRouteModal from '../../../../components/CreateRouteModal'
 import EditRouteModal from '../../../../components/EditRouteModal'
 import axiosInstance from '@/helpers/axios'
@@ -22,29 +22,36 @@ export default function RoutesPage() {
     const [searchTerm, setSearchTerm] = useState('')
     const [assetClassFilter, setAssetClassFilter] = useState('')
     const [currentPage, setCurrentPage] = useState(1)
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
 
-    // Debounced search effect
+    // Ref for search input to maintain focus
+    const searchInputRef = useRef(null)
+
+    // Debounce search term
     useEffect(() => {
-        const delayedSearch = setTimeout(() => {
-            setCurrentPage(1) // Reset to first page when searching
-            fetchRoutes()
-        }, 1500) // 1500ms debounce
+        const timer = setTimeout(() => {
+            setDebouncedSearchTerm(searchTerm)
+        }, 500)
 
-        return () => clearTimeout(delayedSearch)
+        return () => clearTimeout(timer)
     }, [searchTerm])
 
-    // Effect for filter changes and pagination
+    // Reset to first page when search term changes
     useEffect(() => {
-        fetchRoutes()
-    }, [assetClassFilter, currentPage])
+        setCurrentPage(1)
+    }, [debouncedSearchTerm])
 
-    const fetchRoutes = async () => {
+    const fetchRoutes = useCallback(async () => {
         try {
-            setLoading(true)
+            // Don't show loading spinner for search operations to prevent re-render
+            if (currentPage === 1 && !debouncedSearchTerm) {
+                setLoading(true)
+            }
 
             // Build query parameters
             const params = new URLSearchParams()
-            if (searchTerm) params.append('search', searchTerm)
+            if (debouncedSearchTerm)
+                params.append('search', debouncedSearchTerm)
             if (assetClassFilter) params.append('assetClass', assetClassFilter)
             params.append('page', currentPage.toString())
 
@@ -54,23 +61,45 @@ export default function RoutesPage() {
             }`
 
             const response = await axiosInstance.get(url)
-            const data = await response.data
+            const data = response.data
 
             if (response.status === 200) {
                 setRoutes(data.routes || data.data || [])
                 setPagination(data.pagination || {})
+                setError(null) // Clear any previous errors
             } else {
-                setError('Failed to fetch routes')
+                setError(data.message || 'Failed to fetch routes')
             }
         } catch (err) {
+            console.error('Error fetching routes:', err)
             setError('Error fetching routes: ' + err.message)
         } finally {
             setLoading(false)
         }
-    }
+    }, [debouncedSearchTerm, assetClassFilter, currentPage])
+
+    // Fetch data when debounced search term or filters change
+    useEffect(() => {
+        fetchRoutes()
+    }, [fetchRoutes])
 
     const handleSearchChange = (e) => {
-        setSearchTerm(e.target.value)
+        const value = e.target.value
+        setSearchTerm(value)
+
+        // Store cursor position
+        const cursorPosition = e.target.selectionStart
+
+        // Restore focus and cursor position after state update
+        setTimeout(() => {
+            if (searchInputRef.current) {
+                searchInputRef.current.focus()
+                searchInputRef.current.setSelectionRange(
+                    cursorPosition,
+                    cursorPosition
+                )
+            }
+        }, 0)
     }
 
     const handleAssetClassChange = (e) => {
@@ -123,7 +152,7 @@ export default function RoutesPage() {
                 setDeleteConfirm({ show: false, route: null })
                 fetchRoutes() // Refresh the list
             } else {
-                setError(data.message || 'Failed to delete route')
+                setError(response.data.message || 'Failed to delete route')
             }
         } catch (err) {
             console.error('Error deleting route:', err)
@@ -135,7 +164,8 @@ export default function RoutesPage() {
         setDeleteConfirm({ show: false, route: null })
     }
 
-    if (loading) {
+    // Show loading only for initial load or when no search is active
+    if (loading && currentPage === 1 && !debouncedSearchTerm && !searchTerm) {
         return (
             <div className="p-6">
                 <div className="flex justify-center items-center h-64">
@@ -147,7 +177,7 @@ export default function RoutesPage() {
         )
     }
 
-    if (error) {
+    if (error && !routes.length) {
         return (
             <div className="p-6">
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -231,6 +261,7 @@ export default function RoutesPage() {
                             </h2>
                             <div className="flex space-x-2">
                                 <input
+                                    ref={searchInputRef}
                                     type="text"
                                     placeholder="Search routes..."
                                     value={searchTerm}
@@ -250,6 +281,22 @@ export default function RoutesPage() {
                             </div>
                         </div>
                     </div>
+
+                    {/* Show loading indicator for search operations */}
+                    {loading && (debouncedSearchTerm || currentPage > 1) && (
+                        <div className="px-6 py-4 border-b border-gray-200">
+                            <div className="text-sm text-gray-600">
+                                Searching...
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Show error message */}
+                    {error && routes.length > 0 && (
+                        <div className="px-6 py-4 border-b border-gray-200">
+                            <div className="text-sm text-red-600">{error}</div>
+                        </div>
+                    )}
 
                     <div className="overflow-x-auto">
                         <table className="w-full">
@@ -337,10 +384,12 @@ export default function RoutesPage() {
                                 ) : (
                                     <tr>
                                         <td
-                                            colSpan="5"
+                                            colSpan="4"
                                             className="px-6 py-4 text-center text-sm text-gray-500"
                                         >
-                                            No routes found
+                                            {loading
+                                                ? 'Loading...'
+                                                : 'No routes found'}
                                         </td>
                                     </tr>
                                 )}
@@ -406,10 +455,10 @@ export default function RoutesPage() {
                                 Delete Route
                             </h3>
                             <p className="text-gray-600 mb-4">
-                                Are you sure you want to delete "
+                                Are you sure you want to delete &quot;
                                 {deleteConfirm.route?.name ||
                                     deleteConfirm.route?.routeName}
-                                "? This action cannot be undone.
+                                &quot;? This action cannot be undone.
                             </p>
                             <div className="flex justify-end space-x-3">
                                 <button
