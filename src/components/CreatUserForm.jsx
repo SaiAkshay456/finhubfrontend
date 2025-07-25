@@ -1,4 +1,5 @@
 'use client';
+import { API_BASE, USER_MANAGE_ROUTES } from '@/helpers/apiRoutes';
 import axiosInstance from '@/helpers/axios';
 // import useAxios from '@/helpers/axios';
 import { useState } from 'react';
@@ -143,7 +144,7 @@ export default function CreateUserForm() {
         e.preventDefault();
         if (validateStep2()) {
             try {
-                const { data } = await axiosInstance.post('/v1/users/create-user', form, {
+                const { data } = await axiosInstance.post(`${API_BASE}/${USER_MANAGE_ROUTES.CREATE_USER}`, form, {
                     headers: { 'Content-Type': 'application/json' },
                 });
                 setMsg(data.message);
@@ -159,7 +160,8 @@ export default function CreateUserForm() {
                         { label: 'Dashboard', access: false },
                         { label: 'Create User', access: false },
                         { label: 'Model Basket', access: false },
-                        { label: 'KYC Verification', access: false }
+                        { label: "Benchmarks", access: false },
+                        { label: "Recommendations", access: false }
                     ]
                 });
                 setErrors({});
@@ -171,17 +173,13 @@ export default function CreateUserForm() {
             }
         }
     };
-
     return (
         <div className="min-h-screen  py-8 px-4">
             <div className="max-w-4xl mx-auto">
-                {/* Header */}
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">User Creation Form</h1>
                     <p className="text-gray-600">Please fill out the form below to create a new user account</p>
                 </div>
-
-                {/* Progress Indicator */}
                 <div className="mb-8">
                     <div className="flex justify-center">
                         <div className="flex items-center space-x-8">
@@ -207,10 +205,7 @@ export default function CreateUserForm() {
                         </div>
                     </div>
                 </div>
-
-                {/* Form Container */}
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                    {/* Message Alert */}
                     {msg && (
                         <div className={`mx-8 mt-8 p-4 rounded-md border ${msg.toLowerCase().includes('success')
                             ? 'bg-green-50 border-green-200 text-green-800'
@@ -225,8 +220,6 @@ export default function CreateUserForm() {
                             </div>
                         </div>
                     )}
-
-                    {/* Form Content */}
                     <div className="p-8">
                         {step === 1 ? (
                             <div>
@@ -236,7 +229,6 @@ export default function CreateUserForm() {
 
                                 <div className="space-y-6">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        {/* Username */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                                 Username <span className="text-red-500">*</span>
@@ -253,8 +245,6 @@ export default function CreateUserForm() {
                                                 <p className="mt-2 text-xs text-red-600">{errors.username}</p>
                                             )}
                                         </div>
-
-                                        {/* Email */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                                 Email Address <span className="text-red-500">*</span>
@@ -272,8 +262,6 @@ export default function CreateUserForm() {
                                                 <p className="mt-2 text-xs text-red-600">{errors.email}</p>
                                             )}
                                         </div>
-
-                                        {/* Password */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                                 Password <span className="text-red-500">*</span>
@@ -295,8 +283,6 @@ export default function CreateUserForm() {
                                                 </p>
                                             )}
                                         </div>
-
-                                        {/* Phone Number */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                                 Phone Number <span className="text-red-500">*</span>
@@ -314,8 +300,6 @@ export default function CreateUserForm() {
                                                 <p className="mt-2 text-xs text-red-600">{errors.phoneNumber}</p>
                                             )}
                                         </div>
-
-                                        {/* Role */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                                 Role

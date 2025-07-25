@@ -2,9 +2,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../providers/AuthProvider';
-import axios from 'axios';
 import { Mail, Lock, EyeOff, Info, Eye } from "lucide-react";
 import axiosInstance from '@/helpers/axios';
+import Link from 'next/link';
 
 export default function LoginForm() {
     const { setUser, setIsAuthorized } = useAuth();
@@ -66,13 +66,9 @@ export default function LoginForm() {
     }
     return (
         <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
-            {/* Left Column - Marketing Dashboard Preview */}
             <div className="relative hidden lg:flex flex-col items-center justify-center p-8 gradient-bg">
-                {/* Large blue circle */}
                 <div className="absolute top-1/4 left-1/4 w-48 h-48 bg-blue-800 rounded-full opacity-30 blur-3xl" />
                 <div className="absolute bottom-1/4 right-1/4 w-32 h-32 bg-purple-500 rounded-full opacity-30 blur-3xl" />
-
-                {/* Glassmorphism Card */}
                 <div className="relative w-full max-w-md p-6 rounded-xl bg-white/30 backdrop-blur-md border border-white/20 z-10">
                     <div className="flex justify-between items-center mb-4">
                         <span className="text-sm text-gray-600 uppercase font-semibold">Market and PortFolio Trends</span>
@@ -84,37 +80,28 @@ export default function LoginForm() {
                             <Info className="h-4 w-4 mr-1" /> 12.9%
                         </span>
                     </div>
-                    {/* Chart Area */}
                     <div className="relative h-48 mb-6">
-                        {/* Y-axis labels */}
+
                         <div className="absolute left-0 top-0 text-xs text-gray-500">$20K</div>
                         <div className="absolute left-0 bottom-0 text-xs text-gray-500">$10K</div>
 
-                        {/* Placeholder for circular progress bar */}
                         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-16 h-16 rounded-full border-4 border-green-200 border-t-green-600 flex items-center justify-center">
                             <div className="w-10 h-10 rounded-full bg-green-200" />
                         </div>
-                        {/* Simplified Chart Representation */}
+
                         <svg
                             className="absolute left-16 right-0 top-0 bottom-0 w-[calc(100%-4rem)] h-full"
                             viewBox="0 0 300 150"
                             preserveAspectRatio="none"
                         >
-                            {/* Grid lines */}
+
                             <line x1="0" y1="75" x2="300" y2="75" stroke="#E5E7EB" strokeDasharray="2 2" />
                             <line x1="0" y1="150" x2="300" y2="150" stroke="#E5E7EB" strokeDasharray="2 2" />
 
-                            {/* Line graph path - simplified */}
-                            {/* <path
-                                d="M0,100 C30,80 60,120 90,90 C120,70 150,110 180,80 C210,60 240,100 270,70 C300,50"
-                                fill="none"
-                                stroke="#60A5FA"
-                                strokeWidth="2"
-                            /> */}
                             <defs>
                                 <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" stopColor="#00d09c" />  // Groww light green
-                                    <stop offset="100%" stopColor="#00b98b" /> // Slightly darker green
+                                    <stop offset="0%" stopColor="#00d09c" />   Groww light green
+                                    <stop offset="100%" stopColor="#00b98b" />  Slightly darker green
                                 </linearGradient>
                             </defs>
                             <path
@@ -125,7 +112,6 @@ export default function LoginForm() {
                                 strokeLinecap="round"
                             />
 
-                            {/* Bars - simplified */}
                             <rect x="10" y="100" width="10" height="50" fill="#e6faf5" opacity="0.7" />
                             <rect x="40" y="80" width="10" height="70" fill="#d0f5ea" opacity="0.7" />
                             <rect x="70" y="110" width="10" height="40" fill="#baf0de" opacity="0.7" />
@@ -137,7 +123,6 @@ export default function LoginForm() {
                             <rect x="250" y="90" width="10" height="60" fill="#39cf99" opacity="0.7" />
                             <rect x="280" y="70" width="10" height="80" fill="#24ca8e" opacity="0.7" />
 
-                            {/* Tooltip for Net Sales */}
                             <g transform="translate(200, 60)">
                                 <rect x="0" y="-20" width="90" height="40" rx="4" ry="4" fill="white" stroke="#E5E7EB" />
                                 <text x="8" y="-8" fontSize="10" fill="#6B7280">
@@ -151,8 +136,6 @@ export default function LoginForm() {
                                 </text>
                             </g>
                         </svg>
-
-                        {/* X-axis labels */}
                         <div className="absolute bottom-0 left-16 text-xs text-gray-500">Aug 2024</div>
                         <div className="absolute bottom-0 right-0 text-xs text-gray-500">Jul 2025</div>
                     </div>
@@ -165,11 +148,9 @@ export default function LoginForm() {
                 </div>
             </div>
 
-            {/* Right Column - Login Form */}
             <div className="flex items-center justify-center p-8 bg-white">
                 <div className="w-full max-w-md space-y-6">
                     <div className="flex items-center justify-start mb-8">
-                        {/* Logo */}
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 24 24"
@@ -188,8 +169,6 @@ export default function LoginForm() {
                     <div className="space-y-2 text-left">
                         <h1 className="text-3xl font-bold">Sign in</h1>
                     </div>
-
-                    {/* Error Message */}
                     {error && (
                         <div className="p-3 text-sm text-red-600 bg-red-50 rounded-lg border border-red-100 flex items-start">
                             <Info className="h-4 w-4 mr-2 mt-0.5" />
@@ -197,7 +176,7 @@ export default function LoginForm() {
                         </div>
                     )}
 
-                    {/* Sign In / Sign Up Toggle */}
+
                     <div className="flex bg-gray-100 rounded-lg p-1">
                         <button className="flex-1 h-10 rounded-md bg-gradient-to-r from-[#00d09c] to-[#00b98b] text-white shadow-md hover:from-[#00b98b] hover:to-[#00a47a] transition-colors">
                             Sign In
@@ -210,7 +189,7 @@ export default function LoginForm() {
                         </button>
                     </div>
                     <form onSubmit={handleSubmit} className="space-y-4">
-                        {/* Username Input */}
+
                         <div className="space-y-2">
                             <label
                                 htmlFor="username"
@@ -233,8 +212,6 @@ export default function LoginForm() {
                                 />
                             </div>
                         </div>
-
-                        {/* Password Input */}
                         <div className="space-y-2">
                             <label
                                 htmlFor="password"
@@ -263,8 +240,6 @@ export default function LoginForm() {
                                 </button>
                             </div>
                         </div>
-
-                        {/* Remember Me & Forgot Password */}
                         <div className="flex items-center justify-between text-sm">
                             <div className="flex items-center">
                                 <input
@@ -283,7 +258,7 @@ export default function LoginForm() {
                             </a>
                         </div>
 
-                        {/* Sign In Button */}
+
                         <button
                             type="submit"
                             disabled={isLoading}
@@ -304,10 +279,10 @@ export default function LoginForm() {
                     </form>
 
                     <div className="mt-4 text-center text-sm text-gray-500">
-                        Don't have an account?{" "}
-                        <a href="#" className="text-blue-600 hover:text-blue-800 underline">
+                        Dont have an account?{" "}
+                        <Link href="/" className="text-blue-600 hover:text-blue-800 underline">
                             Sign Up
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </div>

@@ -266,16 +266,25 @@ export default function UpdateQuestionnaireForm({ questionnaire, token }) {
                                 type="button"
                                 onClick={prevSlide}
                                 disabled={currentSlide === 0}
-                                className={`px-4 py-2 rounded-md ${currentSlide === 0 ? 'text-gray-400 cursor-not-allowed' : 'text-teal-600 hover:bg-purple-50'}`}
+                                className={`px-4 py-2 rounded-md ${currentSlide === 0 ? 'text-gray-400 cursor-not-allowed' : 'text-teal-600 hover:bg-teal-50'}`}
                             >
                                 Previous
                             </button>
+                            {currentSlide < questions.length - 1 && (
+                                <button
+                                    type="button"
+                                    onClick={nextSlide}
+                                    className="px-4 py-2 bg-black text-white rounded-md"
+                                >
+                                    Next
+                                </button>
+                            )}
                             <button
                                 type="button"
-                                onClick={nextSlide}
-                                className="px-4 py-2 bg-black hover:bg-purple-700 text-white rounded-md"
+                                onClick={() => router.push("/riskprofile")}
+                                className={`px-4 py-2 rounded-md text-teal-600`}
                             >
-                                {currentSlide === questions.length - 1 ? 'Add Question' : 'Next'}
+                                Back to Profile
                             </button>
                         </div>
                         <button

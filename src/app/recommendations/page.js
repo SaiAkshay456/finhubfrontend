@@ -292,7 +292,6 @@ export default function RecommendationTable() {
     }
   ], []);
 
-  // Default Column Definition
   const defaultColDef = useMemo(() => ({
     sortable: true,
     filter: true,
@@ -321,12 +320,10 @@ export default function RecommendationTable() {
           />
         </div>
 
-        {/* Main Content Card */}
+
         <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 overflow-hidden">
-          {/* Controls Header */}
           <div className="bg-gradient-to-r from-white to-gray-50/50 px-8 py-6 border-b border-gray-100">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              {/* Search */}
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
@@ -425,3 +422,4 @@ export default function RecommendationTable() {
     </div>
   );
 }
+

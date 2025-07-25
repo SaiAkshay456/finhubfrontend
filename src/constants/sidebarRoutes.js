@@ -1,21 +1,14 @@
-import { FaHome, FaUserCircle, FaEnvelope } from 'react-icons/fa'
-import { FiSettings, FiLogOut, FiFileText } from 'react-icons/fi'
-import { CiLogout } from 'react-icons/ci'
+
 import { TiUserAdd } from 'react-icons/ti'
 import { FaUsers } from 'react-icons/fa'
-import { HiOutlineViewGrid } from 'react-icons/hi'
-import { MdWorkOutline } from 'react-icons/md'
-import { IoIosNotificationsOutline } from 'react-icons/io'
+import { LuCloudUpload } from "react-icons/lu";
 import { MdOutlineRecommend } from 'react-icons/md'
-import { BsBank2 } from 'react-icons/bs'
-// import AssuredWorkloadIcon from '@mui/icons-material/AssuredWorkload';
+import { LuPackageSearch } from "react-icons/lu";
 import { FaShieldAlt } from 'react-icons/fa'
 import { FaFileUpload } from 'react-icons/fa'
-import { GrDocumentPerformance } from "react-icons/gr";
-// import DashboardIcon from '@mui/icons-material/Dashboard';
+import { BiBarChartAlt2 } from "react-icons/bi";
 import { MdDashboard } from 'react-icons/md'
-import { CiBank } from 'react-icons/ci'
-import { BiCategory } from 'react-icons/bi' // Add category icon
+import { BiCategory } from 'react-icons/bi'
 
 export const sidebarItems = [
     {
@@ -39,7 +32,7 @@ export const sidebarItems = [
     {
         label: 'Model Basket',
         path: '/baskets',
-        icon: MdOutlineRecommend,
+        icon: LuPackageSearch,
         description: 'For employers to post new jobs or internships',
     },
     {
@@ -50,12 +43,6 @@ export const sidebarItems = [
             'Manage categories and assignments for financial instruments',
     },
     {
-        label: 'KYC Verification',
-        path: '/kycverify',
-        icon: BsBank2,
-        description: 'Account and app preferences',
-    },
-    {
         label: 'Risk Profiling',
         path: '/riskprofile',
         icon: FaShieldAlt,
@@ -64,7 +51,7 @@ export const sidebarItems = [
     {
         label: 'Portfolio Upload',
         path: '/upload-portfolio',
-        icon: FaFileUpload,
+        icon: LuCloudUpload,
         description: "Upload protfolio"
     },
     {
@@ -76,7 +63,7 @@ export const sidebarItems = [
     {
         label: "Benchmarks",
         path: "/benchmarks",
-        icon: GrDocumentPerformance,
+        icon: BiBarChartAlt2,
         description: "Benchmark portfolio performance with indices",
     },
     {

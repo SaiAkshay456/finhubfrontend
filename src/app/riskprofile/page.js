@@ -4,6 +4,7 @@ import Link from "next/link";
 import DupliacateQuestionarreButton from "../../components/DupliacateQuestionarreButton";
 import axiosInstance from "@/helpers/axios";
 import { API_BASE, RISK_ROUTES } from "@/helpers/apiRoutes";
+import { IoTrashOutline } from "react-icons/io5";
 
 export default async function RiskPage() {
     const cookieStore = await cookies();
@@ -71,11 +72,19 @@ export default async function RiskPage() {
                             <div key={q._id} className="bg-white rounded-md shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 overflow-hidden flex flex-col">
                                 {/* Card Header */}
                                 <div className="p-3 sm:p-4 flex-1">
-                                    <div className="mb-2">
+                                    <div className="mb-2 flex items-center justify-between">
                                         <h3 className="text-sm sm:text-base font-medium text-gray-800 line-clamp-2">
                                             {q.title || "Untitled Questionnaire"}
                                         </h3>
+                                        <button
+                                            // onClick={() => handleDelete(q.id)}
+                                            className="hover:text-red-700 p-1 focus:outline-none focus:ring-2 focus:ring-red-300"
+                                            aria-label="Delete questionnaire"
+                                        >
+                                            <IoTrashOutline />
+                                        </button>
                                     </div>
+
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-1 text-gray-500 text-xs">
                                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

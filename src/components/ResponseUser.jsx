@@ -1,11 +1,13 @@
 "use client";
 import { useState } from 'react';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 export default function ResponseUser({ questions, questionarieId, userId, tokenId }) {
     const [responses, setResponses] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [msg, setMsg] = useState('');
+    const router = useRouter()
 
     const handleChange = (questionId, value) => {
         setResponses(prev => ({
@@ -27,6 +29,7 @@ export default function ResponseUser({ questions, questionarieId, userId, tokenI
                 withCredentials: true
             });
             setMsg(data.message)
+            router.refresh();
         } catch (err) {
             console.log("err at response submission", err)
             setMsg("Submission Failed")

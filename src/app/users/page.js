@@ -24,6 +24,18 @@ export async function fetchQuestionnaires(token) {
 export default async function AllUsersPage({ searchParams }) {
     const cookieStore = await cookies()
     const token = cookieStore.get("token")?.value
+    const sanitizeSearchTerm = (input) => {
+        if (!input || typeof input !== 'string') return '';
+
+        const sanitized = input
+            .trim()
+            .replace(/['"`[\]{}<>\\]/g, '') // remove special dangerous characters
+            .replace(/\s{2,}/g, ' ');        // collapse multiple spaces
+
+        const isValid = sanitized.length > 0;
+
+        return isValid ? sanitized : '';
+    };
 
     if (!token) {
         return (
@@ -51,10 +63,19 @@ export default async function AllUsersPage({ searchParams }) {
     let loading = false;
     try {
         loading = true
-        const sanitizedSearchTerm = search.trim()
-        const isValidSearch =
-            sanitizedSearchTerm.length > 0 && !sanitizedSearchTerm.includes('"') && !sanitizedSearchTerm.includes("'")
-        const searchQuery = isValidSearch ? `search=${encodeURIComponent(sanitizedSearchTerm)}&` : ""
+        // const sanitizedSearchTerm = search.trim()
+        // const isValidSearch =
+        //     sanitizedSearchTerm.length > 0 && !sanitizedSearchTerm.includes('"') && !sanitizedSearchTerm.includes("'")
+        // const searchQuery = isValidSearch ? `search=${encodeURIComponent(sanitizedSearchTerm)}&` : ""
+        const rawSearch = search || '';
+        const sanitizedSearchTerm = rawSearch
+            .trim()
+            .replace(/['"`[\]{}<>\\]/g, '')
+            .replace(/\s{2,}/g, ' ');
+        const isValidSearch = sanitizedSearchTerm.length > 0;
+        const searchQuery = isValidSearch
+            ? `search=${encodeURIComponent(sanitizedSearchTerm)}&`
+            : '';
         const apiURL = `${API_BASE}/${USER_MANAGE_ROUTES.GET_ALL_USERS}?${searchQuery}page=${currentPage}&limit=${limit}`
         const { data } = await axiosInstance.get(apiURL, {
             headers: {

@@ -18,7 +18,6 @@ export default async function UserDetailsPage({ params }) {
             headers: { Authorization: `Bearer ${token}` },
         });
         user = data.success ? data.user : null;
-        // error = data.success ? null : data.message || 'Failed to fetch user';
         loading = false;
     } catch (err) {
         error = 'Failed to fetch user details';

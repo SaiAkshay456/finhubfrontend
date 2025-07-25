@@ -85,7 +85,7 @@ export default async function RiskProfileOfUser({ params }) {
                             </svg>
                         </div>
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">No assessments found</h3>
-                        <p className="text-gray-500 mb-6">This user hasn't completed any risk profile assessments yet.</p>
+                        <p className="text-gray-500 mb-6">This user not completed any risk profile assessments yet.</p>
                         <button className="px-5 py-2.5 bg-gradient-to-r from-[#00d09c] to-[#00b98b] text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
                             Request Assessment
                         </button>
