@@ -33,54 +33,64 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
   const [selectedAssetOption, setSelectedAssetOption] = useState(null)
   const [isCategoryPrefilled, setIsCategoryPrefilled] = useState(false)
   const [categoryOptions, setCategoryOptions] = useState([]);
+  // const [pollingIntervalId, setPollingIntervalId] = useState(null)
 
 
 
 
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) return;
+  
     const fetchInitialAssets = async () => {
       try {
-        const {data}= await axiosInstance.get("v1/mutual-funds/list-mf?page=1&limit=50")
-        setInitialAssets(data.data)
+        const endpoint =
+          form.assetType === "Mutual Fund"
+            ? "/v1/mutual-funds/list-mf?page=1&limit=50"
+            : "/v1/stocks/list-stocks?page=1&limit=50";
+  
+        const { data } = await axiosInstance.get(endpoint);
+        setInitialAssets(data.data);
       } catch (err) {
-        console.error("Error fetching initial assets:", err)
+        console.error("Error fetching initial assets:", err);
       }
-    }
-    fetchInitialAssets()
-  }, [isOpen])
+    };
+  
+    fetchInitialAssets();
+  }, [isOpen, form.assetType]);
+  
 
   useEffect(() => {
-    if (!isOpen) return
-    if (!isOpen || !searchTerm) return
-
-    const controller = new AbortController()
-
+    if (!isOpen || !searchTerm) return;
+  
+    const controller = new AbortController();
+  
     const fetchAssets = async () => {
       try {
-        const {data} = await axiosInstance.get(
-          `/v1/mutual-funds/list-mf?page=${page}&limit=50&search=${searchTerm}`,
-          { signal: controller.signal },
-        )
-        
-
-        setFilteredAssets(data.data)
-        setAssets(data.data)
-        setHasNext(data.data.pagination?.hasNext)
-        setHasPrev(data.data.pagination?.hasPrev)
+        const endpoint =
+          form.assetType === "Mutual Fund"
+            ? `/v1/mutual-funds/list-mf?page=${page}&limit=50&search=${searchTerm}`
+            : `/v1/stocks/list?page=${page}&limit=50&search=${searchTerm}`;
+  
+        const { data } = await axiosInstance.get(endpoint, { signal: controller.signal });
+  
+        setFilteredAssets(data.data);
+        setAssets(data.data);
+        setHasNext(data.data.pagination?.hasNext);
+        setHasPrev(data.data.pagination?.hasPrev);
       } catch (err) {
         if (err.name !== "AbortError") {
-          console.error("Error fetching assets:", err)
+          console.error("Error fetching assets:", err);
         }
       }
-    }
-
-    const delayDebounce = setTimeout(fetchAssets, 300)
+    };
+  
+    const delayDebounce = setTimeout(fetchAssets, 300);
     return () => {
-      clearTimeout(delayDebounce)
-      controller.abort()
-    }
-  }, [searchTerm, form.assetType, page, isOpen])
+      clearTimeout(delayDebounce);
+      controller.abort();
+    };
+  }, [searchTerm, form.assetType, page, isOpen]);
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -142,11 +152,27 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
       name: asset.name,
       sector: prev.sector || asset.sector || "",
       mutualFundId: asset._id,
-      assetType,
       category: categoryName || prev.category || "",
       cmp: asset.nav || "",
     }));
-  
+    // if (pollingIntervalId) {
+    //   clearInterval(pollingIntervalId); // clear previous polling if exists
+    // }
+    
+    // // Start polling every 10 seconds
+    // const intervalId = setInterval(async () => {
+    //   try {
+    //     const { data } = await axiosInstance.get(`/v1/stockprice/price/${asset.name}`); 
+    //     if (data) {
+    //       setForm(prev => ({ ...prev, cmp: data }));
+    //     }
+    //   } catch (err) {
+    //     console.error("Failed to fetch live price", err);
+    //   }
+    // }, 10000); // 10 seconds
+    
+    // setPollingIntervalId(intervalId);
+    
     setIsCategoryPrefilled(!!categoryName);
     setSearchTerm("");
   
@@ -154,6 +180,19 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
       setFieldErrors((prev) => ({ ...prev, mutualFundId: false }));
     }
   };
+  // useEffect(() => {
+  //   if (!isOpen && pollingIntervalId) {
+  //     clearInterval(pollingIntervalId);
+  //     setPollingIntervalId(null);
+  //   }
+  
+  //   return () => {
+  //     if (pollingIntervalId) {
+  //       clearInterval(pollingIntervalId);
+  //     }
+  //   };
+  // }, [isOpen, pollingIntervalId]);
+  
   useEffect(() => {
     const fetchCategories = async () => {
       try {
