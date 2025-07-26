@@ -6,7 +6,6 @@ import StocksAssignment from './stocks/page'
 
 export default function CategoryAssignment() {
     const [activeSubTab, setActiveSubTab] = useState('mutual-funds')
-
     const subTabs = [
         {
             id: 'mutual-funds',

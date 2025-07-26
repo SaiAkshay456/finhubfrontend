@@ -3,6 +3,7 @@ import Sidebar from '../../components/Sidebar';
 import { sidebarItems } from '../../constants/sidebarRoutes';
 import { cookies } from 'next/headers';
 import axiosInstance from '@/helpers/axios';
+import { redirect } from 'next/navigation';
 export const metadata = {
     title: "Recommendations",
     description: "Personalized mutual fund or stock recommendations",
