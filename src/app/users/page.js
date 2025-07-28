@@ -24,19 +24,6 @@ export async function fetchQuestionnaires(token) {
 export default async function AllUsersPage({ searchParams }) {
     const cookieStore = await cookies()
     const token = cookieStore.get("token")?.value
-    const sanitizeSearchTerm = (input) => {
-        if (!input || typeof input !== 'string') return '';
-
-        const sanitized = input
-            .trim()
-            .replace(/['"`[\]{}<>\\]/g, '') // remove special dangerous characters
-            .replace(/\s{2,}/g, ' ');        // collapse multiple spaces
-
-        const isValid = sanitized.length > 0;
-
-        return isValid ? sanitized : '';
-    };
-
     if (!token) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -209,23 +196,26 @@ export default async function AllUsersPage({ searchParams }) {
                     )}
                     {!error && users.length === 0 ? (
                         stats.totalUsers === 0 ? (
-                            <div className="p-12 text-center">
-                                <div className="w-24 h-24 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
-                                    <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                                        />
-                                    </svg>
+                            <div className="min-h-[400px] min-w-full flex items-center justify-center border border-dashed border-gray-300 rounded-md">
+                                <div className="flex flex-col items-center text-center px-4">
+                                    <div className="w-24 h-24 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center mb-6">
+                                        <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No users found</h3>
+                                    <p className="text-gray-600 mb-6">Try adjusting your search or create a new user to get started</p>
+                                    <button className="px-6 py-3 bg-gradient-to-r from-[#00d09c] to-[#00b98b] text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:scale-105">
+                                        + Create New User
+                                    </button>
                                 </div>
-                                <h3 className="text-xl font-semibold text-gray-900 mb-2">No users found</h3>
-                                <p className="text-gray-600 mb-6">Try adjusting your search or create a new user to get started</p>
-                                <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:scale-105">
-                                    Create New User
-                                </button>
                             </div>
+
                         ) : (
                             <div className="flex justify-center items-center py-20">
                                 <div className="text-center">

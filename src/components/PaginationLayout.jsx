@@ -95,7 +95,6 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import React from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function PaginationLayout({ currentPage, totalPages, search }) {
     const router = useRouter();
@@ -115,38 +114,31 @@ export default function PaginationLayout({ currentPage, totalPages, search }) {
 
     const generatePages = () => {
         const pages = [];
-        const maxVisiblePages = 5; // Reduced from 7 for better mobile experience
+        const maxVisiblePages = 5;
         const halfVisible = Math.floor(maxVisiblePages / 2);
 
         if (totalPages <= maxVisiblePages) {
             for (let i = 1; i <= totalPages; i++) pages.push(i);
         } else {
-            // Always show first page
             pages.push(1);
 
-            // Calculate start and end of middle range
             let start = Math.max(2, currentPage - halfVisible);
             let end = Math.min(totalPages - 1, currentPage + halfVisible);
 
-            // Adjust if we're near the start or end
             if (currentPage <= halfVisible + 1) {
                 end = maxVisiblePages - 1;
             } else if (currentPage >= totalPages - halfVisible) {
                 start = totalPages - (maxVisiblePages - 2);
             }
 
-            // Add ellipsis if needed
             if (start > 2) pages.push('...');
 
-            // Add middle pages
             for (let i = start; i <= end; i++) {
                 pages.push(i);
             }
 
-            // Add ellipsis if needed
             if (end < totalPages - 1) pages.push('...');
 
-            // Always show last page
             pages.push(totalPages);
         }
 
@@ -158,7 +150,7 @@ export default function PaginationLayout({ currentPage, totalPages, search }) {
             return (
                 <span
                     key={`dots-${idx}`}
-                    className="flex items-center justify-center w-10 h-10 text-gray-400 select-none"
+                    className="flex items-center justify-center w-10 h-10 text-gray-500"
                 >
                     ...
                 </span>
@@ -169,12 +161,10 @@ export default function PaginationLayout({ currentPage, totalPages, search }) {
             <button
                 key={pg}
                 onClick={() => goToPage(pg)}
-                className={`flex items-center justify-center w-10 h-10 rounded-full text-sm font-medium transition-all duration-200 ${pg === currentPage
-                    ? 'bg-gradient-to-r from-[#00d09c] to-[#00b98b] text-white shadow-md'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                className={`flex items-center justify-center w-10 h-10 rounded-md text-sm font-medium transition-colors ${pg === currentPage
+                        ? 'bg-[#e8e8e8] text-gray-800 font-semibold border border-gray-300'
+                        : 'text-gray-500 hover:bg-gray-100'
                     }`}
-                aria-current={pg === currentPage ? 'page' : undefined}
-                aria-label={`Go to page ${pg}`}
             >
                 {pg}
             </button>
@@ -182,27 +172,31 @@ export default function PaginationLayout({ currentPage, totalPages, search }) {
     });
 
     return (
-        <div className="flex items-center justify-center mt-8 gap-2">
+        <div className="flex items-center justify-center gap-2 mt-8">
             <button
                 onClick={() => goToPage(Math.max(currentPage - 1, 1))}
                 disabled={currentPage === 1}
-                className="flex items-center justify-center w-10 h-10 rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-                aria-label="Previous page"
+                className={`px-4 py-2 rounded-md border border-gray-300 text-sm font-medium ${currentPage === 1
+                        ? 'text-gray-300 cursor-default'
+                        : 'text-gray-500 hover:bg-gray-100'
+                    }`}
             >
-                <ChevronLeft className="w-5 h-5" />
+                Prev
             </button>
 
-            <div className="flex items-center gap-1 mx-2">
+            <div className="flex items-center gap-1">
                 {pageItems}
             </div>
 
             <button
                 onClick={() => goToPage(Math.min(currentPage + 1, totalPages))}
                 disabled={currentPage === totalPages}
-                className="flex items-center justify-center w-10 h-10 rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-                aria-label="Next page"
+                className={`px-4 py-2 rounded-md border border-gray-300 text-sm font-medium ${currentPage === totalPages
+                        ? 'text-gray-300 cursor-default'
+                        : 'text-gray-500 hover:bg-gray-100'
+                    }`}
             >
-                <ChevronRight className="w-5 h-5" />
+                Next
             </button>
         </div>
     );

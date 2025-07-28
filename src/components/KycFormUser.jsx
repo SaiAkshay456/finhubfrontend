@@ -156,7 +156,7 @@ export default function KycFormUser({ userId, token }) {
                 <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`px-4 py-2 text-white rounded-md ${isSubmitting ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'}`}
+                    className={`px-4 py-2 text-white rounded-md ${isSubmitting ? 'bg-blue-400' : 'bg-gradient-to-r from-[#00d09c] to-[#00b98b] hover:bg-blue-700'}`}
                 >
                     {isSubmitting ? 'Submitting...' : 'Submit KYC'}
                 </button>

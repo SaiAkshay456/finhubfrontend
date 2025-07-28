@@ -50,7 +50,7 @@ export default async function Layout({ children }) {
         }
     }
 
-    return <main className="min-h-screen flex justify-center items-center">
+    return <main className="min-h-screen">
         {children}
     </main>
 }

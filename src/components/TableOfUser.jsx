@@ -414,6 +414,7 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRef, useEffect } from 'react';
 import ToggleUserStatusButton from './ToggleUserStatusButton';
 import { Clock, ListFilter, ChevronDown, User, Mail, Hash, MoreVertical } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -840,3 +841,4 @@ export default function TableOfUser({ users, questionnaires, token }) {
         </div>
     );
 }
+
