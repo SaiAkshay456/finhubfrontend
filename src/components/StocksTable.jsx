@@ -1,5 +1,6 @@
 'use client'
-import React from 'react'
+import axiosInstance from '@/helpers/axios'
+import React, { useEffect, useState } from 'react'
 
 const CustomButtonComponent = ({ item, onAssign, hasAssignment }) => {
     return (
@@ -24,6 +25,128 @@ export default function StocksTable({
     getAssignedInstrumentCategory,
     hasInstrumentCategoryAssignment,
 }) {
+    // Local state for assigned categories
+    const [assignedCategories, setAssignedCategories] = useState({})
+
+    // Fetch price and assign category for each stock on mount or when data changes
+    useEffect(() => {
+        async function fetchStockPrice(symbol) {
+            try {
+                await fetch(
+                    `https://finhub-socket-server.onrender.com/subscribe/${symbol}`
+                )
+                const response = await fetch(
+                    `https://finhub-socket-server.onrender.com/get/${symbol}`
+                )
+                const result = await response.json()
+                const tick = result?.tick
+                if (!tick) return null
+                const price =
+                    typeof tick.last_price === 'number'
+                        ? tick.last_price
+                        : typeof tick.ohlc?.close === 'number'
+                        ? tick.ohlc.close
+                        : null
+                return Math.round(price)
+            } catch (error) {
+                console.error(`[fetchStockPrice] Error for ${symbol}:`, error)
+                return null
+            }
+        }
+
+        async function fetchStockCategories() {
+            try {
+                const response = await axiosInstance.get(
+                    '/v1/category/stock-instrument-categories/all'
+                )
+                // FIX: get categories from response.data
+                const categories = Array.isArray(response.data)
+                    ? response.data
+                    : []
+                const hashMap = {}
+                categories.forEach((cat) => {
+                    if (
+                        cat.name &&
+                        cat.range &&
+                        typeof cat.range.min === 'number' &&
+                        typeof cat.range.max === 'number'
+                    ) {
+                        hashMap[cat.name] = {
+                            min: cat.range.min,
+                            max: cat.range.max,
+                            _id: cat._id,
+                        }
+                    }
+                })
+                const result = Object.entries(hashMap).map(
+                    ([name, { min, max, _id }]) => ({
+                        name,
+                        range: { min, max },
+                        _id,
+                    })
+                )
+                return result
+            } catch (err) {
+                return []
+            }
+        }
+
+        async function assignCategoriesToStocks() {
+            if (!data || !data.length) {
+                return
+            }
+            const stockCategories = await fetchStockCategories()
+            const assignments = {}
+            await Promise.all(
+                data.map(async (stock) => {
+                    const price = await fetchStockPrice(stock.instrument_token)
+                    console.log(
+                        `[assignCategoriesToStocks] Stock ${stock.instrument_token} price: ${price}`
+                    )
+                    let matchedCategory = null
+
+                    const candidates = stockCategories.filter((catObj) => {
+                        // Defensive: ensure price is a valid number
+                        if (typeof price !== 'number' || isNaN(price))
+                            return false
+                        // Defensive: ensure min/max are numbers
+                        if (
+                            typeof catObj.range?.min !== 'number' ||
+                            typeof catObj.range?.max !== 'number'
+                        )
+                            return false
+                        // Adjust this logic if you want exclusive or inclusive bounds
+                        return (
+                            price >= catObj.range.min &&
+                            (price <= catObj.range.max ||
+                                catObj.range.max === Infinity)
+                        )
+                    })
+
+                    if (candidates.length > 0) {
+                        // Sort by smallest range width
+                        const bestCategory = candidates.sort(
+                            (a, b) =>
+                                a.range.max -
+                                a.range.min -
+                                (b.range.max - b.range.min)
+                        )[0]
+                        matchedCategory = bestCategory.name
+                        console.log(
+                            `[assignCategoriesToStocks] Stock ${stock.instrument_token} matched category: ${matchedCategory}`
+                        )
+                    }
+
+                    assignments[stock.instrument_token] =
+                        matchedCategory || 'Uncategorized'
+                })
+            )
+            setAssignedCategories(assignments)
+        }
+
+        assignCategoriesToStocks()
+    }, [data])
+
     return (
         <div className="bg-white rounded-lg shadow">
             {/* Search and Filters */}
@@ -72,6 +195,9 @@ export default function StocksTable({
                                         Segment
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Instrument Category
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Actions
                                     </th>
                                 </tr>
@@ -115,6 +241,11 @@ export default function StocksTable({
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                                                 {item.segment}
                                             </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                {assignedCategories[
+                                                    item.instrument_token
+                                                ] || 'Uncategorized'}
+                                            </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                 <CustomButtonComponent
                                                     item={item}
@@ -129,7 +260,7 @@ export default function StocksTable({
                                 ) : (
                                     <tr>
                                         <td
-                                            colSpan={6}
+                                            colSpan={7}
                                             className="px-6 py-4 text-center text-sm text-gray-500"
                                         >
                                             No stocks found
