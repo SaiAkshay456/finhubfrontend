@@ -74,9 +74,9 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
             : `/v1/stocks/list-stocks?page=${page}&limit=50&search=${searchTerm}`;
   
         const { data } = await axiosInstance.get(endpoint, { signal: controller.signal });
-  
         setFilteredAssets(data.data);
         setAssets(data.data);
+        console.log(filteredAssets)
         setHasNext(data.data.pagination?.hasNext);
         setHasPrev(data.data.pagination?.hasPrev);
       } catch (err) {
@@ -136,13 +136,16 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
     let assetType = "";
   
     // Fetch category name if categories field is present
-    if (asset.categories) {
+    if (asset.amfiCategory) {
       try {
-        const {data}= await axiosInstance.get(`/v1/category/instrument-categories/${asset.categories}`);
-  
-        if (data?.name) {
-          categoryName = data.name;
-          assetType = data.assetClass || "";
+        const {data: amfiData}= await axiosInstance.get(`/v1/category/amfi-categories/${asset.amfiCategory}`);
+        const id = amfiData.instrumentCategorySchema
+        console.log(id)
+        const {data: categoryData}= await axiosInstance.get(`/v1/category/instrument-categories/${id}`);
+        console.log(categoryData)
+        if (categoryData?.name) {
+          categoryName = categoryData.name;
+          // assetType = categoryData.assetClass || "";
         }
       } catch (err) {
         console.error("Error fetching category:", err);
@@ -234,7 +237,7 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
 
 
   const handleSubmit = async () => {
-    const { mutualFundId, sector, rmp, cmp, riskProfile, action, remark, validTill, category } = form
+    const { mutualFundId, sector, rmp, cmp, riskProfile, action, remark, validTill, category , assetType } = form
 
     const newErrors = {}
     if (!mutualFundId) newErrors.mutualFundId = true
@@ -267,6 +270,7 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
         remark,
         validTill,
         category,
+        assetType
       }, {
         headers: { "Content-Type": "application/json" },
       })
@@ -389,9 +393,10 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
   value={selectedAssetOption}
   options={(searchTerm ? filteredAssets : initialAssets).map((a) => ({
     value: a._id,
-    label: a.name,
+    label: `${a.name} (${a.isin || "No ISIN"})`,
     data: a,
   }))}
+  
   onChange={(selectedOption) => {
     const asset = selectedOption?.data
     if (asset) handleAssetSelect(asset)
