@@ -1,22 +1,6 @@
-// 'use client';
-
-import { useAuth } from '../../../providers/AuthProvider';
-
 export default function Layout({ children }) {
-    // const router = useRouter();
-    // const { isAuthorized, user } = useAuth();
-    // useEffect(() => {
-    //     if (!isAuthorized || user?.role !== 'admin') {
-    //         router.replace('/login'); // or a 403 page like '/unauthorized'
-    //     }
-    // }, [isAuthorized, user, router]);
-
-    // // While loading or redirecting, prevent flicker
-    // if (!isAuthorized || user?.role !== 'admin') {
-    //     redirect('/unauthorized');
-    // }
     return (
-        <main className="min-h-screen flex justify-center items-center">
+        <main className="min-h-screen">
             {children}
         </main>
     );

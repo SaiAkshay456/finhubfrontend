@@ -20,5 +20,6 @@ export const USER_MANAGE_ROUTES = {
     GET_USER_DETAILS: `${USER_MANAGEMENT}/user`,
     KYC_VERIFY_USER: `${USER_MANAGEMENT}/user/kyc-form-submit`,
     USER_UPDATE: `${USER_MANAGEMENT}/user/update-user`,
-    GET_ALL_USERS: `${USER_MANAGEMENT}/get-all-users`
+    GET_ALL_USERS: `${USER_MANAGEMENT}/get-all-users`,
+    UPLOAD_PORTFOLIO: `${USER_MANAGEMENT}/user/portfolio-upload`
 }
