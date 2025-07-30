@@ -5,29 +5,19 @@ import axiosInstance from "../helpers/axios";
 import Select from "react-select";
 
 export default function BenchmarkModal({ isOpen, onClose, onCreated }) {
+  const [assetType, setAssetType] = useState("Stock");
   const [category, setCategory] = useState("");
-  const [stock, setStock] = useState("");
-  const [stocks, setStocks] = useState([]);
+  const [stock, setStock] = useState(""); // will store ID
+  const [selectedAssetOption, setSelectedAssetOption] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredAssets, setFilteredAssets] = useState([]);
+  const [initialAssets, setInitialAssets] = useState([]);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [categoryOptions, setCategoryOptions] = useState([]);
 
-  useEffect(() => {
-    if (!isOpen) return;
-    const fetchStocks = async () => {
-      try {
-        const { data } = await axiosInstance.get("/v1/getStocks/getStocks");
-        const stockList = Array.isArray(data) ?data : [];
-        setStocks(stockList);
-      } catch (err) {
-        console.error("Error fetching stocks:", err);
-        setStocks([]);
-      }
-    };
-    
-    fetchStocks();
-  }, [isOpen]);
-
+  // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -44,16 +34,70 @@ export default function BenchmarkModal({ isOpen, onClose, onCreated }) {
     fetchCategories();
   }, []);
 
+  // Fetch assets initially
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const fetchAssets = async () => {
+      try {
+        const endpoint =
+          assetType === "Mutual Fund"
+            ? "/v1/mutual-funds/list-mf?page=1&limit=50"
+            : "/v1/stocks/list-stocks?page=1&limit=50";
+
+        const { data } = await axiosInstance.get(endpoint);
+        setInitialAssets(data.data);
+      } catch (err) {
+        console.error("Error fetching initial assets:", err);
+      }
+    };
+
+    fetchAssets();
+  }, [isOpen, assetType]);
+
+  // Filter assets by search term
+  useEffect(() => {
+    if (!isOpen || !searchTerm) return;
+    const controller = new AbortController();
+
+    const fetchAssets = async () => {
+      try {
+        const endpoint =
+          assetType === "Mutual Fund"
+            ? `/v1/mutual-funds/list-mf?page=1&limit=50&search=${searchTerm}`
+            : `/v1/stocks/list-stocks?page=1&limit=50&search=${searchTerm}`;
+
+        const { data } = await axiosInstance.get(endpoint, {
+          signal: controller.signal,
+        });
+
+        setFilteredAssets(data.data);
+      } catch (err) {
+        if (err.name !== "AbortError") console.error("Search fetch failed", err);
+      }
+    };
+
+    const debounce = setTimeout(fetchAssets, 300);
+    return () => {
+      clearTimeout(debounce);
+      controller.abort();
+    };
+  }, [searchTerm, assetType, isOpen]);
+
   const handleSubmit = async () => {
     if (!category || !stock) {
-      setError("Category and stock are required.");
+      setError("Category and asset are required.");
       return;
     }
+
     setLoading(true);
     try {
+      console.log(selectedAssetOption)
+      const stockName =selectedAssetOption.label
+      console.log(stock)
       const { data } = await axiosInstance.post(
         "/v1/benchmark/create",
-        { category, stock },
+        { category, stockName},
         { headers: { "Content-Type": "application/json" } }
       );
       if (data.success) {
@@ -69,9 +113,24 @@ export default function BenchmarkModal({ isOpen, onClose, onCreated }) {
     }
   };
 
+  const getReactSelectStyles = () => ({
+    control: (provided, state) => ({
+      ...provided,
+      backgroundColor: "#f9fafb",
+      borderRadius: "0.75rem",
+      borderColor: "#e5e7eb",
+      padding: "0.25rem",
+      boxShadow: state.isFocused ? "0 0 0 2px #3b82f6" : "none",
+      "&:hover": {
+        backgroundColor: "#fff",
+      },
+    }),
+  });
+
   if (!isOpen) return null;
 
-  const filteredStocks = stocks.filter((s) => s.category === category);
+
+  // const filteredStocks = stocks.filter((s) => s.category === category);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px]">
@@ -95,54 +154,72 @@ export default function BenchmarkModal({ isOpen, onClose, onCreated }) {
 
         {/* Content */}
         <div className="p-6 space-y-5">
-          <div className="space-y-2">
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700">
-              Category
-            </label>
-            <Select
-              options={categoryOptions}
-              value={categoryOptions.find((opt) => opt.value === category)}
-              onChange={(selected) => setCategory(selected?.value || "")}
-              placeholder="Select an Instrument Category"
-              className="text-sm"
-            />
-          </div>
+  {/* Asset Type */}
+  <div className="space-y-2">
+    <label className="block text-sm font-medium text-gray-700">Asset Type</label>
+    <select
+      value={assetType}
+      onChange={(e) => {
+        setAssetType(e.target.value);
+        setSearchTerm("");
+        setSelectedAssetOption(null);
+        setStock("");
+      }}
+      className="w-full h-11 px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition"
+    >
+      <option>Stock</option>
+      <option>Mutual Fund</option>
+    </select>
+  </div>
 
-          <div className="space-y-2">
-            <label htmlFor="stock" className="block text-sm font-medium text-gray-700">
-              Stock
-            </label>
-            <div className="relative">
-              <select
-                id="stock"
-                value={stock}
-                onChange={(e) => setStock(e.target.value)}
-                disabled={!category}
-                className={`w-full h-11 px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-800 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-colors ${!category ? "opacity-60 cursor-not-allowed" : ""}`}
-              >
-                <option value="">{category ? "Select Stock" : "Select category first"}</option>
-                {filteredStocks.map((s, idx) => (
-                  <option key={idx} value={s.name}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-500">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                     fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
-                     strokeLinejoin="round">
-                  <path d="m6 9 6 6 6-6"></path>
-                </svg>
-              </div>
-            </div>
-          </div>
+  {/* Category */}
+  <div className="space-y-2">
+    <label className="block text-sm font-medium text-gray-700">Category</label>
+    <Select
+      options={categoryOptions}
+      value={categoryOptions.find((opt) => opt.value === category)}
+      onChange={(selected) => setCategory(selected?.value || "")}
+      placeholder="Select an Instrument Category"
+      className="text-sm"
+    />
+  </div>
 
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-              {error}
-            </div>
-          )}
-        </div>
+  {/* Asset Search Dropdown */}
+  <div className="space-y-2">
+    <label className="block text-sm font-medium text-gray-700">Asset</label>
+    <Select
+      inputValue={searchTerm}
+      onInputChange={(val) => setSearchTerm(val)}
+      value={selectedAssetOption}
+      options={(searchTerm ? filteredAssets : initialAssets).map((a) => ({
+        value: a._id,
+        label: a.name,
+        data: a,
+      }))}
+      onChange={(selected) => {
+        if (selected) {
+          setSelectedAssetOption(selected);
+          setStock(selected.value);
+        } else {
+          setSelectedAssetOption(null);
+          setStock("");
+        }
+      }}
+      placeholder="Search and select an asset..."
+      isClearable
+      styles={getReactSelectStyles()}
+      noOptionsMessage={() => (searchTerm ? "No assets found" : "Start typing...")}
+    />
+  </div>
+
+  {/* Error */}
+  {error && (
+    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+      {error}
+    </div>
+  )}
+</div>
+
 
         {/* Footer */}
         <div className="px-6 py-4 border-t border-gray-100 flex gap-3 justify-end">

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { X } from "lucide-react"
 import Select from "react-select"
 import axiosInstance from "../helpers/axios"
+import axios from "axios"
 export default function CreateRecommendationModal({ isOpen, onClose, onCreated }) {
   const [form, setForm] = useState({
     assetType: "Stock",
@@ -13,6 +14,7 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
     category: "",
     rmp: "",
     cmp: "",
+    instrumentToken: "",
     riskProfile: "Low",
     action: "Buy",
     remark: "",
@@ -69,7 +71,7 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
         const endpoint =
           form.assetType === "Mutual Fund"
             ? `/v1/mutual-funds/list-mf?page=${page}&limit=50&search=${searchTerm}`
-            : `/v1/stocks/list?page=${page}&limit=50&search=${searchTerm}`;
+            : `/v1/stocks/list-stocks?page=${page}&limit=50&search=${searchTerm}`;
   
         const { data } = await axiosInstance.get(endpoint, { signal: controller.signal });
   
@@ -128,7 +130,7 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
     };
   
     setSelectedAssetOption(selectedOption);
-  
+
     // Default form setup
     let categoryName = "";
     let assetType = "";
@@ -146,7 +148,7 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
         console.error("Error fetching category:", err);
       }
     }
-  
+    console.log()
     setForm((prev) => ({
       ...prev,
       name: asset.name,
@@ -154,25 +156,23 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
       mutualFundId: asset._id,
       category: categoryName || prev.category || "",
       cmp: asset.nav || "",
+      instrumentToken: asset.instrument_token|| "",
     }));
-    // if (pollingIntervalId) {
-    //   clearInterval(pollingIntervalId); // clear previous polling if exists
+    if(asset.instrument_token){
+    try {
+      await axios.get(`https://finhub-socket-server.onrender.com/subscribe/${asset.instrument_token}`);
+    } catch (err) {
+      console.error("Error subscribing to stock:", err);
+    }
+    // try {
+    //   const res = await axios.get(`https://finhub-socket-server.onrender.com/get/${asset.instrument_token}`);
+    //   const data = res.data;
+    //   // console.log(data)
+    //   setForm(prev => ({ ...prev, cmp: data?.tick?.last_price || "" }));
+    // } catch (err) {
+    //   console.error("Error fetching CMP:", err);
     // }
-    
-    // // Start polling every 10 seconds
-    // const intervalId = setInterval(async () => {
-    //   try {
-    //     const { data } = await axiosInstance.get(`/v1/stockprice/price/${asset.name}`); 
-    //     if (data) {
-    //       setForm(prev => ({ ...prev, cmp: data }));
-    //     }
-    //   } catch (err) {
-    //     console.error("Failed to fetch live price", err);
-    //   }
-    // }, 10000); // 10 seconds
-    
-    // setPollingIntervalId(intervalId);
-    
+  }
     setIsCategoryPrefilled(!!categoryName);
     setSearchTerm("");
   
@@ -180,18 +180,7 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
       setFieldErrors((prev) => ({ ...prev, mutualFundId: false }));
     }
   };
-  // useEffect(() => {
-  //   if (!isOpen && pollingIntervalId) {
-  //     clearInterval(pollingIntervalId);
-  //     setPollingIntervalId(null);
-  //   }
   
-  //   return () => {
-  //     if (pollingIntervalId) {
-  //       clearInterval(pollingIntervalId);
-  //     }
-  //   };
-  // }, [isOpen, pollingIntervalId]);
   
   useEffect(() => {
     const fetchCategories = async () => {
@@ -213,6 +202,34 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
   }, [form.category]);
   
   
+  useEffect(() => {
+    if (!isOpen || !form.instrumentToken) return;
+  
+    let isMounted = true;
+  
+    const fetchCMP = async () => {
+      try {
+        const res = await axios.get(`https://finhub-socket-server.onrender.com/get/${form.instrumentToken}`);
+        const data = res.data;
+        if (isMounted) {
+          setForm((prev) => ({
+            ...prev,
+            cmp: data?.tick?.last_price || prev.cmp,
+          }));
+        }
+      } catch (err) {
+        console.error("Polling CMP fetch error:", err);
+      }
+    };
+  
+    const intervalId = setInterval(fetchCMP, 5000); // every 5s
+    fetchCMP(); // initial fetch
+  
+    return () => {
+      clearInterval(intervalId);  // cleanup on unmount or token change
+      isMounted = false;
+    };
+  }, [form.instrumentToken, isOpen]);
   
 
 
