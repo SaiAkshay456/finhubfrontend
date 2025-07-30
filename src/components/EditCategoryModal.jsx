@@ -8,6 +8,7 @@ export default function EditCategoryModal({
     onClose,
     onUpdated,
     category,
+    categoryType, // <-- receive from parent
 }) {
     const [form, setForm] = useState({
         assetClass: '',
@@ -23,6 +24,7 @@ export default function EditCategoryModal({
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
     const [fetchingRoutes, setFetchingRoutes] = useState(false)
+    const [initialRoute, setInitialRoute] = useState('')
 
     // Initialize form when category changes
     useEffect(() => {
@@ -37,6 +39,7 @@ export default function EditCategoryModal({
             rangeMin: category.range?.min?.toString() || '',
             rangeMax: category.range?.max?.toString() || '',
         })
+        setInitialRoute(category.route || '')
     }, [category, isOpen])
 
     // Fetch asset classes when modal opens
@@ -185,12 +188,24 @@ export default function EditCategoryModal({
                 payload.range = null
             }
 
-            console.log('Update payload being sent:', payload)
+            // Determine if we need to switch APIs based on route change
+            let endpoint = `/v1/category/update-instrument-category/${category._id}`
+            if (
+                (initialRoute !== 'Core Direct' &&
+                    form.route === 'Core Direct') ||
+                (initialRoute === 'Core Direct' && form.route !== 'Core Direct')
+            ) {
+                // If switching to Core Direct, use stock instrument category API
+                if (form.route === 'Core Direct') {
+                    endpoint = `/v1/category/update-stock-instrument-category/${category._id}`
+                } else {
+                    endpoint = `/v1/category/update-instrument-category/${category._id}`
+                }
+            } else if (form.route === 'Core Direct') {
+                endpoint = `/v1/category/update-stock-instrument-category/${category._id}`
+            }
 
-            const res = await axiosInstance.put(
-                `/v1/category/update-instrument-category/${category._id}`,
-                payload
-            )
+            const res = await axiosInstance.put(endpoint, payload)
             const data = res.data
 
             if (res.status === 200) {
