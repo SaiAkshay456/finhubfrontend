@@ -5,6 +5,11 @@ import CreateCategoryModal from '../../../../components/CreateCategoryModal'
 import EditCategoryModal from '../../../../components/EditCategoryModal'
 import axiosInstance from '@/helpers/axios'
 
+const CATEGORY_TYPE_OPTIONS = [
+    { label: 'Mutual Funds', value: 'mutual-funds' },
+    { label: 'Stocks', value: 'stocks' },
+]
+
 export default function InstrumentCategoryManagement() {
     const [categories, setCategories] = useState([])
     const [loading, setLoading] = useState(true)
@@ -22,6 +27,7 @@ export default function InstrumentCategoryManagement() {
     const [searchTerm, setSearchTerm] = useState('')
     const [assetClassFilter, setAssetClassFilter] = useState('')
     const [routeFilter, setRouteFilter] = useState('')
+    const [categoryType, setCategoryType] = useState('mutual-funds')
     const [currentPage, setCurrentPage] = useState(1)
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
 
@@ -33,23 +39,19 @@ export default function InstrumentCategoryManagement() {
         const timer = setTimeout(() => {
             setDebouncedSearchTerm(searchTerm)
         }, 500)
-
         return () => clearTimeout(timer)
     }, [searchTerm])
 
-    // Reset to first page when search term changes
+    // Reset to first page when search term or filters change
     useEffect(() => {
         setCurrentPage(1)
-    }, [debouncedSearchTerm])
+    }, [debouncedSearchTerm, assetClassFilter, routeFilter, categoryType])
 
+    // Fetch categories based on type
     const fetchCategories = useCallback(async () => {
         try {
-            // Don't show loading spinner for search operations to prevent re-render
-            if (currentPage === 1 && !debouncedSearchTerm) {
-                setLoading(true)
-            }
-
-            // Build query parameters
+            setLoading(true)
+            let url = ''
             const params = new URLSearchParams()
             if (debouncedSearchTerm)
                 params.append('search', debouncedSearchTerm)
@@ -57,18 +59,35 @@ export default function InstrumentCategoryManagement() {
             if (routeFilter) params.append('route', routeFilter)
             params.append('page', currentPage.toString())
 
+            if (categoryType === 'stocks') {
+                url = `/v1/category/list-stock-instrument-categories`
+            } else {
+                url = `/v1/category/list-instrument-categories`
+            }
             const queryString = params.toString()
-            const url = `/v1/category/list-instrument-categories${
-                queryString ? '?' + queryString : ''
-            }`
+            if (queryString) url += `?${queryString}`
 
             const response = await axiosInstance.get(url)
             const data = response.data
 
             if (response.status === 200) {
-                setCategories(data.categories || [])
-                setPagination(data.pagination || {})
-                setError(null) // Clear any previous errors
+                let fetchedCategories = data.categories || []
+                if (categoryType === 'mutual-funds') {
+                    fetchedCategories = fetchedCategories.filter(
+                        (category) => category.route !== 'Core Direct'
+                    )
+                }
+                setCategories(fetchedCategories)
+                // Use backend pagination values directly
+                setPagination({
+                    currentPage: data.pagination.currentPage,
+                    totalPages: data.pagination.totalPages,
+                    totalItems: data.pagination.totalItems,
+                    itemsPerPage: data.pagination.itemsPerPage,
+                    hasPrevPage: data.pagination.hasPrevPage,
+                    hasNextPage: data.pagination.hasNextPage,
+                })
+                setError(null)
             } else {
                 setError(data.message || 'Failed to fetch categories')
             }
@@ -78,9 +97,14 @@ export default function InstrumentCategoryManagement() {
         } finally {
             setLoading(false)
         }
-    }, [debouncedSearchTerm, assetClassFilter, routeFilter, currentPage])
+    }, [
+        debouncedSearchTerm,
+        assetClassFilter,
+        routeFilter,
+        currentPage,
+        categoryType,
+    ])
 
-    // Fetch data when debounced search term or filters change
     useEffect(() => {
         fetchCategories()
     }, [fetchCategories])
@@ -88,11 +112,7 @@ export default function InstrumentCategoryManagement() {
     const handleSearchChange = (e) => {
         const value = e.target.value
         setSearchTerm(value)
-
-        // Store cursor position
         const cursorPosition = e.target.selectionStart
-
-        // Restore focus and cursor position after state update
         setTimeout(() => {
             if (searchInputRef.current) {
                 searchInputRef.current.focus()
@@ -106,12 +126,17 @@ export default function InstrumentCategoryManagement() {
 
     const handleAssetClassChange = (e) => {
         setAssetClassFilter(e.target.value)
-        setCurrentPage(1) // Reset to first page when filtering
+        setCurrentPage(1)
     }
 
     const handleRouteChange = (e) => {
         setRouteFilter(e.target.value)
-        setCurrentPage(1) // Reset to first page when filtering
+        setCurrentPage(1)
+    }
+
+    const handleCategoryTypeChange = (e) => {
+        setCategoryType(e.target.value)
+        setCurrentPage(1)
     }
 
     const handlePrevPage = () => {
@@ -127,11 +152,11 @@ export default function InstrumentCategoryManagement() {
     }
 
     const handleCategoryCreated = () => {
-        fetchCategories() // Refresh the list after creating a new category
+        fetchCategories()
     }
 
     const handleCategoryUpdated = () => {
-        fetchCategories() // Refresh the list after updating a category
+        fetchCategories()
         setIsEditModalOpen(false)
         setEditingCategory(null)
     }
@@ -147,15 +172,17 @@ export default function InstrumentCategoryManagement() {
 
     const handleDeleteConfirm = async () => {
         if (!deleteConfirm.category) return
-
         try {
-            const response = await axiosInstance.delete(
-                `/v1/category/delete-instrument-category/${deleteConfirm.category._id}`
-            )
-
+            let url = ''
+            if (categoryType === 'stocks') {
+                url = `/v1/category/delete-stock-instrument-category/${deleteConfirm.category._id}`
+            } else {
+                url = `/v1/category/delete-instrument-category/${deleteConfirm.category._id}`
+            }
+            const response = await axiosInstance.delete(url)
             if (response.status === 200) {
                 setDeleteConfirm({ show: false, category: null })
-                fetchCategories() // Refresh the list
+                fetchCategories()
             } else {
                 setError(response.data.message || 'Failed to delete category')
             }
@@ -203,12 +230,17 @@ export default function InstrumentCategoryManagement() {
         (category) => category.assetClass === 'Commodity'
     ).length
     const categoriesWithRange = categories.filter(
-        (category) => category.range && category.range.min && category.range.max
+        (category) =>
+            category.range &&
+            category.range.min != null &&
+            category.range.max != null
     ).length
     const totalCategories = categories.length
     const assignedCategories = categories.filter(
         (category) => category.status === 'set'
     ).length
+
+    const isStocks = categoryType === 'stocks'
 
     return (
         <div className="p-6">
@@ -341,6 +373,20 @@ export default function InstrumentCategoryManagement() {
                                         Direct Debt
                                     </option>
                                 </select>
+                                <select
+                                    value={categoryType}
+                                    onChange={handleCategoryTypeChange}
+                                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                >
+                                    {CATEGORY_TYPE_OPTIONS.map((opt) => (
+                                        <option
+                                            key={opt.value}
+                                            value={opt.value}
+                                        >
+                                            {opt.label}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -412,8 +458,8 @@ export default function InstrumentCategoryManagement() {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                 {category.range &&
-                                                category.range.min &&
-                                                category.range.max
+                                                category.range.min != null &&
+                                                category.range.max != null
                                                     ? `${category.range.min} - ${category.range.max}`
                                                     : '-'}
                                             </td>
@@ -495,6 +541,7 @@ export default function InstrumentCategoryManagement() {
                     isOpen={isCreateModalOpen}
                     onClose={() => setIsCreateModalOpen(false)}
                     onCreated={handleCategoryCreated}
+                    categoryType={categoryType}
                 />
 
                 {/* Edit Category Modal */}
@@ -507,6 +554,7 @@ export default function InstrumentCategoryManagement() {
                         }}
                         onUpdated={handleCategoryUpdated}
                         category={editingCategory}
+                        categoryType={categoryType}
                     />
                 )}
 

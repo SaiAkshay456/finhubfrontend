@@ -3,12 +3,12 @@
 import axiosInstance from '@/helpers/axios'
 import { useState, useEffect } from 'react'
 
-export default function CreateCategoryModal({ isOpen, onClose, onCreated }) {
+export default function CreateCategoryModal({ isOpen, onClose, onCreated, categoryType }) {
     const [form, setForm] = useState({
-        assetClass: '', // Will store asset class name
-        assetClassId: '', // Will store asset class ID for fetching routes
-        route: '', // Will store route name
-        routeID: '', // Will store route ID
+        assetClass: '',
+        assetClassId: '',
+        route: '',
+        routeID: '',
         name: '',
         rangeMin: '',
         rangeMax: '',
@@ -84,10 +84,10 @@ export default function CreateCategoryModal({ isOpen, onClose, onCreated }) {
         setForm((prev) => ({
             ...prev,
             assetClassId: selectedId,
-            assetClass: assetClassName, // Store the name
-            route: '', // Reset route when asset class changes
-            routeID: '', // Reset route ID
-            name: '', // Reset name
+            assetClass: assetClassName,
+            route: '',
+            routeID: '',
+            name: '',
             rangeMin: '',
             rangeMax: '',
         }))
@@ -106,7 +106,7 @@ export default function CreateCategoryModal({ isOpen, onClose, onCreated }) {
         setForm((prev) => ({
             ...prev,
             routeID: selectedId,
-            route: routeName, // Store the name
+            route: routeName,
         }))
         setError('')
     }
@@ -119,7 +119,6 @@ export default function CreateCategoryModal({ isOpen, onClose, onCreated }) {
             return
         }
 
-        // Validate range if provided
         if (
             (form.rangeMin && !form.rangeMax) ||
             (!form.rangeMin && form.rangeMax)
@@ -141,12 +140,11 @@ export default function CreateCategoryModal({ isOpen, onClose, onCreated }) {
         try {
             const payload = {
                 name: form.name,
-                assetClass: form.assetClass, // Send asset class name
-                routeID: form.routeID, // Send route ID
-                route: form.route, // Send route name
+                assetClass: form.assetClass,
+                routeID: form.routeID,
+                route: form.route,
             }
 
-            // Add range if provided
             if (form.rangeMin && form.rangeMax) {
                 payload.range = {
                     min: parseFloat(form.rangeMin),
@@ -154,19 +152,18 @@ export default function CreateCategoryModal({ isOpen, onClose, onCreated }) {
                 }
             }
 
-            console.log('Payload being sent:', payload) // Debug log
+            // Determine API endpoint based on route
+            let endpoint = '/v1/category/add-instrument-category'
+            if (form.route === 'Core Direct') {
+                endpoint = '/v1/category/add-stock-instrument-category'
+            }
 
-            const res = await axiosInstance.post(
-                '/v1/category/add-instrument-category',
-                payload
-            )
-
+            const res = await axiosInstance.post(endpoint, payload)
             const data = res.data
 
             if (res.status === 200 || res.status === 201) {
                 onCreated?.()
                 onClose()
-                // Reset form
                 setForm({
                     assetClass: '',
                     assetClassId: '',
