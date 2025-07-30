@@ -7,7 +7,8 @@ import axiosInstance from "@/helpers/axios";
 import { API_BASE, USER_MANAGE_ROUTES } from "@/helpers/apiRoutes";
 import { SubscriptionModal } from "@/components/SubscriptionModal";
 import UserExtraSections from "../../../components/UserExtraSections";
-import { PortfolioUpload } from "../../../components/PortfolioUpload"
+import PortfolioUpload from "../../../components/PortfolioUpload"
+import KycModal from "@/components/KycModal";
 export default async function UserDetailsPage({ params }) {
     const token = await cookies().get('token')?.value;
     if (!token) redirect('/login');
@@ -15,7 +16,7 @@ export default async function UserDetailsPage({ params }) {
 
     const { id } = params;
     let user, error;
-
+    let kycDetails;
     try {
         loading = true;
         const { data } = await axiosInstance.get(`${API_BASE}/${USER_MANAGE_ROUTES.GET_USER_DETAILS}/${id}`, {
@@ -27,6 +28,7 @@ export default async function UserDetailsPage({ params }) {
     } catch (err) {
         error = 'Failed to fetch user details';
         loading = false;
+        console.log(err);
     }
     if (loading) {
         return <div className="flex items-center justify-center h-screen">
@@ -361,7 +363,7 @@ export default async function UserDetailsPage({ params }) {
                     </div>
                 </div>
                 <UserExtraSections user={id} />
-                <div className="mt-6 bg-white rounded-lg shadow-sm border border-gray-200">
+                <div className="mt-6">
                     <PortfolioUpload userId={user._id} />
                 </div>
             </div>
