@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-    baseURL: process.env.BASE_URL, // full URL of your backend
-    withCredentials: true, // important for cookies / auth
+    baseURL: "https://finhub-backend.onrender.com", // full URL of your backend
+    // withCredentials: true, // important for cookies / auth
 });
 
 export default axiosInstance;
