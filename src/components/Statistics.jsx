@@ -16,21 +16,17 @@ import {
 import { useState } from 'react';
 
 export default function Statistics() {
-    const [darkMode, setDarkMode] = useState(false);
 
-    const toggleTheme = () => {
-        setDarkMode(!darkMode);
-    };
 
     return (
-        <div className={`min-h-screen p-6 rounded ${darkMode ? 'bg-gray-900 text-gray-100' : 'text-gray-900'}`}>
+        <div className={`min-h-screen p-6 rounded  text-gray-100 text-gray-900`}>
             {/* Header */}
             <header className="flex items-center justify-between mb-8">
                 <h1 className="text-3xl font-bold">Dashboard</h1>
                 <div className="flex items-center gap-4">
                     <button
                         onClick={toggleTheme}
-                        className={`p-2 rounded-lg ${darkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-gray-200 hover:bg-gray-300'}`}
+                        className={`p-2 rounded-lg bg-gray-800 hover:bg-gray-700`}
                     >
                         {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
                     </button>
