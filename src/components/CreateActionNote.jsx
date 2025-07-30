@@ -4,7 +4,7 @@ import { useState } from "react"
 import { X, Calendar, Mail, MessageCircle, ChevronDown } from "lucide-react"
 import axiosInstance from "@/helpers/axios"
 
-export default function CreateActionNoteModal({ onClose, onCreated }) {
+export default function CreateActionNoteModal({ user,onClose, onCreated }) {
   const [task, setTask] = useState("")
   const [dueDate, setDueDate] = useState("")
   const [reminderType, setReminderType] = useState("email")
@@ -19,6 +19,7 @@ export default function CreateActionNoteModal({ onClose, onCreated }) {
         task,
         dueDate,
         reminderType,
+        clientId:user,
       })
       onCreated()
       onClose()

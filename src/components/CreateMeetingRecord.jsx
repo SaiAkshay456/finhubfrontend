@@ -4,7 +4,7 @@ import { useState } from "react"
 import { X, Upload, Calendar, FileText } from "lucide-react"
 import axiosInstance from "@/helpers/axios"
 
-export default function MeetingModal({ onClose, onCreated }) {
+export default function MeetingModal({user, onClose, onCreated }) {
   const [file, setFile] = useState(null)
   const [date, setDate] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -17,6 +17,7 @@ export default function MeetingModal({ onClose, onCreated }) {
       const formData = new FormData()
       formData.append("file", file)
       formData.append("date", date)
+      formData.append("user", user)
 
       const { data } = await axiosInstance.post("/v1/meeting-record/create", formData)
       onCreated(data.data)

@@ -1,21 +1,22 @@
+
 import { cookies } from "next/headers";
 import { redirect } from 'next/navigation';
 import KycFormUser from "../../../components/KycFormUser";
 import Link from "next/link";
 import axiosInstance from "@/helpers/axios";
 import { API_BASE, USER_MANAGE_ROUTES } from "@/helpers/apiRoutes";
-import KycModal from "@/components/KycModal";
-import PortfolioUpload from "@/components/PortfolioUpload";
-import { SubscriptionModal } from "@/components/SubscriptionModal";
+
+import UserExtraSections from "../../../components/UserExtraSections";
+
+
 export default async function UserDetailsPage({ params }) {
     const token = await cookies().get('token')?.value;
     if (!token) redirect('/login');
     let loading = false;
 
     const { id } = params;
-    let user = null
-    let error;
-    let kycDetails = null
+    let user, error;
+
     try {
         loading = true;
         const { data } = await axiosInstance.get(`${API_BASE}/${USER_MANAGE_ROUTES.GET_USER_DETAILS}/${id}`, {
@@ -360,9 +361,8 @@ export default async function UserDetailsPage({ params }) {
                         )}
                     </div>
                 </div>
-                <div className="mt-6">
-                    <PortfolioUpload userId={user._id} />
-                </div>
+                <UserExtraSections user={id} />
+
             </div>
 
         </div >
