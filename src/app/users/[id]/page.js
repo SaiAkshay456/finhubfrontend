@@ -5,10 +5,9 @@ import KycFormUser from "../../../components/KycFormUser";
 import Link from "next/link";
 import axiosInstance from "@/helpers/axios";
 import { API_BASE, USER_MANAGE_ROUTES } from "@/helpers/apiRoutes";
-
+import { SubscriptionModal } from "@/components/SubscriptionModal";
 import UserExtraSections from "../../../components/UserExtraSections";
-
-
+import { PortfolioUpload } from "../../../components/PortfolioUpload"
 export default async function UserDetailsPage({ params }) {
     const token = await cookies().get('token')?.value;
     if (!token) redirect('/login');
@@ -362,9 +361,10 @@ export default async function UserDetailsPage({ params }) {
                     </div>
                 </div>
                 <UserExtraSections user={id} />
-
+                <div className="mt-6 bg-white rounded-lg shadow-sm border border-gray-200">
+                    <PortfolioUpload userId={user._id} />
+                </div>
             </div>
-
         </div >
     );
 }
