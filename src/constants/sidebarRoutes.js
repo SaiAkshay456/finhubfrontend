@@ -67,6 +67,12 @@ export const sidebarItems = [
         description: "Benchmark portfolio performance with indices",
     },
     {
+        label: "Action Notes",
+        path: "/action-notes",
+        icon: BiBarChartAlt2,
+        description: "Create useful Action Notes"
+    },
+    {
         label: 'Fill Response',
         path: '/fill-response',
         icon: FaFileUpload,
