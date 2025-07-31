@@ -33,7 +33,6 @@ export default function LoginForm() {
                     },
                 }
             );
-
             setUser(res.data.user);
             setIsAuthorized(true);
             const getCookie = (name) => {
