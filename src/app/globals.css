@@ -1,7 +1,6 @@
  @import "tailwindcss";
 
 
-
  /* @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"); */
 
  /* Your provided imports and root variables */
@@ -27,7 +26,6 @@
 
  :root {
    --background: #ffffff;
-   --foreground: #171717;
 
    /* Global UI colors */
    --page-bg: #f8f9fa;

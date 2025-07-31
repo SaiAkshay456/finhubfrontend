@@ -13,7 +13,7 @@ import {
     Sun,
     Moon
 } from "lucide-react"
-import { useState } from 'react';
+
 
 export default function Statistics() {
 
@@ -24,13 +24,7 @@ export default function Statistics() {
             <header className="flex items-center justify-between mb-8">
                 <h1 className="text-3xl font-bold">Dashboard</h1>
                 <div className="flex items-center gap-4">
-                    <button
-                        onClick={toggleTheme}
-                        className={`p-2 rounded-lg bg-gray-800 hover:bg-gray-700`}
-                    >
-                        {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-                    </button>
-                    <button className={`flex items-center px-4 py-2 ${darkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-gray-200 hover:bg-gray-300'} rounded-lg transition-colors duration-200`}>
+                    <button className={`flex items-center px-4 py-2 ${false ? 'bg-gray-800 hover:bg-gray-700' : 'bg-gray-200 hover:bg-gray-300'} rounded-lg transition-colors duration-200`}>
                         <CalendarDays className="h-4 w-4 mr-2" />
                         <span>Time period:</span>
                     </button>
@@ -40,8 +34,8 @@ export default function Statistics() {
             {/* Summary Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
                 {/* Total Customers Card */}
-                <div className={`rounded-xl p-4 flex flex-col justify-between border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                    <div className={`flex items-center ${darkMode ? 'text-gray-400' : 'text-gray-500'} text-sm mb-2`}>
+                <div className={`rounded-xl p-4 flex flex-col justify-between border ${false ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                    <div className={`flex items-center ${false ? 'text-gray-400' : 'text-gray-500'} text-sm mb-2`}>
                         <Users className="h-4 w-4 mr-2" /> PF Value
                     </div>
                     <div className="flex items-center">
@@ -52,8 +46,8 @@ export default function Statistics() {
                 </div>
 
                 {/* Total Revenue Card */}
-                <div className={`rounded-xl p-4 flex flex-col justify-between border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                    <div className={`flex items-center ${darkMode ? 'text-gray-400' : 'text-gray-500'} text-sm mb-2`}>
+                <div className={`rounded-xl p-4 flex flex-col justify-between border ${false ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                    <div className={`flex items-center ${false ? 'text-gray-400' : 'text-gray-500'} text-sm mb-2`}>
                         <DollarSign className="h-4 w-4 mr-2" /> Invested
                     </div>
                     <div className="flex items-center">
@@ -64,8 +58,8 @@ export default function Statistics() {
                 </div>
 
                 {/* Total Orders Card */}
-                <div className={`rounded-xl p-4 flex flex-col justify-between border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                    <div className={`flex items-center ${darkMode ? 'text-gray-400' : 'text-gray-500'} text-sm mb-2`}>
+                <div className={`rounded-xl p-4 flex flex-col justify-between border ${false ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                    <div className={`flex items-center ${false ? 'text-gray-400' : 'text-gray-500'} text-sm mb-2`}>
                         <ShoppingBag className="h-4 w-4 mr-2" /> Gain %
                     </div>
                     <div className="flex items-center">
@@ -76,8 +70,8 @@ export default function Statistics() {
                 </div>
 
                 {/* Total Returns Card */}
-                <div className={`rounded-xl p-4 flex flex-col justify-between border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                    <div className={`flex items-center ${darkMode ? 'text-gray-400' : 'text-gray-500'} text-sm mb-2`}>
+                <div className={`rounded-xl p-4 flex flex-col justify-between border ${false ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                    <div className={`flex items-center ${false ? 'text-gray-400' : 'text-gray-500'} text-sm mb-2`}>
                         <RefreshCcw className="h-4 w-4 mr-2" /> XIHHR %
                     </div>
                     <div className="flex items-center">
@@ -88,14 +82,14 @@ export default function Statistics() {
                 </div>
 
                 {/* Add Data Card */}
-                <div className={`rounded-xl p-4 flex flex-col items-center justify-center border-dashed border-2 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                    <Plus className={`h-6 w-6 ${darkMode ? 'text-gray-400' : 'text-gray-500'} mb-2`} />
-                    <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Add data</span>
+                <div className={`rounded-xl p-4 flex flex-col items-center justify-center border-dashed border-2 ${false ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                    <Plus className={`h-6 w-6 ${false ? 'text-gray-400' : 'text-gray-500'} mb-2`} />
+                    <span className={`text-sm ${false ? 'text-gray-400' : 'text-gray-500'}`}>Add data</span>
                 </div>
             </div>
 
             {/* Product Sales Chart */}
-            <div className={`rounded-xl p-6 mb-8 border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <div className={`rounded-xl p-6 mb-8 border ${false ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-bold">Portfolio Growth</h2>
                     <div className="flex items-center space-x-4 text-sm">
@@ -110,24 +104,24 @@ export default function Statistics() {
 
                 <div className="relative h-80 w-full">
                     {/* Y-axis labels */}
-                    <div className={`absolute left-0 top-0 text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>70 K</div>
-                    <div className={`absolute left-0 top-[16.66%] text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>60 K</div>
-                    <div className={`absolute left-0 top-[33.33%] text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>50 K</div>
-                    <div className={`absolute left-0 top-[50%] text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>40 K</div>
-                    <div className={`absolute left-0 top-[66.66%] text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>30 K</div>
-                    <div className={`absolute left-0 top-[83.33%] text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>20 K</div>
-                    <div className={`absolute left-0 bottom-0 text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>10 K</div>
-                    <div className={`absolute left-0 bottom-0 text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'} translate-y-4`}>0</div>
+                    <div className={`absolute left-0 top-0 text-xs ${false ? 'text-gray-400' : 'text-gray-500'}`}>70 K</div>
+                    <div className={`absolute left-0 top-[16.66%] text-xs ${false ? 'text-gray-400' : 'text-gray-500'}`}>60 K</div>
+                    <div className={`absolute left-0 top-[33.33%] text-xs ${false ? 'text-gray-400' : 'text-gray-500'}`}>50 K</div>
+                    <div className={`absolute left-0 top-[50%] text-xs ${false ? 'text-gray-400' : 'text-gray-500'}`}>40 K</div>
+                    <div className={`absolute left-0 top-[66.66%] text-xs ${false ? 'text-gray-400' : 'text-gray-500'}`}>30 K</div>
+                    <div className={`absolute left-0 top-[83.33%] text-xs ${false ? 'text-gray-400' : 'text-gray-500'}`}>20 K</div>
+                    <div className={`absolute left-0 bottom-0 text-xs ${false ? 'text-gray-400' : 'text-gray-500'}`}>10 K</div>
+                    <div className={`absolute left-0 bottom-0 text-xs ${false ? 'text-gray-400' : 'text-gray-500'} translate-y-4`}>0</div>
 
                     {/* Grid lines */}
                     <div className="absolute inset-0 pl-10">
-                        <div className={`absolute inset-y-0 left-0 w-px ${darkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
-                        <div className={`absolute inset-x-0 top-[16.66%] h-px ${darkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
-                        <div className={`absolute inset-x-0 top-[33.33%] h-px ${darkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
-                        <div className={`absolute inset-x-0 top-[50%] h-px ${darkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
-                        <div className={`absolute inset-x-0 top-[66.66%] h-px ${darkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
-                        <div className={`absolute inset-x-0 top-[83.33%] h-px ${darkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
-                        <div className={`absolute inset-x-0 bottom-0 h-px ${darkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
+                        <div className={`absolute inset-y-0 left-0 w-px ${false ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
+                        <div className={`absolute inset-x-0 top-[16.66%] h-px ${false ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
+                        <div className={`absolute inset-x-0 top-[33.33%] h-px ${false ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
+                        <div className={`absolute inset-x-0 top-[50%] h-px ${false ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
+                        <div className={`absolute inset-x-0 top-[66.66%] h-px ${false ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
+                        <div className={`absolute inset-x-0 top-[83.33%] h-px ${false ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
+                        <div className={`absolute inset-x-0 bottom-0 h-px ${false ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
                     </div>
 
                     {/* Bars */}
@@ -155,10 +149,10 @@ export default function Statistics() {
                                     className="w-3 rounded-t-sm bg-orange-500 group-hover:bg-orange-400 transition-colors"
                                     style={{ height: `${(data.rev / 70) * 100}%` }}
                                 ></div>
-                                <span className={`absolute -bottom-6 text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{data.date}</span>
+                                <span className={`absolute -bottom-6 text-xs ${false ? 'text-gray-400' : 'text-gray-500'}`}>{data.date}</span>
                                 {data.tooltip && (
-                                    <div className={`absolute bottom-[calc(100%+10px)] left-1/2 -translate-x-1/2 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-md shadow-lg p-2 whitespace-nowrap z-10 opacity-0 group-hover:opacity-100 transition-opacity`}>
-                                        <div className={`flex items-center text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'} mb-1`}>
+                                    <div className={`absolute bottom-[calc(100%+10px)] left-1/2 -translate-x-1/2 ${false ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-md shadow-lg p-2 whitespace-nowrap z-10 opacity-0 group-hover:opacity-100 transition-opacity`}>
+                                        <div className={`flex items-center text-xs ${false ? 'text-gray-400' : 'text-gray-500'} mb-1`}>
                                             <Circle className="h-2 w-2 fill-blue-500 text-blue-500 mr-1" /> Gross margin
                                         </div>
                                         <div className="flex items-center text-sm font-bold">
@@ -176,7 +170,7 @@ export default function Statistics() {
             {/* Sales by Product Category & Sales by Countries */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Sales by Product Category */}
-                <div className={`rounded-xl p-6 border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                <div className={`rounded-xl p-6 border ${false ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                     <h2 className="text-xl font-bold mb-6">Portfolio across countries</h2>
                     <div className="flex flex-col md:flex-row items-center justify-center gap-6">
                         {/* Pie Chart */}
@@ -215,7 +209,7 @@ export default function Statistics() {
                 </div>
 
                 {/* Sales by Countries */}
-                <div className={`rounded-xl p-6 border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                <div className={`rounded-xl p-6 border ${false ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                     <h2 className="text-xl font-bold mb-6">Investments by countries</h2>
                     <div className="space-y-3">
                         <div className="flex items-center justify-between text-sm">
