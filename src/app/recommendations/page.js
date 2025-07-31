@@ -4,21 +4,31 @@ import { Search, Plus, TrendingUp, Calendar, AlertCircle, CheckCircle2, Clock } 
 import CreateRecommendationModal from "../../components/CreateRecommendationModal";
 import * as Popover from '@radix-ui/react-popover';
 import { MoreHorizontal } from 'lucide-react';
+import ConfirmStatusModal from '../../components/ConfirmStatusModal';
+
 import { AgGridReact } from 'ag-grid-react';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import axiosInstance from '../../helpers/axios';
 ModuleRegistry.registerModules([AllCommunityModule]);
+import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
 
 
 export default function RecommendationTable() {
   const [recommendations, setRecommendations] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+const [selectedStatusInfo, setSelectedStatusInfo] = useState(null); 
+const [selectedToDelete, setSelectedToDelete] = useState(null);
+const [showDeleteModal, setShowDeleteModal] = useState(false);
+const [showExpiredModal, setShowExpiredModal] = useState(false);
+const [expiredRecommendations, setExpiredRecommendations] = useState([]);
+
 
   // Fetch all recommendations
   const fetchRecommendations = async () => {
     try {
-      const { data } = await axiosInstance.get('/v1/recommendations/getRecommendations');
+      const { data } = await axiosInstance.get('/v1/recommendations/active');
 
       console.log(data)
       if (data.success) {
@@ -29,15 +39,15 @@ export default function RecommendationTable() {
     }
   };
 
-  const handleStatusToggle = async (id, currentStatus) => {
+  const handleStatusToggle = (id, currentStatus) => {
     const newStatus = currentStatus === 'Active' ? 'Closed' : 'Active';
-
-    const confirmed = window.confirm(
-      `Are you sure you want to change the status to "${newStatus}"?`
-    );
-
-    if (!confirmed) return;
-
+    setSelectedStatusInfo({ id, currentStatus, newStatus });
+    setShowConfirmModal(true);
+  };
+  
+  const confirmStatusChange = async () => {
+    const { id, newStatus } = selectedStatusInfo;
+  
     try {
       const { data } = await axiosInstance.patch(
         `/v1/recommendations/updateStatus/${id}`,
@@ -46,19 +56,58 @@ export default function RecommendationTable() {
           headers: { 'Content-Type': 'application/json' },
         }
       );
-
+  
       if (data.success) {
         fetchRecommendations();
       }
     } catch (err) {
       console.error('Failed to update status:', err);
+    } finally {
+      setShowConfirmModal(false);
+      setSelectedStatusInfo(null);
     }
   };
-
+  
+  const fetchExpiredRecommendations = async () => {
+    try {
+      const { data } = await axiosInstance.get('/v1/recommendations/expired');
+      if (data.success) {
+        setExpiredRecommendations(data.data);
+      }
+    } catch (err) {
+      console.error('Error fetching expired:', err);
+    }
+  };
+  const handleShowExpired = () => {
+    fetchExpiredRecommendations();
+    setShowExpiredModal(true);
+  };
+    
 
   useEffect(() => {
     fetchRecommendations()
   }, []);
+
+  const handleDelete = (rec) => {
+    setSelectedToDelete(rec);
+    setShowDeleteModal(true);
+  };
+  
+  const confirmDelete = async () => {
+    if (!selectedToDelete) return;
+    try {
+      const { data } = await axiosInstance.delete(`/v1/recommendations/delete/${selectedToDelete._id}`);
+      if (data.success) {
+        fetchRecommendations(); 
+      }
+    } catch (err) {
+      console.error("Failed to delete recommendation:", err);
+    } finally {
+      setShowDeleteModal(false);
+      setSelectedToDelete(null);
+    }
+  };
+  
 
   const filtered = recommendations.filter(rec =>
     rec.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -214,6 +263,15 @@ export default function RecommendationTable() {
                   <p className="font-semibold text-gray-800 mb-1">Remarks</p>
                   <p className="line-clamp-3">{rec.remark || '—'}</p>
                 </div>
+                <div className="border-t border-gray-200 pt-4 mt-4">
+  <button
+    onClick={() => handleDelete(rec)}
+    className="text-red-600 hover:text-red-800 text-sm font-semibold"
+  >
+    Delete Recommendation
+  </button>
+</div>
+
               </div>
               <Popover.Arrow className="fill-white" />
             </Popover.Content>
@@ -318,6 +376,46 @@ export default function RecommendationTable() {
             onClose={() => setIsModalOpen(false)}
             onCreated={() => fetchRecommendations()}
           />
+          <ConfirmStatusModal
+  isOpen={showConfirmModal}
+  onClose={() => setShowConfirmModal(false)}
+  onConfirm={confirmStatusChange}
+  newStatus={selectedStatusInfo?.newStatus}
+/>
+<DeleteConfirmationModal
+  isOpen={showDeleteModal}
+  onClose={() => setShowDeleteModal(false)}
+  onConfirm={confirmDelete}
+  name={selectedToDelete?.name}
+/>
+{showExpiredModal && (
+  <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
+    <div className="bg-white rounded-2xl shadow-xl max-w-3xl w-full p-6">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-bold">Expired Recommendations</h2>
+        <button onClick={() => setShowExpiredModal(false)}>✕</button>
+      </div>
+      {expiredRecommendations.length === 0 ? (
+        <p className="text-sm text-gray-500">No expired recommendations found.</p>
+      ) : (
+        <ul className="space-y-2">
+          {expiredRecommendations.map((rec) => (
+            <li key={rec._id} className="border p-3 rounded-md">
+              <div className="flex justify-between">
+                <span className="font-semibold">{rec.name}</span>
+                <span className="text-sm text-gray-500">
+                  Expired on {new Date(rec.validTill).toLocaleDateString()}
+                </span>
+              </div>
+              <p className="text-sm text-gray-600">{rec.category}</p>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </div>
+)}
+
         </div>
 
 
@@ -343,6 +441,13 @@ export default function RecommendationTable() {
                 <Plus className="w-5 h-5" />
                 Create Recommendation
               </button>
+              <button
+  onClick={handleShowExpired}
+  className="text-sm text-gray-600 underline hover:text-[#00b98b] ml-1"
+>
+  View Expired Recommendations
+</button>
+
             </div>
           </div>
 
