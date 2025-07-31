@@ -140,12 +140,13 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
       try {
         const { data: amfiData } = await axiosInstance.get(`/v1/category/amfi-categories/${asset.amfiCategory}`);
         const id = amfiData.instrumentCategorySchema
-        console.log(id)
-        const { data: categoryData } = await axiosInstance.get(`/v1/category/instrument-categories/${id}`);
-        console.log(categoryData)
-        if (categoryData?.name) {
-          categoryName = categoryData.name;
-          // assetType = categoryData.assetClass || "";
+        if (id) {
+          const { data: categoryData } = await axiosInstance.get(`/v1/category/instrument-categories/${id}`);
+          console.log(categoryData)
+          if (categoryData?.name) {
+            categoryName = categoryData.name;
+            // assetType = categoryData.assetClass || "";
+          }
         }
       } catch (err) {
         console.error("Error fetching category:", err);
@@ -461,6 +462,7 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
                 value={form.validTill}
                 onChange={handleChange}
                 className={inputClass("validTill")}
+                min={new Date().toISOString().split("T")[0]}
               />
             </div>
 

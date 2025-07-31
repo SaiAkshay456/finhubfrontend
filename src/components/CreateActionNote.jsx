@@ -9,6 +9,7 @@ export default function CreateActionNoteModal({ user,onClose, onCreated }) {
   const [dueDate, setDueDate] = useState("")
   const [reminderType, setReminderType] = useState("email")
   const [isLoading, setIsLoading] = useState(false)
+  const [reminderTimer, setReminderTimer] = useState("1");
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -19,6 +20,7 @@ export default function CreateActionNoteModal({ user,onClose, onCreated }) {
         task,
         dueDate,
         reminderType,
+        reminderTimer,
         clientId:user,
       })
       onCreated()
@@ -109,6 +111,28 @@ export default function CreateActionNoteModal({ user,onClose, onCreated }) {
               <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
             </div>
           </div>
+          {/* Reminder Timer Select */}
+<div className="space-y-2">
+  <label htmlFor="reminderTimer" className="block text-sm font-medium text-gray-700">
+    Reminder Timer (before due)
+  </label>
+  <div className="relative">
+    <select
+      id="reminderTimer"
+      value={reminderTimer}
+      onChange={(e) => setReminderTimer(e.target.value)}
+      className="w-full h-11 px-4 py-2 pl-4 pr-10 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 appearance-none bg-white cursor-pointer"
+      disabled={isLoading}
+    >
+      <option value="1">1 Hour Before</option>
+      <option value="8">8 Hours Before</option>
+      <option value="12">12 Hours Before</option>
+      <option value="24">24 Hours Before</option>
+    </select>
+    <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+  </div>
+</div>
+
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4">

@@ -69,8 +69,8 @@ function ActionNotes({user}) {
             </span>
           </div>
           <p className="text-sm text-gray-500">
-            Reminder: {note.reminderType === "email" ? "Email" : "WhatsApp"}
-          </p>
+  Reminder: {note.reminderType === "email" ? "Email" : "WhatsApp"} ({note.reminderTimer}h before due)
+</p>
         </div>
       ))}
     </div>
@@ -132,8 +132,8 @@ function AllNotesModal({ notes, onClose }) {
                 })}
               </div>
               <p className="text-sm text-gray-500">
-                Reminder: {note.reminderType === "email" ? "Email" : "WhatsApp"}
-              </p>
+  Reminder: {note.reminderType === "email" ? "Email" : "WhatsApp"} ({note.reminderTimer}h before due)
+</p>
             </div>
           ))}
         </div>
