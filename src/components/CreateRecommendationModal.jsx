@@ -42,37 +42,37 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
 
   useEffect(() => {
     if (!isOpen) return;
-  
+
     const fetchInitialAssets = async () => {
       try {
         const endpoint =
           form.assetType === "Mutual Fund"
             ? "/v1/mutual-funds/list-mf?page=1&limit=50"
             : "/v1/stocks/list-stocks?page=1&limit=50";
-  
+
         const { data } = await axiosInstance.get(endpoint);
         setInitialAssets(data.data);
       } catch (err) {
         console.error("Error fetching initial assets:", err);
       }
     };
-  
+
     fetchInitialAssets();
   }, [isOpen, form.assetType]);
-  
+
 
   useEffect(() => {
     if (!isOpen || !searchTerm) return;
-  
+
     const controller = new AbortController();
-  
+
     const fetchAssets = async () => {
       try {
         const endpoint =
           form.assetType === "Mutual Fund"
             ? `/v1/mutual-funds/list-mf?page=${page}&limit=50&search=${searchTerm}`
             : `/v1/stocks/list-stocks?page=${page}&limit=50&search=${searchTerm}`;
-  
+
         const { data } = await axiosInstance.get(endpoint, { signal: controller.signal });
         setFilteredAssets(data.data);
         setAssets(data.data);
@@ -85,18 +85,18 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
         }
       }
     };
-  
+
     const delayDebounce = setTimeout(fetchAssets, 300);
     return () => {
       clearTimeout(delayDebounce);
       controller.abort();
     };
   }, [searchTerm, form.assetType, page, isOpen]);
-  
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-  
+
     if (name === "assetType") {
       // Reset dependent fields when asset type changes
       setForm((prev) => ({
@@ -114,13 +114,13 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
     } else {
       setForm((prev) => ({ ...prev, [name]: value }));
     }
-  
+
     setError("");
     if (fieldErrors[name]) {
       setFieldErrors((prev) => ({ ...prev, [name]: false }));
     }
   };
-  
+
 
   const handleAssetSelect = async (asset) => {
     const selectedOption = {
@@ -128,20 +128,20 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
       label: asset.name,
       data: asset,
     };
-  
+
     setSelectedAssetOption(selectedOption);
 
     // Default form setup
     let categoryName = "";
     let assetType = "";
-  
+
     // Fetch category name if categories field is present
     if (asset.amfiCategory) {
       try {
-        const {data: amfiData}= await axiosInstance.get(`/v1/category/amfi-categories/${asset.amfiCategory}`);
+        const { data: amfiData } = await axiosInstance.get(`/v1/category/amfi-categories/${asset.amfiCategory}`);
         const id = amfiData.instrumentCategorySchema
         console.log(id)
-        const {data: categoryData}= await axiosInstance.get(`/v1/category/instrument-categories/${id}`);
+        const { data: categoryData } = await axiosInstance.get(`/v1/category/instrument-categories/${id}`);
         console.log(categoryData)
         if (categoryData?.name) {
           categoryName = categoryData.name;
@@ -159,32 +159,32 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
       mutualFundId: asset._id,
       category: categoryName || prev.category || "",
       cmp: asset.nav || "",
-      instrumentToken: asset.instrument_token|| "",
+      instrumentToken: asset.instrument_token || "",
     }));
-    if(asset.instrument_token){
-    try {
-      await axios.get(`https://finhub-socket-server.onrender.com/subscribe/${asset.instrument_token}`);
-    } catch (err) {
-      console.error("Error subscribing to stock:", err);
+    if (asset.instrument_token) {
+      try {
+        await axios.get(`https://finhub-socket-server.onrender.com/subscribe/${asset.instrument_token}`);
+      } catch (err) {
+        console.error("Error subscribing to stock:", err);
+      }
+      // try {
+      //   const res = await axios.get(`https://finhub-socket-server.onrender.com/get/${asset.instrument_token}`);
+      //   const data = res.data;
+      //   // console.log(data)
+      //   setForm(prev => ({ ...prev, cmp: data?.tick?.last_price || "" }));
+      // } catch (err) {
+      //   console.error("Error fetching CMP:", err);
+      // }
     }
-    // try {
-    //   const res = await axios.get(`https://finhub-socket-server.onrender.com/get/${asset.instrument_token}`);
-    //   const data = res.data;
-    //   // console.log(data)
-    //   setForm(prev => ({ ...prev, cmp: data?.tick?.last_price || "" }));
-    // } catch (err) {
-    //   console.error("Error fetching CMP:", err);
-    // }
-  }
     setIsCategoryPrefilled(!!categoryName);
     setSearchTerm("");
-  
+
     if (fieldErrors.mutualFundId) {
       setFieldErrors((prev) => ({ ...prev, mutualFundId: false }));
     }
   };
-  
-  
+
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -198,18 +198,18 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
         console.error("Failed to load categories", err);
       }
     };
-  
+
     if (!form.category) {
       fetchCategories();
     }
   }, [form.category]);
-  
-  
+
+
   useEffect(() => {
     if (!isOpen || !form.instrumentToken) return;
-  
+
     let isMounted = true;
-  
+
     const fetchCMP = async () => {
       try {
         const res = await axios.get(`https://finhub-socket-server.onrender.com/get/${form.instrumentToken}`);
@@ -224,20 +224,20 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
         console.error("Polling CMP fetch error:", err);
       }
     };
-  
+
     const intervalId = setInterval(fetchCMP, 5000); // every 5s
     fetchCMP(); // initial fetch
-  
+
     return () => {
       clearInterval(intervalId);  // cleanup on unmount or token change
       isMounted = false;
     };
   }, [form.instrumentToken, isOpen]);
-  
+
 
 
   const handleSubmit = async () => {
-    const { mutualFundId, sector, rmp, cmp, riskProfile, action, remark, validTill, category , assetType } = form
+    const { mutualFundId, sector, rmp, cmp, riskProfile, action, remark, validTill, category, assetType } = form
 
     const newErrors = {}
     if (!mutualFundId) newErrors.mutualFundId = true
@@ -260,7 +260,7 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
     setError("")
     setLoading(true)
     try {
-      const {data} = await axiosInstance.post("/v1/recommendations/create",{
+      const { data } = await axiosInstance.post("/v1/recommendations/create", {
         mutualFundId,
         sector,
         rmp: Number.parseFloat(rmp),
@@ -304,13 +304,11 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
   }
 
   const inputClass = (field) =>
-    `w-full px-4 py-3 border ${
-      fieldErrors[field] ? "border-red-500 bg-red-50" : "border-gray-200 bg-gray-50"
+    `w-full px-4 py-3 border ${fieldErrors[field] ? "border-red-500 bg-red-50" : "border-gray-200 bg-gray-50"
     } rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:bg-white`
 
   const selectClass = (field) =>
-    `w-full px-4 py-3 border ${
-      fieldErrors[field] ? "border-red-500 bg-red-50" : "border-gray-200 bg-gray-50"
+    `w-full px-4 py-3 border ${fieldErrors[field] ? "border-red-500 bg-red-50" : "border-gray-200 bg-gray-50"
     } rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:bg-white`
 
   // Custom styles for React Select with error state
@@ -333,7 +331,7 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
     }),
   })
 
-    if (!isOpen) return null
+  if (!isOpen) return null
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -349,24 +347,24 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
           </button>
         </div>
 
-                {/* Content */}
-                <div className="px-8 py-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Asset Type */}
-                        <div className="space-y-2">
-                            <label className="block text-sm font-semibold text-gray-700">
-                                Asset Type
-                            </label>
-                            <select
-                                name="assetType"
-                                value={form.assetType}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
-                            >
-                                <option>Stock</option>
-                                <option>Mutual Fund</option>
-                            </select>
-                        </div>
+        {/* Content */}
+        <div className="px-8 py-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Asset Type */}
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">
+                Asset Type
+              </label>
+              <select
+                name="assetType"
+                value={form.assetType}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
+              >
+                <option>Stock</option>
+                <option>Mutual Fund</option>
+              </select>
+            </div>
 
             {/* Sector */}
             <div className="space-y-2">
@@ -385,41 +383,41 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
             <div className="md:col-span-2 space-y-2">
               <label className="block text-sm font-semibold text-gray-700">Asset</label>
               <Select
-  inputValue={searchTerm}
-  onInputChange={(value) => {
-    setSearchTerm(value)
-    setPage(1)
-  }}
-  value={selectedAssetOption}
-  options={(searchTerm ? filteredAssets : initialAssets).map((a) => ({
-    value: a._id,
-    label: `${a.name} (${a.isin || "No ISIN"})`,
-    data: a,
-  }))}
-  
-  onChange={(selectedOption) => {
-    const asset = selectedOption?.data
-    if (asset) handleAssetSelect(asset)
-    else {
-      setSelectedAssetOption(null)
-      setForm((prev) => ({
-        ...prev,
-        name: "",
-        mutualFundId: "",
-        sector: "",
-        category: "",
-        cmp: "",
-      }))
-      setIsCategoryPrefilled(false)
-    }
-  }}
-  placeholder="Search and select an asset..."
-  isClearable
-  className="react-select-container"
-  classNamePrefix="react-select"
-  styles={getReactSelectStyles(fieldErrors.mutualFundId)}
-  noOptionsMessage={() => (searchTerm ? "No assets found" : "Start typing...")}
-/>
+                inputValue={searchTerm}
+                onInputChange={(value) => {
+                  setSearchTerm(value)
+                  setPage(1)
+                }}
+                value={selectedAssetOption}
+                options={(searchTerm ? filteredAssets : initialAssets).map((a) => ({
+                  value: a._id,
+                  label: `${a.name} (${a.isin || "No ISIN"})`,
+                  data: a,
+                }))}
+
+                onChange={(selectedOption) => {
+                  const asset = selectedOption?.data
+                  if (asset) handleAssetSelect(asset)
+                  else {
+                    setSelectedAssetOption(null)
+                    setForm((prev) => ({
+                      ...prev,
+                      name: "",
+                      mutualFundId: "",
+                      sector: "",
+                      category: "",
+                      cmp: "",
+                    }))
+                    setIsCategoryPrefilled(false)
+                  }
+                }}
+                placeholder="Search and select an asset..."
+                isClearable
+                className="react-select-container"
+                classNamePrefix="react-select"
+                styles={getReactSelectStyles(fieldErrors.mutualFundId)}
+                noOptionsMessage={() => (searchTerm ? "No assets found" : "Start typing...")}
+              />
 
               {/* {form.name && (
                 <div className="mt-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg">
@@ -428,30 +426,30 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
               )} */}
             </div>
             {/* Category */}
-<div className="space-y-2">
-  <label className="block text-sm font-semibold text-gray-700">Category</label>
-  {isCategoryPrefilled ? (
-    <input
-      type="text"
-      name="category"
-      value={form.category}
-      className={inputClass("category")}
-      disabled
-    />
-  ) : (
-    <Select
-  options={categoryOptions}
-  value={categoryOptions.find(opt => opt.value === form.category)}
-  onChange={(selected) =>
-    setForm((prev) => ({ ...prev, category: selected?.value || "" }))
-  }
-  placeholder="Select a Insturment category"
-  styles={getReactSelectStyles(fieldErrors.category)}
-  className="text-sm"
-/>
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">Category</label>
+              {isCategoryPrefilled ? (
+                <input
+                  type="text"
+                  name="category"
+                  value={form.category}
+                  className={inputClass("category")}
+                  disabled
+                />
+              ) : (
+                <Select
+                  options={categoryOptions}
+                  value={categoryOptions.find(opt => opt.value === form.category)}
+                  onChange={(selected) =>
+                    setForm((prev) => ({ ...prev, category: selected?.value || "" }))
+                  }
+                  placeholder="Select a Insturment category"
+                  styles={getReactSelectStyles(fieldErrors.category)}
+                  className="text-sm"
+                />
 
-  )}
-</div>
+              )}
+            </div>
 
 
             {/* Valid Till */}
@@ -533,15 +531,15 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
             </div>
           </div>
 
-                    {/* Error Message */}
-                    {error && (
-                        <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-xl">
-                            <p className="text-red-700 text-sm font-medium">
-                                {error}
-                            </p>
-                        </div>
-                    )}
-                </div>
+          {/* Error Message */}
+          {error && (
+            <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+              <p className="text-red-700 text-sm font-medium">
+                {error}
+              </p>
+            </div>
+          )}
+        </div>
 
         {/* Footer */}
         <div className="sticky bottom-0 bg-white rounded-b-2xl border-t border-gray-100 px-8 py-6 flex items-center justify-end gap-3">
@@ -552,19 +550,19 @@ export default function CreateRecommendationModal({ isOpen, onClose, onCreated }
             Cancel
           </button>
           <button
-  onClick={handleSubmit}
-  disabled={loading}
-  className="px-8 py-3 bg-gradient-to-r from-[#00d09c] to-[#00b98b] hover:opacity-90 text-white font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
->
-  {loading ? (
-    <div className="flex items-center gap-2">
-      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-      Creating...
-    </div>
-  ) : (
-    "Create Recommendation"
-  )}
-</button>
+            onClick={handleSubmit}
+            disabled={loading}
+            className="px-8 py-3 bg-gradient-to-r from-[#00d09c] to-[#00b98b] hover:opacity-90 text-white font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+          >
+            {loading ? (
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                Creating...
+              </div>
+            ) : (
+              "Create Recommendation"
+            )}
+          </button>
 
         </div>
       </div>
