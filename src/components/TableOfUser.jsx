@@ -259,7 +259,11 @@ export default function TableOfUser({ users, questionnaires, token }) {
                                             </div>
                                             <div>
                                                 <div className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
+<<<<<<< HEAD
                                                     @{user.username || user.email.split('@')[0]}
+=======
+                                                    {user.username || user.email.split('@')[0]}
+>>>>>>> origin/hotfix/cmp
                                                 </div>
                                                 <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
                                                     {user._id.slice(-8)}
@@ -700,6 +704,11 @@ export default function TableOfUser({ users, questionnaires, token }) {
 //             </div>
 //         );
 //     };
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> origin/hotfix/cmp
 //     // Column Definitions
 //     const columnDefs = useMemo(() => [
 //         {

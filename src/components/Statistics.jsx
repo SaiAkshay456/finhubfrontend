@@ -24,6 +24,15 @@ export default function Statistics() {
             <header className="flex items-center justify-between mb-8">
                 <h1 className="text-3xl font-bold">Dashboard</h1>
                 <div className="flex items-center gap-4">
+<<<<<<< HEAD
+=======
+                    {/* <button
+                        onClick={toggleTheme}
+                        className={`p-2 rounded-lg bg-gray-800 hover:bg-gray-700`}
+                    >
+                        {false ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                    </button> */}
+>>>>>>> origin/hotfix/cmp
                     <button className={`flex items-center px-4 py-2 ${false ? 'bg-gray-800 hover:bg-gray-700' : 'bg-gray-200 hover:bg-gray-300'} rounded-lg transition-colors duration-200`}>
                         <CalendarDays className="h-4 w-4 mr-2" />
                         <span>Time period:</span>
