@@ -20,7 +20,6 @@ export async function fetchQuestionnaires(token) {
         return []
     }
 }
-
 export default async function AllUsersPage({ searchParams }) {
     const cookieStore = await cookies()
     const token = cookieStore.get("token")?.value

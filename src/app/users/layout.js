@@ -1,8 +1,3 @@
-
-// import { useAuth } from "../../providers/AuthProvider";
-import Sidebar from '../../components/Sidebar';
-// layout.js (server component)
-
 import axiosInstance from '@/helpers/axios';
 import { sidebarItems } from '../../constants/sidebarRoutes';
 import { cookies } from 'next/headers';

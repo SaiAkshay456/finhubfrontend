@@ -19,31 +19,23 @@ export default function Statistics() {
 
 
     return (
-        <div className={`min-h-screen p-6 rounded  text-gray-100 text-gray-900`}>
+        <div className={`min-h-screen p-6 rounded  text-gray-900`}>
             {/* Header */}
             <header className="flex items-center justify-between mb-8">
                 <h1 className="text-3xl font-bold">Dashboard</h1>
                 <div className="flex items-center gap-4">
-<<<<<<< HEAD
-=======
-                    {/* <button
-                        onClick={toggleTheme}
-                        className={`p-2 rounded-lg bg-gray-800 hover:bg-gray-700`}
-                    >
-                        {false ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-                    </button> */}
->>>>>>> origin/hotfix/cmp
                     <button className={`flex items-center px-4 py-2 ${false ? 'bg-gray-800 hover:bg-gray-700' : 'bg-gray-200 hover:bg-gray-300'} rounded-lg transition-colors duration-200`}>
                         <CalendarDays className="h-4 w-4 mr-2" />
                         <span>Time period:</span>
                     </button>
-                </div>
-            </header>
+                </div >
+            </header >
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+            < div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8" >
                 {/* Total Customers Card */}
-                <div className={`rounded-xl p-4 flex flex-col justify-between border ${false ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                < div className={`rounded-xl p-4 flex flex-col justify-between border ${false ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`
+                }>
                     <div className={`flex items-center ${false ? 'text-gray-400' : 'text-gray-500'} text-sm mb-2`}>
                         <Users className="h-4 w-4 mr-2" /> PF Value
                     </div>
@@ -52,10 +44,10 @@ export default function Statistics() {
                         <TrendingUp className="h-4 w-4 text-green-400 mr-1" />
                         <span className="text-green-400 text-sm">2.5 %</span>
                     </div>
-                </div>
+                </div >
 
                 {/* Total Revenue Card */}
-                <div className={`rounded-xl p-4 flex flex-col justify-between border ${false ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                < div className={`rounded-xl p-4 flex flex-col justify-between border ${false ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                     <div className={`flex items-center ${false ? 'text-gray-400' : 'text-gray-500'} text-sm mb-2`}>
                         <DollarSign className="h-4 w-4 mr-2" /> Invested
                     </div>
@@ -64,10 +56,10 @@ export default function Statistics() {
                         <TrendingUp className="h-4 w-4 text-green-400 mr-1" />
                         <span className="text-green-400 text-sm">0.5 %</span>
                     </div>
-                </div>
+                </div >
 
                 {/* Total Orders Card */}
-                <div className={`rounded-xl p-4 flex flex-col justify-between border ${false ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                < div className={`rounded-xl p-4 flex flex-col justify-between border ${false ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                     <div className={`flex items-center ${false ? 'text-gray-400' : 'text-gray-500'} text-sm mb-2`}>
                         <ShoppingBag className="h-4 w-4 mr-2" /> Gain %
                     </div>
@@ -76,10 +68,10 @@ export default function Statistics() {
                         <TrendingDown className="h-4 w-4 text-red-400 mr-1" />
                         <span className="text-red-400 text-sm">6.2 %</span>
                     </div>
-                </div>
+                </div >
 
                 {/* Total Returns Card */}
-                <div className={`rounded-xl p-4 flex flex-col justify-between border ${false ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                < div className={`rounded-xl p-4 flex flex-col justify-between border ${false ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                     <div className={`flex items-center ${false ? 'text-gray-400' : 'text-gray-500'} text-sm mb-2`}>
                         <RefreshCcw className="h-4 w-4 mr-2" /> XIHHR %
                     </div>
@@ -88,17 +80,17 @@ export default function Statistics() {
                         <TrendingUp className="h-4 w-4 text-gray-400 mr-1" />
                         <span className="text-gray-400 text-sm">0.12 %</span>
                     </div>
-                </div>
+                </div >
 
                 {/* Add Data Card */}
-                <div className={`rounded-xl p-4 flex flex-col items-center justify-center border-dashed border-2 ${false ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                < div className={`rounded-xl p-4 flex flex-col items-center justify-center border-dashed border-2 ${false ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                     <Plus className={`h-6 w-6 ${false ? 'text-gray-400' : 'text-gray-500'} mb-2`} />
                     <span className={`text-sm ${false ? 'text-gray-400' : 'text-gray-500'}`}>Add data</span>
-                </div>
-            </div>
+                </div >
+            </div >
 
             {/* Product Sales Chart */}
-            <div className={`rounded-xl p-6 mb-8 border ${false ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            < div className={`rounded-xl p-6 mb-8 border ${false ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-bold">Portfolio Growth</h2>
                     <div className="flex items-center space-x-4 text-sm">
@@ -174,12 +166,12 @@ export default function Statistics() {
                         ))}
                     </div>
                 </div>
-            </div>
+            </div >
 
             {/* Sales by Product Category & Sales by Countries */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            < div className="grid grid-cols-1 lg:grid-cols-2 gap-4" >
                 {/* Sales by Product Category */}
-                <div className={`rounded-xl p-6 border ${false ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                < div className={`rounded-xl p-6 border ${false ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                     <h2 className="text-xl font-bold mb-6">Portfolio across countries</h2>
                     <div className="flex flex-col md:flex-row items-center justify-center gap-6">
                         {/* Pie Chart */}
@@ -215,10 +207,10 @@ export default function Statistics() {
                             </div>
                         </div>
                     </div>
-                </div>
+                </div >
 
                 {/* Sales by Countries */}
-                <div className={`rounded-xl p-6 border ${false ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                < div className={`rounded-xl p-6 border ${false ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                     <h2 className="text-xl font-bold mb-6">Investments by countries</h2>
                     <div className="space-y-3">
                         <div className="flex items-center justify-between text-sm">
@@ -258,8 +250,8 @@ export default function Statistics() {
                             <span className="font-medium">29%</span>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
+                </div >
+            </div >
+        </div >
     )
 }
