@@ -1,29 +1,25 @@
 'use client';
-
 import Link from 'next/link';
 import { sidebarItems } from '../constants/sidebarRoutes';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight, LogOut, LayoutGrid } from "lucide-react";
 import { useAuth } from '@/providers/AuthProvider';
-import axios from 'axios';
-
+import { API_BASE, AUTH_ROUTES } from '@/helpers/apiRoutes';
+import axiosInstance from '@/helpers/axios';
 export default function Sidebar({ user, children }) {
     const [isOpen, setIsOpen] = useState(true);
     const pathname = usePathname();
     const { setIsAuthorized, setUser } = useAuth();
-
     const toggleSidebar = () => setIsOpen(!isOpen);
     console.log(sidebarItems)
     const allowedSidebar = sidebarItems.filter(route =>
         user?.sidebar?.some(item => item.label === route.label && item.access)
     );
-    // const allowedSidebar = sidebarItems;
-
     console.log(allowedSidebar)
     const handleLogoutUser = async () => {
         try {
-            const res = await axios.get('http://localhost:3030/v1/auth/logout', {
+            const res = await axiosInstance.get(`${API_BASE}/${AUTH_ROUTES.LOGOUT}`, {
                 withCredentials: true,
             });
             setUser(null);
@@ -33,16 +29,13 @@ export default function Sidebar({ user, children }) {
             console.error('Logout failed:', err);
         }
     };
-
     return (
         <>
             <div className="flex h-screen bg-gray-100 text-gray-800">
-                {/* Sidebar */}
                 <div
                     className={`fixed left-0 top-0 h-full bg-white border-r border-gray-200 transition-all duration-300 z-50 flex flex-col ${isOpen ? "w-64" : "w-20"
                         }`}
                 >
-                    {/* Header */}
                     <div className="flex items-center ml-3 justify-between p-4 border-b border-gray-200 flex-shrink-0">
                         {isOpen ? (
                             <div className="flex items-center">
@@ -106,8 +99,6 @@ export default function Sidebar({ user, children }) {
                             })}
                         </nav>
                     </div>
-
-                    {/* User Profile and Logout - Compact */}
                     <div className="border-t border-gray-200 p-3 flex-shrink-0">
                         {user && (
                             <>
@@ -134,7 +125,6 @@ export default function Sidebar({ user, children }) {
                                 )}
                             </>
                         )}
-
                         <button
                             onClick={handleLogoutUser}
                             className={`w-full flex ml-3 items-center px-2 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md transition-colors ${!isOpen ? "justify-center" : ""
@@ -151,8 +141,6 @@ export default function Sidebar({ user, children }) {
                         </button>
                     </div>
                 </div>
-
-                {/* Main Content */}
                 <main
                     className={`flex flex-1 overflow-y-auto bg-white ml-0 transition-all duration-300 ${isOpen ? "lg:ml-64" : "lg:ml-20"
                         }`}
@@ -160,8 +148,6 @@ export default function Sidebar({ user, children }) {
                     {children}
                 </main>
             </div>
-
-            {/* Mobile Toggle Button */}
             <button
                 onClick={toggleSidebar}
                 className="fixed top-4 left-4 z-50 lg:hidden bg-white p-2 rounded-lg shadow-md border border-gray-200"

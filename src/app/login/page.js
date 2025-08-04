@@ -1,10 +1,11 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../providers/AuthProvider';
 import { Mail, Lock, EyeOff, Info, Eye } from "lucide-react";
 import axiosInstance from '@/helpers/axios';
 import Link from 'next/link';
+import { API_BASE, AUTH_ROUTES } from '@/helpers/apiRoutes';
 
 export default function LoginForm() {
     const { setUser, setIsAuthorized } = useAuth();
@@ -25,12 +26,12 @@ export default function LoginForm() {
 
         try {
             const res = await axiosInstance.post(
-                '/v1/auth/login',
+                `${API_BASE}/${AUTH_ROUTES.LOGIN}`,
                 form,
                 {
                     headers: {
                         'Content-Type': 'application/json',
-                    },
+                    }
                 }
             );
             setUser(res.data.user);

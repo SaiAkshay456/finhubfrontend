@@ -4,6 +4,7 @@ export const RISK_PROFILE = `riskprofile`;
 
 export const USER_MANAGEMENT = 'users';
 
+export const AUTH_MANAGE = 'auth';
 export const RISK_ROUTES = {
     SEND_TO_USERS_QUESTIONNAIRE: `${RISK_PROFILE}/send/questionaries-to-users`,
     USER_RESPONSE: `${RISK_PROFILE}/user-response`,
@@ -23,3 +24,9 @@ export const USER_MANAGE_ROUTES = {
     GET_ALL_USERS: `${USER_MANAGEMENT}/get-all-users`,
     UPLOAD_PORTFOLIO: `${USER_MANAGEMENT}/user/portfolio-upload`
 }
+export const AUTH_ROUTES = {
+    LOGIN: `${AUTH_MANAGE}/login`,
+    LOGOUT: `${AUTH_MANAGE}/logout`
+}
+
+

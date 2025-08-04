@@ -36,9 +36,8 @@ export default function ClientLayoutWrapper({ children, token }) {
     const { isAuthorized, user } = useAuth();
 
     if (!isAuthorized) {
-        return <>{children}</>; // No sidebar for unauthorized users
+        return <>{children}</>;
     }
-    // Show sidebar for all pages when authorized
     return (
         <div className="flex h-screen w-screen overflow-hidden">
             <Sidebar user={user} />
