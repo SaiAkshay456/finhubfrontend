@@ -7,12 +7,10 @@ import axiosInstance from '@/helpers/axios';
 export default async function BasketLayout({ children }) {
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
-
+    console.log(cookieStore.getAll())
     if (!token) {
         redirect('/login');
     }
-
-    // Get current path from pathname (can also be hardcoded per layout)
     const currentPath = '/baskets'; // or get from route segment
 
     // Find label based on current path
