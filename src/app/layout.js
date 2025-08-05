@@ -12,7 +12,7 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }) {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
   console.log(token)
   let user = null;
@@ -24,6 +24,7 @@ export default async function RootLayout({ children }) {
           Authorization: `Bearer ${token}`
         },
       });
+      console.log(data)
       console.log(data.user);
       isAuthorized = true;
       user = data.user
