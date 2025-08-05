@@ -20,7 +20,6 @@ export default function Sidebar({ user, children }) {
     const handleLogoutUser = async () => {
         try {
             const res = await axiosInstance.get(`${API_BASE}/${AUTH_ROUTES.LOGOUT}`, {
-                withCredentials: true,
             });
             setUser(null);
             setIsAuthorized(false);
