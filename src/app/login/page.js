@@ -36,16 +36,8 @@ export default function LoginForm() {
             );
             setUser(res.data.user);
             setIsAuthorized(true);
-            const getCookie = (name) => {
-                const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-                return match ? decodeURIComponent(match[2]) : null;
-            };
-
-            const callbackUrl = getCookie('callBackUrl') || "/";
-            console.log(callbackUrl, "line 50");
-            localStorage.setItem('clearCallBackCookie', 'true');
             // Redirect to the stored callback URL
-            router.replace(callbackUrl);
+            router.replace("/");
             setIsLoading(false)
 
         } catch (err) {
