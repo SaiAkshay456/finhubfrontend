@@ -21,7 +21,7 @@ export async function fetchQuestionnaires(token) {
     }
 }
 export default async function AllUsersPage({ searchParams }) {
-    const cookieStore = await cookies()
+    const cookieStore = cookies()
     const token = cookieStore.get("token")?.value
     if (!token) {
         return (
