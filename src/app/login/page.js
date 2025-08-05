@@ -5,6 +5,7 @@ import { useAuth } from '../../providers/AuthProvider';
 import { Mail, Lock, EyeOff, Info, Eye } from "lucide-react";
 import axiosInstance from '@/helpers/axios';
 import Link from 'next/link';
+import axios from "axios"
 import { API_BASE, AUTH_ROUTES } from '@/helpers/apiRoutes';
 
 export default function LoginForm() {
@@ -25,8 +26,8 @@ export default function LoginForm() {
         setIsLoading(true);
 
         try {
-            const res = await axiosInstance.post(
-                `${API_BASE}/${AUTH_ROUTES.LOGIN}`,
+            const res = await axios.post(
+                `https://finhub-backend.onrender.com${API_BASE}/${AUTH_ROUTES.LOGIN}`,
                 form,
                 {
                     headers: {

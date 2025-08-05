@@ -3,7 +3,6 @@ export const API_BASE = '/v1';
 export const RISK_PROFILE = `riskprofile`;
 
 export const USER_MANAGEMENT = 'users';
-
 export const AUTH_MANAGE = 'auth';
 export const RISK_ROUTES = {
     SEND_TO_USERS_QUESTIONNAIRE: `${RISK_PROFILE}/send/questionaries-to-users`,
