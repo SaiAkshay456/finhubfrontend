@@ -12,10 +12,6 @@ export default async function Layout({ children }) {
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
 
-    if (!token) {
-        redirect('/login');
-    }
-
     // Get current path from pathname (can also be hardcoded per layout)
     const currentPath = '/users'; // or get from route segment
 
