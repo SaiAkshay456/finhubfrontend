@@ -5,15 +5,14 @@ import { redirect } from 'next/navigation';
 import axiosInstance from '@/helpers/axios';
 
 export default async function BasketLayout({ children }) {
-    const cookieStore = await cookies();
+    const cookieStore = cookies();
     const token = cookieStore.get('token')?.value;
 
     if (!token) {
         redirect('/login');
     }
-    const currentPath = '/riskprofile'; // or get from route segment
+    const currentPath = '/riskprofile';
 
-    // Find label based on current path
     const matched = sidebarItems.find(item => item.path === currentPath);
     const label = matched?.label;
 

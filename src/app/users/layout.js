@@ -9,7 +9,7 @@ export const metadata = {
 };
 
 export default async function Layout({ children }) {
-    const cookieStore = await cookies();
+    const cookieStore = cookies();
     const token = cookieStore.get('token')?.value;
     console.log(token, "14 line")
 
@@ -38,9 +38,8 @@ export default async function Layout({ children }) {
         }
     } catch (err) {
         if (err.response?.status === 401) {
-            console.log("41 line")
+            console.log("41 line", err)
             redirect('/unauthorized');
-
         } else {
             console.error('Access check failed:', err);
         }

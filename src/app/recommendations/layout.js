@@ -10,7 +10,7 @@ export const metadata = {
 };
 
 export default async function Layout({ children }) {
-    const cookieStore = await cookies();
+    const cookieStore = cookies();
     const token = cookieStore.get('token')?.value;
 
     if (!token) {

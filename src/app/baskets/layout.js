@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import axiosInstance from '@/helpers/axios';
 
 export default async function BasketLayout({ children }) {
-    const cookieStore = await cookies();
+    const cookieStore = cookies();
     const token = cookieStore.get('token')?.value;
     console.log(cookieStore.getAll())
     if (!token) {

@@ -154,7 +154,7 @@ export const sidebarItems = [
 // }
 
 // export default async function AllUsersPage({ searchParams }) {
-//     const cookieStore = await cookies();
+//     const cookieStore = cookies();
 //     const token = cookieStore.get('token')?.value;
 
 //     const searchTerm = await searchParams?.search || '';

@@ -8,7 +8,7 @@ import { API_BASE, RISK_ROUTES } from '@/helpers/apiRoutes';
 
 export default async function EditPage({ params }) {
     const { id } = params;
-    const cookieStore = await cookies();
+    const cookieStore = cookies();
     const token = cookieStore.get('token')?.value;
     let data = null
     let error = null;

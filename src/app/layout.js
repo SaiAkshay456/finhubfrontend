@@ -12,7 +12,7 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }) {
-  const cookieStore = await cookies();
+  const cookieStore = cookies();
   const token = cookieStore.get('token')?.value;
   console.log(token)
   let user = null;
