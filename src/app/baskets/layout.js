@@ -11,17 +11,15 @@ export default async function BasketLayout({ children }) {
     if (!token) {
         redirect('/login');
     }
-    const currentPath = '/baskets'; // or get from route segment
+    const currentPath = '/baskets';
 
-    // Find label based on current path
     const matched = sidebarItems.find(item => item.path === currentPath);
     const label = matched?.label;
 
     if (!label) {
-        redirect('/'); // or 404
+        redirect('/');
     }
 
-    // Send label to backend to check access
     try {
         const { data } = await axiosInstance.post('/v1/permission-route/check-access', { path: label }, {
             headers: {
