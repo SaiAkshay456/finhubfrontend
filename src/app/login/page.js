@@ -96,13 +96,13 @@ export default function LoginForm() {
                                     <stop offset="100%" stopColor="#00b98b" />  Slightly darker green
                                 </linearGradient>
                             </defs>
-                            <path
+                            {/* <path
                                 d="M0,100 C30,80 60,120 90,90 C120,70 150,110 180,80 C210,60 240,100 270,70 C300,50"
                                 fill="none"
                                 stroke="url(#lineGradient)"
                                 strokeWidth="2"
                                 strokeLinecap="round"
-                            />
+                            /> */}
 
                             <rect x="10" y="100" width="10" height="50" fill="#e6faf5" opacity="0.7" />
                             <rect x="40" y="80" width="10" height="70" fill="#d0f5ea" opacity="0.7" />
