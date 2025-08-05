@@ -12,7 +12,6 @@ export default async function Layout({ children }) {
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
 
-    // Get current path from pathname (can also be hardcoded per layout)
     const currentPath = '/users'; // or get from route segment
 
     // Find label based on current path
@@ -29,7 +28,7 @@ export default async function Layout({ children }) {
                 Authorization: `Bearer ${token}`,
             },
         });
-
+        console.log(data)
         if (!data.success) {
             redirect('/unauthorized');
         }

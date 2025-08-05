@@ -17,17 +17,19 @@ export default async function RootLayout({ children }) {
   console.log(token)
   let user = null;
   let isAuthorized = false;
-  try {
-    const { data } = await axiosInstance.post('/v1/auth/login', {}, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
-    });
-    console.log(data.user);
-    isAuthorized = true;
-    user = data.user
-  } catch (err) {
-    console.log('Auth fetch error:', err);
+  if (token) {
+    try {
+      const { data } = await axiosInstance.post('/v1/auth/login', {}, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+      });
+      console.log(data.user);
+      isAuthorized = true;
+      user = data.user
+    } catch (err) {
+      console.log('Auth fetch error:', err);
+    }
   }
   return (
     <html lang="en">
