@@ -28,7 +28,6 @@ export default async function Layout({ children }) {
         const { data } = await axiosInstance.post('/v1/permission-route/check-access', { path: label }, {
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
             },
         });
         console.log(data)
