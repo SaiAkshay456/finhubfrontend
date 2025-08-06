@@ -37,6 +37,7 @@ export default function LoginForm() {
                     }
                 }
             );
+            console.log(res.data)
             setUser(res.data.user);
             setIsAuthorized(true);
             // Redirect to the stored callback URL
@@ -45,6 +46,7 @@ export default function LoginForm() {
 
         } catch (err) {
             setError(err.response?.data.message || 'Login failed. Please try again.');
+            console.log("login err", err)
         } finally {
             setIsLoading(false);
         }
