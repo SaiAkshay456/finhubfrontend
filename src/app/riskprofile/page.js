@@ -7,7 +7,7 @@ import { API_BASE, RISK_ROUTES } from "@/helpers/apiRoutes";
 import { IoTrashOutline } from "react-icons/io5";
 
 export default async function RiskPage() {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
     let questionnaires = [];
     let loading = false;
