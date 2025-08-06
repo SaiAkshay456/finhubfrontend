@@ -13,13 +13,14 @@ export const metadata = {
 
 export default async function RootLayout({ children }) {
   const cookieStore = await cookies();
+  console.log(cookieStore)
   const token = cookieStore.get('token')?.value;
   console.log(token)
   let user = null;
   let isAuthorized = false;
   if (token) {
     try {
-      const { data } = await axiosInstance.get('/v1/auth/login', {});
+      const { data } = await axiosInstance.post('/v1/auth/login', {});
       console.log(data)
       console.log(data.user);
       isAuthorized = true;
