@@ -21,18 +21,18 @@ export async function fetchQuestionnaires(token) {
     }
 }
 export default async function AllUsersPage({ searchParams }) {
-    const cookieStore = cookies()
-    const token = cookieStore.get("token")?.value
-    if (!token) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center p-8 bg-white rounded-lg shadow-md">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">Authentication Required</h2>
-                    <p className="text-gray-600">Please log in to view this page.</p>
-                </div>
-            </div>
-        )
-    }
+    // const cookieStore = cookies()
+    // const token = cookieStore.get("token")?.value
+    // if (!token) {
+    //     return (
+    //         <div className="min-h-screen flex items-center justify-center">
+    //             <div className="text-center p-8 bg-white rounded-lg shadow-md">
+    //                 <h2 className="text-xl font-semibold text-gray-800 mb-4">Authentication Required</h2>
+    //                 <p className="text-gray-600">Please log in to view this page.</p>
+    //             </div>
+    //         </div>
+    //     )
+    // }
 
     const search = searchParams?.search || ""
     const currentPage = Number.parseInt(searchParams?.page || "1")
