@@ -4,6 +4,7 @@ const axiosInstance = axios.create({
     baseURL: "https://finhub-backend.onrender.com",
     withCredentials: true,
 });
+axios.defaults.withCredentials = true;
 
 export default axiosInstance;
 
