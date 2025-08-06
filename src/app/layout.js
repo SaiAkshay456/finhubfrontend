@@ -19,7 +19,7 @@ export default async function RootLayout({ children }) {
   let isAuthorized = false;
   if (token) {
     try {
-      const { data } = await axiosInstance.get('/v1/auth/me');
+      const { data } = await axiosInstance.get('/v1/auth/login', {});
       console.log(data)
       console.log(data.user);
       isAuthorized = true;
