@@ -30,9 +30,10 @@ export default function LoginForm() {
                 `https://finhub-backend.onrender.com${API_BASE}/${AUTH_ROUTES.LOGIN}`,
                 form,
                 {
+                    withCredentials: true,
                     headers: {
                         'Content-Type': 'application/json',
-                        withCredentials: true
+
                     }
                 }
             );
