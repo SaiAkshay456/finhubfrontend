@@ -1,12 +1,14 @@
+// next.config.js
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // ignoreBuildErrors: true,
-    // typescript: {
-    //     ignoreBuildErrors: true,
-    // },
-    // eslint: {
-    //     ignoreDuringBuilds: true,
-    // },
+    output: 'export', // ✅ Required for Netlify static export
+    reactStrictMode: true,
+
+    images: {
+        unoptimized: true, // ✅ Required if you're using <Image /> without image optimization
+    },
+
     async headers() {
         return [
             {
@@ -24,10 +26,6 @@ const nextConfig = {
             },
         ];
     },
-
 };
 
-// next.config.js
-
 export default nextConfig;
-
