@@ -18,7 +18,7 @@ export default async function RootLayout({ children }) {
   let user = null;
   let isAuthorized = false;
   try {
-    const { data } = await axiosInstance.post('/v1/auth/login', {});
+    const { data } = await axiosInstance.get('/v1/auth/me');
     console.log(data)
     console.log(data.user);
     isAuthorized = true;
