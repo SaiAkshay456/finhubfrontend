@@ -8,7 +8,7 @@ export const metadata = {
     description: "Browse and add user here",
 };
 export default async function Layout({ children }) {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
 
     if (!token) {

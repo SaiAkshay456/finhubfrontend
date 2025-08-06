@@ -13,7 +13,6 @@ export default async function UserDetailsPage({ params }) {
     const token = await cookies().get('token')?.value;
     if (!token) redirect('/login');
     let loading = false;
-
     const { id } = params;
     let user, error;
     let kycDetails;

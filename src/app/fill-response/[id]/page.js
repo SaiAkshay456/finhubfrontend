@@ -32,7 +32,7 @@ export default async function FillResponsePage({ params }) {
     const { id } = params;
     if (!id) return <div className="text-red-600">No ID in URL</div>;
 
-    const token = cookies().get("temp_token")?.value;
+    const token = await cookies().get("temp_token")?.value;
 
     if (!token) {
         return (
