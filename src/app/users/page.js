@@ -16,7 +16,7 @@ export async function fetchQuestionnaires(token) {
         const questionnaires = data
         return questionnaires
     } catch (err) {
-        console.error("Error fetching questionnaires:", err)
+        console.log("Error fetching questionnaires:", err)
         return []
     }
 }
@@ -81,7 +81,7 @@ export default async function AllUsersPage({ searchParams }) {
             error = data.message || "Failed to fetch users"
         }
     } catch (err) {
-        console.error("Failed to fetch users:", err)
+        console.log("Failed to fetch users:", err)
         error = "Failed to connect to server"
     } finally {
         loading = false

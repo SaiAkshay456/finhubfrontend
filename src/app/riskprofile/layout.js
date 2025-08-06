@@ -34,9 +34,10 @@ export default async function BasketLayout({ children }) {
         }
     } catch (err) {
         if (err.response?.status === 401) {
+            console.log(err)
             redirect('/unauthorized');
         } else {
-            console.error('Access check failed:', err);
+            console.log('Access check failed:', err);
         }
     }
 
