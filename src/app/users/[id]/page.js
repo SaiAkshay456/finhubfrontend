@@ -136,7 +136,7 @@ export default async function UserDetailsPage({ params }) {
                 {/* KYC Form */}
                 {!user.status.isKycCompleted && (
                     <div className="mb-8">
-                        <KycFormUser userId={user._id} token={token} />
+                        <KycFormUser userId={user._id} />
                     </div>
                 )}
 

@@ -148,7 +148,6 @@ export default function RecommendationTable() {
     )
 
     if (!confirmed) return
-
     try {
       const { data } = await axiosInstance.patch(
         `/v1/recommendations/updateStatus/${id}`,
@@ -250,10 +249,10 @@ export default function RecommendationTable() {
     return (
       <span
         className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-medium ${risk === 'Low'
-            ? 'bg-green-100 text-green-700'
-            : risk === 'Medium'
-              ? 'bg-yellow-100 text-yellow-700'
-              : 'bg-red-100 text-red-700'
+          ? 'bg-green-100 text-green-700'
+          : risk === 'Medium'
+            ? 'bg-yellow-100 text-yellow-700'
+            : 'bg-red-100 text-red-700'
           }`}
       >
         {getRiskIcon(risk)}
@@ -268,10 +267,10 @@ export default function RecommendationTable() {
     return (
       <span
         className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-medium ${action === 'Buy'
-            ? 'bg-green-100 text-green-700'
-            : action === 'Sell'
-              ? 'bg-red-100 text-red-700'
-              : 'bg-yellow-100 text-yellow-700'
+          ? 'bg-green-100 text-green-700'
+          : action === 'Sell'
+            ? 'bg-red-100 text-red-700'
+            : 'bg-yellow-100 text-yellow-700'
           }`}
       >
         {getActionIcon(action)}
@@ -287,8 +286,8 @@ export default function RecommendationTable() {
       <button
         onClick={() => handleStatusToggle(rec._id, rec.status)}
         className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-medium transition-colors ${rec.status === 'Active'
-            ? 'bg-green-100 text-green-700 hover:bg-green-200'
-            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          ? 'bg-green-100 text-green-700 hover:bg-green-200'
+          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
           }`}
         title="Click to toggle status"
       >

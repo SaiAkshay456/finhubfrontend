@@ -161,7 +161,7 @@ export default async function RiskProfileOfUser({ params }) {
                                     <p className="text-gray-600 text-sm">Assign a risk category based on the responses</p>
                                 </div>
                             </div>
-                            <AssignRiskCategory userId={params.id} token={token} />
+                            <AssignRiskCategory userId={params.id} />
                         </div>
                     </div>
                 )}

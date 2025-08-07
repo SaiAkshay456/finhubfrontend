@@ -2,7 +2,7 @@
 import axiosInstance from '@/helpers/axios';
 import { useState } from 'react';
 import Select from 'react-select';
-export default function AssignRiskCategory({ userId, token }) {
+export default function AssignRiskCategory({ userId }) {
     const [selectedOption, setSelectedOption] = useState(null);
     const [msg, setMsg] = useState('');
     const [loading, setLoading] = useState(false);
@@ -28,7 +28,6 @@ export default function AssignRiskCategory({ userId, token }) {
                 {
                     headers: {
                         'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`
                     }
                 }
             );

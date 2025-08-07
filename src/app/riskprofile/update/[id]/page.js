@@ -1,6 +1,5 @@
 import { cookies } from 'next/headers';
 import UpdateQuestionnaireForm from './UpdateForm';
-import { AxiosError } from 'axios';
 import axiosInstance from '@/helpers/axios';
 import { API_BASE, RISK_ROUTES } from '@/helpers/apiRoutes';
 // import QuestionnaireEditClient from './QuestionnaireEditClient';
@@ -8,7 +7,7 @@ import { API_BASE, RISK_ROUTES } from '@/helpers/apiRoutes';
 
 export default async function EditPage({ params }) {
     const { id } = params;
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
     let data = null
     let error = null;
@@ -43,6 +42,6 @@ export default async function EditPage({ params }) {
     console.log(data.questions)//once clg and see
     const questionnaire = data.questions
     return (
-        <UpdateQuestionnaireForm questionnaire={questionnaire} token={token} />
+        <UpdateQuestionnaireForm questionnaire={questionnaire} />
     );
 }

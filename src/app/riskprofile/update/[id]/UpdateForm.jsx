@@ -6,7 +6,7 @@ import axiosInstance from '@/helpers/axios';
 import { API_BASE, RISK_ROUTES } from '@/helpers/apiRoutes';
 
 
-export default function UpdateQuestionnaireForm({ questionnaire, token }) {
+export default function UpdateQuestionnaireForm({ questionnaire }) {
     const [questions, setQuestions] = useState(questionnaire.questions || []);
     const [currentSlide, setCurrentSlide] = useState(0);
     const [msg, setMsg] = useState('');
@@ -95,7 +95,6 @@ export default function UpdateQuestionnaireForm({ questionnaire, token }) {
             const { data } = await axiosInstance.put(`${API_BASE}/${RISK_ROUTES.UPDATE_QUESTIONNARIE}/${questionnaire._id}`, { title, questions }, {
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
                 },
             });
             if (data.success) {

@@ -39,7 +39,7 @@ const getColor = (isActive) => {
     return "bg-red-100 text-red-800";
 };
 
-export default function TableOfUser({ users, questionnaires, token }) {
+export default function TableOfUser({ users, questionnaires }) {
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [moreSelectedUsers, setMoreSelectedUsers] = useState([]);
     const [selectedQuestionnaire, setSelectedQuestionnaire] = useState(null);
@@ -128,7 +128,6 @@ export default function TableOfUser({ users, questionnaires, token }) {
                 {
                     headers: {
                         'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`,
                     },
                 }
             );

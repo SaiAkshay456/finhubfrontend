@@ -233,7 +233,7 @@ export default async function AllUsersPage({ searchParams }) {
                     ) : (
                         <div className="overflow-x-auto">
 
-                            <TableOfUser users={users} token={token} questionnaires={questionarriesArray} />
+                            <TableOfUser users={users} questionnaires={questionarriesArray} />
                         </div>
                     )}
                 </div>

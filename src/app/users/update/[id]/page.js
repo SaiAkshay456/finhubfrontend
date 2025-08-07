@@ -39,7 +39,7 @@ export default async function UpdateUserPage({ params }) {
 
     return (
         <div className="max-w-3xl mx-auto p-6 rounded">
-            <UpdateUserForm user={data.user} token={token} />
+            <UpdateUserForm user={data.user} />
         </div>
     );
 }

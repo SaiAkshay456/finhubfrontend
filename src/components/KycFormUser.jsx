@@ -5,7 +5,7 @@ import { isAtLeast18 } from '../constants/dobValidation';
 import { API_BASE, USER_MANAGE_ROUTES } from '@/helpers/apiRoutes';
 import axiosInstance from '@/helpers/axios';
 
-export default function KycFormUser({ userId, token }) {
+export default function KycFormUser({ userId }) {
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -47,7 +47,6 @@ export default function KycFormUser({ userId, token }) {
                 formPayload
                 , {
                     headers: {
-                        Authorization: `Bearer ${token}`,
                         'Content-Type': 'multipart/form-data' // if protected
                     },
                     // if using cookies (optional
