@@ -13,9 +13,9 @@ export const metadata = {
 
 export default async function RootLayout({ children }) {
   const cookieStore = await cookies();
-  console.log(cookieStore)
+  console.log("store at layout.js", cookieStore)
   const token = cookieStore.get('token')?.value;
-  console.log(token)
+  console.log("token at layout.js", token)
   let user = null;
   let isAuthorized = false;
   if (token) {
