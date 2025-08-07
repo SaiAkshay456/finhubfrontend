@@ -33,14 +33,12 @@ export default function LoginForm() {
                     withCredentials: true,
                     headers: {
                         'Content-Type': 'application/json',
-
                     }
                 }
             );
             console.log(res.data)
             setUser(res.data.user);
             setIsAuthorized(true);
-            // Redirect to the stored callback URL
             router.replace("/");
             setIsLoading(false)
 
