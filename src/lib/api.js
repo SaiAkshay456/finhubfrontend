@@ -1,14 +1,12 @@
 import { cookies } from 'next/headers';
 import axios from 'axios';
 
-const baseURL = "https://finhub-backend.onrender.com";
-const headers = { 'Content-Type': 'application/json' };
-
 const serverAxios = axios.create({
-    baseURL,
-    headers,
+    baseURL: 'https://finhub-backend.onrender.com',
+    headers: {
+        'Content-Type': 'application/json',
+    },
 });
-
 
 export async function fetchWithAuth(url, options = {}) {
     const cookieStore = cookies();
@@ -34,4 +32,3 @@ export async function fetchWithAuth(url, options = {}) {
         return { data: null, error: error.response?.data };
     }
 }
-
