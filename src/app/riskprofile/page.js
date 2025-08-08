@@ -146,8 +146,8 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import AssignRiskCategory from '../../../components/AssignRiskCategory';
 import { API_BASE, RISK_ROUTES } from '@/helpers/apiRoutes';
-import clientAxiosInstance from '@/lib/clientApi';
-import { cookies } from 'next/headers';
+import clientAxiosInstance from '@/lib/clientAxios';
+
 
 export default function RiskProfileOfUser({ params }) {
     const [responses, setResponses] = useState(null);
