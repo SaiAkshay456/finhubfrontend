@@ -141,7 +141,7 @@
 // }
 
 'use client';
-
+import { useParams } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import AssignRiskCategory from '../../components/AssignRiskCategory';
@@ -150,6 +150,7 @@ import clientAxiosInstance from '@/lib/clientAxios';
 
 
 export default function RiskProfileOfUser({ params }) {
+    const { id } = useParams();
     const [responses, setResponses] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -161,7 +162,7 @@ export default function RiskProfileOfUser({ params }) {
             setLoading(true);
             try {
                 // Use the client-side axios instance to make the API call
-                const { data } = await clientAxiosInstance.get(`${API_BASE}/${RISK_ROUTES.USER_RESPONSE}/${params.id}`);
+                const { data } = await clientAxiosInstance.get(`${API_BASE}/${RISK_ROUTES.USER_RESPONSE}/${id}`);
 
                 if (data.success) {
                     setResponses(data.data || []);
