@@ -2,8 +2,8 @@
 
 import { useTransition, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import axiosInstance from '@/helpers/axios';
 import { API_BASE, RISK_ROUTES } from '@/helpers/apiRoutes';
+import clientAxiosInstance from '@/lib/clientAxios';
 
 export default function DupliacateQuestionarreButton({ questionId }) {
     const router = useRouter();
@@ -12,7 +12,7 @@ export default function DupliacateQuestionarreButton({ questionId }) {
 
     const handleDuplicate = async () => {
         try {
-            const { data } = await axiosInstance.post(`${API_BASE}/${RISK_ROUTES.DUPLICATE_QUESTIONNARIE}/${questionId}`, {
+            const { data } = await clientAxiosInstance.post(`${API_BASE}/${RISK_ROUTES.DUPLICATE_QUESTIONNARIE}/${questionId}`, {
                 headers: {
                     'Content-Type': 'application/json',
                 }

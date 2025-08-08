@@ -1,10 +1,8 @@
 
 import { sidebarItems } from '../../constants/sidebarRoutes';
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import axiosInstance from '@/helpers/axios';
-
-export default async function BasketLayout({ children }) {
+import { fetchWithAuth } from '@/lib/api';
+export default async function RiskProfileLayout({ children }) {
     const currentPath = '/riskprofile';
     const matched = sidebarItems.find(item => item.path === currentPath);
     const label = matched?.label;
@@ -13,11 +11,10 @@ export default async function BasketLayout({ children }) {
         redirect('/');
     }
     try {
-        const { data } = await axiosInstance.post('/v1/permission-route/check-access', { path: label }, {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+        const { data, error } = await fetchWithAuth('/v1/permission-route/check-access', {
+            method: 'POST',
+            data: { path: label }
+        })
 
         if (!data.success) {
             redirect('/unauthorized');

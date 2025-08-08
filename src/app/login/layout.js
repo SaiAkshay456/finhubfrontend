@@ -1,9 +1,11 @@
-import { cookies } from 'next/headers';
-// import LoginForm from '../../features/auth/LoginForm';
+import { useAuth } from '../../providers/AuthProvider';
+import { useRouter } from 'next/navigation';
 export default async function LoginLayout({ children }) {
-    // const cookieStore = await cookies();
-    // const token = cookieStore.get('token')?.value;
-    // console.log("Token :", token)
+    const { isAuthorized } = useAuth();
+    const router = useRouter();
+    if (isAuthorized) {
+        router.push('/'); // Redirect to home if already logged in
+    }
     return <>
         {children}
     </>

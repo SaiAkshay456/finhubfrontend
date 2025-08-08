@@ -1,11 +1,8 @@
 
 import { sidebarItems } from '../../constants/sidebarRoutes';
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 // import axiosInstance from '@/helpers/axios';
 import { fetchWithAuth } from '@/lib/api';
-// import axios from 'axios';
-import { method } from 'lodash';
 
 
 export default async function BasketLayout({ children }) {
