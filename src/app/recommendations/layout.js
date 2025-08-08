@@ -12,6 +12,8 @@ export const metadata = {
 export default async function Layout({ children }) {
     const currentPath = '/recommendations';
     let loading = false
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
     const matched = sidebarItems.find(item => item.path === currentPath);
     const label = matched?.label;
 
