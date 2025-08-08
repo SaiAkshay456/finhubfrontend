@@ -18,7 +18,7 @@ export async function fetchQuestionnaires(token) {
         //         Authorization: `Bearer ${token}`,
         //     },
         // })
-        const questionnaires = data
+        const questionnaires = data || []
         return questionnaires
     } catch (err) {
         console.log("Error fetching questionnaires:", err)

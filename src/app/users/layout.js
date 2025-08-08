@@ -1,8 +1,7 @@
-import axiosInstance from '@/helpers/axios';
 import { sidebarItems } from '../../constants/sidebarRoutes';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-
+import { fetchWithAuth } from '@/lib/api';
 export const metadata = {
     title: "Users Page",
     description: "Browse and manage users",
