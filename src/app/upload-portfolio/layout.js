@@ -1,7 +1,7 @@
 import { sidebarItems } from '../../constants/sidebarRoutes';
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import axiosInstance from '@/helpers/axios';
+// import axiosInstance from '@/helpers/axios';
+import { fetchWithAuth } from '@/lib/api';
 export default async function PortfolioLayout({ children }) {
     const currentPath = '/upload-portfolio';
     const matched = sidebarItems.find(item => item.path === currentPath);
@@ -12,13 +12,17 @@ export default async function PortfolioLayout({ children }) {
     let loading = false;
     try {
         loading = true
-        const { data } = await axiosInstance.post('/v1/permission-route/check-access', { path: label }, {
-            headers: {
-                'Content-Type': 'application/json',
+        const { data, error } = await fetchWithAuth('/v1/permission-route/check-access', {
+            method: 'POST',
+            data: { path: label }
+        }
+        )
+        // const { data } = await axiosInstance.post('/v1/permission-route/check-access', { path: label }, {
+        //     headers: {
+        //         'Content-Type': 'application/json',
 
-            },
-        });
-
+        //     },
+        // });
         if (!data.success) {
             redirect('/unauthorized');
         }
