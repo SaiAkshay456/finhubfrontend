@@ -3,13 +3,13 @@ import { sidebarItems } from '../../constants/sidebarRoutes';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 // import axiosInstance from '@/helpers/axios';
-import axios from 'axios';
+import { fetchWithAuth } from '@/lib/api';
+// import axios from 'axios';
+import { method } from 'lodash';
 
 
 export default async function BasketLayout({ children }) {
     const currentPath = '/baskets';
-    const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
     const matched = sidebarItems.find(item => item.path === currentPath);
     const label = matched?.label;
 
@@ -17,13 +17,10 @@ export default async function BasketLayout({ children }) {
         redirect('/');
     }
     try {
-        const { data } = await axios.post('https://finhub-backend.onrender.com/v1/permission-route/check-access', { path: label }, {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-        });
-
+        const { data, error } = await fetchWithAuth('/v1/permission-route/check-access', {
+            method: 'POST',
+            data: { path: label }
+        })
         if (!data.success) {
             redirect('/unauthorized');
         }
