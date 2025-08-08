@@ -18,17 +18,16 @@ export default async function RootLayout({ children }) {
   console.log("token at layout.js", token)
   let user = null;
   let isAuthorized = false;
-  if (token) {
-    try {
-      const { data } = await axiosInstance.post('/v1/auth/login', {});
-      console.log(data)
-      console.log(data.user);
-      isAuthorized = true;
-      user = data.user
-    } catch (err) {
-      console.log('Auth fetch error:', err);
-    }
+  try {
+    const { data } = await axiosInstance.post('/v1/auth/login', {});
+    console.log(data)
+    console.log(data.user);
+    isAuthorized = true;
+    user = data.user
+  } catch (err) {
+    console.log('Auth fetch error:', err);
   }
+
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>

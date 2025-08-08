@@ -5,12 +5,6 @@ import { redirect } from 'next/navigation';
 import axiosInstance from '@/helpers/axios';
 
 export default async function BasketLayout({ children }) {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
-    console.log(cookieStore.getAll())
-    if (!token) {
-        redirect('/login');
-    }
     const currentPath = '/baskets';
 
     const matched = sidebarItems.find(item => item.path === currentPath);

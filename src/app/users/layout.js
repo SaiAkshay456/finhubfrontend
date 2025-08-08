@@ -12,15 +12,13 @@ export default async function Layout({ children }) {
     const token = cookieStore.get('token')?.value;
     console.log(token, "14 line")
 
-    const currentPath = '/users'; // or get from route segment
+    const currentPath = '/users';
     console.log(token, "17 line")
-    // Find label based on current path
     const matched = sidebarItems.find(item => item.path === currentPath);
     const label = matched?.label;
     console.log(token, "2 line")
-
     if (!label) {
-        redirect('/'); // or 404
+        redirect('/');
     }
     try {
         console.log(token, "27 line")

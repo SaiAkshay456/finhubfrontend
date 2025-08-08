@@ -10,15 +10,7 @@ export const metadata = {
 };
 
 export default async function Layout({ children }) {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
-
-    if (!token) {
-        redirect('/login');
-    }
-    const currentPath = '/recommendations'; // or get from route segment
-
-    // Find label based on current path
+    const currentPath = '/recommendations';
     let loading = false
     const matched = sidebarItems.find(item => item.path === currentPath);
     const label = matched?.label;
