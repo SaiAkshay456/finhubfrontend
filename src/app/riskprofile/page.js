@@ -166,7 +166,7 @@ export default function RiskPage() {
                     setError(data.message || "Failed to fetch questionnaires");
                 }
             } catch (err) {
-                console.error("Error fetching questionnaires:", err);
+                console.log("Error fetching questionnaires:", err);
                 setError("Failed to connect to server.");
             } finally {
                 setLoading(false);
