@@ -266,7 +266,7 @@ import PaginationLayout from '@/components/PaginationLayout';
 import BasketSearchDebounce from '@/components/BasketSearchDebounce';
 import TableOfUser from '@/components/TableOfUser';
 import { ArrowUp } from 'lucide-react';
-import clientAxiosInstance from '@/lib/clientApi';
+import clientAxiosInstance from '@/lib/clientAxios';
 import { API_BASE, RISK_ROUTES, USER_MANAGE_ROUTES } from '@/helpers/apiRoutes';
 
 export default function AllUsersPage({ searchParams }) {

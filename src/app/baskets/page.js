@@ -133,7 +133,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import BasketModalTrigger from '@/components/BasketModalTrigger';
 import ShowRecommendation from '@/components/ShowRecommendation';
-import clientAxiosInstance from '@/lib/clientApi'; // Use the client-side Axios instance
+import clientAxiosInstance from '@/lib/clientAxios'; // Use the client-side Axios instance
 import { API_BASE, RISK_ROUTES, USER_MANAGE_ROUTES } from '@/helpers/apiRoutes';
 
 export default function BasketsTable() {
