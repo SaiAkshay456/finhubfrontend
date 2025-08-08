@@ -2,7 +2,8 @@
 import { sidebarItems } from '../../constants/sidebarRoutes';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import axiosInstance from '@/helpers/axios';
+// import axiosInstance from '@/helpers/axios';
+import axios from 'axios';
 
 export default async function BasketLayout({ children }) {
     const currentPath = '/baskets';
@@ -15,10 +16,9 @@ export default async function BasketLayout({ children }) {
     }
 
     try {
-        const { data } = await axiosInstance.post('/v1/permission-route/check-access', { path: label }, {
+        const { data } = await axios.post('/v1/permission-route/check-access', { path: label }, {
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
             },
         });
 
