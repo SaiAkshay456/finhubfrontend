@@ -141,7 +141,7 @@
 // }
 
 'use client';
-import { use } from 'next/navigation';
+import { use, useParams } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import AssignRiskCategory from '../../components/AssignRiskCategory';
@@ -150,7 +150,7 @@ import clientAxiosInstance from '@/lib/clientAxios';
 
 
 export default function RiskProfileOfUser() {
-    const { id } = use();
+    const { id } = useParams();
     const [responses, setResponses] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
