@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import axiosInstance from '@/helpers/axios';
 import { API_BASE, USER_MANAGE_ROUTES } from '@/helpers/apiRoutes';
+import clientAxiosInstance from '@/lib/clientAxios';
 
 export default function UpdateUserForm({ user, token }) {
     const router = useRouter();
@@ -111,7 +112,7 @@ export default function UpdateUserForm({ user, token }) {
         }
 
         try {
-            const { data } = await axiosInstance.put(
+            const { data } = await clientAxiosInstance.put(
                 `${API_BASE}/${USER_MANAGE_ROUTES.USER_UPDATE}/${user._id}`,
                 sendData,
                 {

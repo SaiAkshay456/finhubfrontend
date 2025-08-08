@@ -2,18 +2,15 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 // import UpdateUserForm from '@/components/UpdateUserForm'; // You'll create this next
 import UpdateUserForm from '../../../../components/UpdateUserForm';
-import axiosInstance from '@/helpers/axios';
 import { API_BASE, USER_MANAGE_ROUTES } from '@/helpers/apiRoutes';
+import clientAxiosInstance from '@/lib/clientAxios';
 export default async function UpdateUserPage({ params }) {
-    const token1 = await cookies()
-    const token = token1.get('token')?.value;
-    if (!token) redirect('/login');
     const { id } = params;
     let loading = false;
     let data = null;
     try {
         loading = true;
-        const res = await axiosInstance.get(`${API_BASE}/${USER_MANAGE_ROUTES.GET_USER_DETAILS}/${id}`, {
+        const res = await clientAxiosInstance.get(`${API_BASE}/${USER_MANAGE_ROUTES.GET_USER_DETAILS}/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
         });
         data = res.data

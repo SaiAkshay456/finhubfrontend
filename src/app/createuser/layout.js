@@ -1,19 +1,11 @@
-import axiosInstance from '@/helpers/axios';
 import { sidebarItems } from '../../constants/sidebarRoutes';
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-
+import { fetchWithAuth } from '@/lib/api';
 export const metadata = {
     title: "Add User Page",
     description: "Browse and add user here",
 };
 export default async function Layout({ children }) {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
-
-    if (!token) {
-        redirect('/login');
-    }
     const currentPath = '/createuser'; // or get from route segment
 
     const matched = sidebarItems.find(item => item.path === currentPath);
@@ -23,12 +15,10 @@ export default async function Layout({ children }) {
         redirect('/'); // or 404
     }
     try {
-        const { data } = await axiosInstance.post('/v1/permission-route/check-access', { path: label }, {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-        });
+        const { data, error } = await fetchWithAuth('/v1/permission-route/check-access', {
+            method: 'POST',
+            data: { path: label }
+        })
 
         if (!data.success) {
             redirect('/unauthorized');

@@ -79,6 +79,7 @@ export default function RecommendationTable() {
         )
         const result = await response.json()
         const tick = result?.tick
+        console.log("Tick data:82", tick)
         if (!tick) return null
         const price =
           typeof tick.last_price === 'number'

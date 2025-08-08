@@ -9,17 +9,15 @@ import { SubscriptionModal } from "@/components/SubscriptionModal";
 import UserExtraSections from "../../../components/UserExtraSections";
 import PortfolioUpload from "../../../components/PortfolioUpload"
 import KycModal from "@/components/KycModal";
+import clientAxiosInstance from "@/lib/clientAxios";
 export default async function UserDetailsPage({ params }) {
-    const token = await cookies().get('token')?.value;
-    if (!token) redirect('/login');
     let loading = false;
     const { id } = params;
     let user, error;
     let kycDetails;
     try {
         loading = true;
-        const { data } = await axiosInstance.get(`${API_BASE}/${USER_MANAGE_ROUTES.GET_USER_DETAILS}/${id}`, {
-            headers: { Authorization: `Bearer ${token}` },
+        const { data } = await clientAxiosInstance.get(`${API_BASE}/${USER_MANAGE_ROUTES.GET_USER_DETAILS}/${id}`, {
         });
         user = data.success ? data.user : null;
         kycDetails = data.success ? data.kycDetails : null;

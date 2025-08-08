@@ -73,6 +73,7 @@ export const useRecommendationsData = () => {
                         price = res.data.data.nav;
                     }
                     prices[rec.mutualFund] = price;
+                    console.log(`[fetchAllCMPs] Price for ${rec.name}:`, prices);
                 } catch (error) {
                     console.error(
                         `[fetchAllCMPs] Error for ${rec.name}:`,

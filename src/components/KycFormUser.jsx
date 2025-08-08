@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { isAtLeast18 } from '../constants/dobValidation';
 import { API_BASE, USER_MANAGE_ROUTES } from '@/helpers/apiRoutes';
-import axiosInstance from '@/helpers/axios';
+import clientAxiosInstance from '@/lib/clientAxios';
 
 export default function KycFormUser({ userId }) {
     const [formData, setFormData] = useState({
@@ -43,7 +43,7 @@ export default function KycFormUser({ userId }) {
             formPayload.append('address', formData.address);
             formPayload.append('aadharFile', formData.aadharFile);
             formPayload.append('panFile', formData.panFile);
-            const res = await axiosInstance.put(`${API_BASE}/${USER_MANAGE_ROUTES.KYC_VERIFY_USER}/${userId}`,
+            const res = await clientAxiosInstance.put(`${API_BASE}/${USER_MANAGE_ROUTES.KYC_VERIFY_USER}/${userId}`,
                 formPayload
                 , {
                     headers: {

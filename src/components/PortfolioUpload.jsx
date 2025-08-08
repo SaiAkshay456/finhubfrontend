@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import axiosInstance from '@/helpers/axios';
 import { API_BASE, USER_MANAGE_ROUTES } from '@/helpers/apiRoutes';
+import clientAxiosInstance from '@/lib/clientAxios';
 
 export default function PortfolioUpload({ userId }) {
     const [file, setFile] = useState(null);
@@ -22,7 +23,7 @@ export default function PortfolioUpload({ userId }) {
         formData.append("portfolioFile", file);
         try {
             setUploading(true);
-            await axiosInstance.put(`${API_BASE}/${USER_MANAGE_ROUTES.UPLOAD_PORTFOLIO}/${userId}`, formData);
+            await clientAxiosInstance.put(`${API_BASE}/${USER_MANAGE_ROUTES.UPLOAD_PORTFOLIO}/${userId}`, formData);
             setSuccess(true);
             setFile(null);
         } catch (err) {
