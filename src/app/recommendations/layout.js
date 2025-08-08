@@ -1,8 +1,7 @@
 // app/recommendations/layout.js
-import Sidebar from '../../components/Sidebar';
+
 import { sidebarItems } from '../../constants/sidebarRoutes';
-import { cookies } from 'next/headers';
-import axiosInstance from '@/helpers/axios';
+import { fetchWithAuth } from '@/lib/api';
 import { redirect } from 'next/navigation';
 export const metadata = {
     title: "Recommendations",
@@ -12,8 +11,6 @@ export const metadata = {
 export default async function Layout({ children }) {
     const currentPath = '/recommendations';
     let loading = false
-    const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
     const matched = sidebarItems.find(item => item.path === currentPath);
     const label = matched?.label;
 
@@ -24,12 +21,10 @@ export default async function Layout({ children }) {
     // Send label to backend to check access
     try {
         loading = true
-        const { data } = await axiosInstance.post('/v1/permission-route/check-access', { path: label }, {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-        });
+        const { data, error } = await fetchWithAuth('/v1/permission-route/check-access', {
+            method: 'POST',
+            data: { path: label }
+        })
 
         if (!data.success) {
             redirect('/unauthorized');
