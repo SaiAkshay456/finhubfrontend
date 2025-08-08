@@ -14,9 +14,8 @@ export default async function BasketLayout({ children }) {
     if (!label) {
         redirect('/');
     }
-
     try {
-        const { data } = await axios.post('/v1/permission-route/check-access', { path: label }, {
+        const { data } = await axios.post('https://finhub-backend.onrender.com/v1/permission-route/check-access', { path: label }, {
             headers: {
                 'Content-Type': 'application/json',
             },
