@@ -11,11 +11,10 @@ const serverAxios = axios.create({
 export async function fetchWithAuth(url, options = {}) {
     const cookieStore = cookies();
     const token = cookieStore.get('token')?.value;
-
+    console.log(token, "Token from cookies");
     if (!token) {
         return { data: null, error: 'Unauthorized: No token provided' };
     }
-
     try {
         const response = await serverAxios({
             method: options.method || 'GET',
