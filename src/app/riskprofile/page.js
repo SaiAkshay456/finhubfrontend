@@ -149,7 +149,7 @@ import { API_BASE, RISK_ROUTES } from '@/helpers/apiRoutes';
 import clientAxiosInstance from '@/lib/clientAxios';
 
 
-export default function RiskProfileOfUser({ params }) {
+export default function RiskProfileOfUser() {
     const { id } = useParams();
     const [responses, setResponses] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -181,7 +181,7 @@ export default function RiskProfileOfUser({ params }) {
             }
         };
 
-        if (params.id) {
+        if (id) {
             fetchResponses();
         }
     }, [params.id, router]);
