@@ -1,7 +1,7 @@
 "use client";
 import { useAuth } from '../../providers/AuthProvider';
 import { useRouter } from 'next/navigation';
-export default async function LoginLayout({ children }) {
+export default function LoginLayout({ children }) {
     const { isAuthorized } = useAuth();
     const router = useRouter();
     if (isAuthorized) {
