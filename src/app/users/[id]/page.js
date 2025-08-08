@@ -1,9 +1,7 @@
-
-import { cookies } from "next/headers";
-import { redirect } from 'next/navigation';
+"use client";
 import KycFormUser from "../../../components/KycFormUser";
 import Link from "next/link";
-import axiosInstance from "@/helpers/axios";
+
 import { API_BASE, USER_MANAGE_ROUTES } from "@/helpers/apiRoutes";
 import { SubscriptionModal } from "@/components/SubscriptionModal";
 import UserExtraSections from "../../../components/UserExtraSections";
@@ -17,8 +15,7 @@ export default async function UserDetailsPage({ params }) {
     let kycDetails;
     try {
         loading = true;
-        const { data } = await clientAxiosInstance.get(`${API_BASE}/${USER_MANAGE_ROUTES.GET_USER_DETAILS}/${id}`, {
-        });
+        const { data } = await clientAxiosInstance.get(`${API_BASE}/${USER_MANAGE_ROUTES.GET_USER_DETAILS}/${id}`);
         user = data.success ? data.user : null;
         kycDetails = data.success ? data.kycDetails : null;
         loading = false;
