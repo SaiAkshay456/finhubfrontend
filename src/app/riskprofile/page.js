@@ -144,7 +144,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import AssignRiskCategory from '../../../components/AssignRiskCategory';
+import AssignRiskCategory from '../../components/AssignRiskCategory';
 import { API_BASE, RISK_ROUTES } from '@/helpers/apiRoutes';
 import clientAxiosInstance from '@/lib/clientAxios';
 
