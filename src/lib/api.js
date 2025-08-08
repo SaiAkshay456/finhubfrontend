@@ -9,7 +9,7 @@ const serverAxios = axios.create({
 });
 
 export async function fetchWithAuth(url, options = {}) {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
     console.log(token, "Token from cookies");
     if (!token) {
