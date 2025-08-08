@@ -23,6 +23,7 @@ export default async function PortfolioLayout({ children }) {
 
         //     },
         // });
+        console.log("Access check data: success", data)
         if (!data.success) {
             redirect('/unauthorized');
         }
