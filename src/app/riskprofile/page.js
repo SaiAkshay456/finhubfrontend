@@ -141,7 +141,7 @@
 // }
 
 'use client';
-import { use, useParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import AssignRiskCategory from '../../components/AssignRiskCategory';
