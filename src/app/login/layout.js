@@ -1,3 +1,4 @@
+"use client";
 import { useAuth } from '../../providers/AuthProvider';
 import { useRouter } from 'next/navigation';
 export default async function LoginLayout({ children }) {
