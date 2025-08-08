@@ -9,13 +9,7 @@ const serverAxios = axios.create({
     headers,
 });
 
-const clientAxios = axios.create({
-    baseURL,
-    withCredentials: true,
-    headers,
-});
 
-// A reusable function for making authenticated calls from a Server Component.
 export async function fetchWithAuth(url, options = {}) {
     const cookieStore = cookies();
     const token = cookieStore.get('token')?.value;
@@ -41,5 +35,3 @@ export async function fetchWithAuth(url, options = {}) {
     }
 }
 
-// Export the client-side instance as the default export for easy import.
-export default clientAxios;
