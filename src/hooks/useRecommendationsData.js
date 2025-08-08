@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react';
 // import axiosInstance from '../helpers/axios';
 import clientAxiosInstance from '@/lib/clientAxios';
-import axios from '@/lib/api';
 const fetchStockPrice = async (symbol) => {
     try {
         await fetch(
