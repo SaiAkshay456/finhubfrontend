@@ -27,7 +27,7 @@ const fetchStockPrice = async (symbol) => {
     }
 };
 
-export const useRecommendationData = () => {
+export const useRecommendationsData = () => {
     const [recommendations, setRecommendations] = useState([]);
     const [cmpMap, setCmpMap] = useState({});
     const [isLoading, setIsLoading] = useState(true);

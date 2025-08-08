@@ -2,7 +2,7 @@
 import clientAxiosInstance from '@/lib/clientAxios';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useRecommendationData } from '@/hooks/useRecommendationData';
+import { useRecommendationsData } from '@/hooks/useRecommendationsData';
 import Select from 'react-select';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 
@@ -28,7 +28,7 @@ export default function CreateBasketModal({ isOpen, onClose }) {
 
     const [msg, setMsg] = useState(null);
     const router = useRouter();
-    const { recommendations, cmpMap, isLoading } = useRecommendationData();
+    const { recommendations, cmpMap, isLoading } = useRecommendationsData();
 
     const assetClasses = ['Equity', 'Debt', 'Commodity'].map(cls => ({
         value: cls,
