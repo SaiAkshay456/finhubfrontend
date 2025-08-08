@@ -4,9 +4,10 @@ import Link from 'next/link';
 import ToggleUserStatusButton from './ToggleUserStatusButton';
 import { Clock, ListFilter, User, Mail, MoreVertical } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import axiosInstance from '@/helpers/axios';
+// import axiosInstance from '@/helpers/axios';
 import { API_BASE, RISK_ROUTES } from '@/helpers/apiRoutes';
 import dynamic from 'next/dynamic';
+import clientAxiosInstance from '@/lib/clientAxios';
 
 const Select = dynamic(() => import('react-select'), { ssr: false });
 
@@ -122,7 +123,7 @@ export default function TableOfUser({ users, questionnaires }) {
                 questionnaireId: selectedQuestionnaire.value,
             }));
 
-            const { data } = await axiosInstance.post(
+            const { data } = await clientAxiosInstance.post(
                 `${API_BASE}/${RISK_ROUTES.SEND_TO_USERS_QUESTIONNAIRE}`,
                 { assignments: payload },
                 {

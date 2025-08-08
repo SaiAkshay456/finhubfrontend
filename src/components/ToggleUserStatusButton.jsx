@@ -42,7 +42,8 @@
 'use client';
 
 import { API_BASE, USER_MANAGE_ROUTES } from '@/helpers/apiRoutes';
-import axiosInstance from '@/helpers/axios';
+// import axiosInstance from '@/helpers/axios';
+import clientAxiosInstance from '@/lib/clientAxios';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -55,7 +56,7 @@ export default function ToggleUserStatusButton({ userId, isActive, onToggle }) {
         e.stopPropagation();
         try {
             setLoading(true);
-            const { data } = await axiosInstance.patch(
+            const { data } = await clientAxiosInstance.patch(
                 `${API_BASE}/${USER_MANAGE_ROUTES.USER_STATUS_UPDATE}/${userId}`,
                 { isActive: !status }
             );

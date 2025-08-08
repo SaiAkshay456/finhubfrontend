@@ -22,11 +22,16 @@ export default async function Layout({ children }) {
     }
     try {
         console.log(token, "27 line")
-        const { data } = await axiosInstance.post('/v1/permission-route/check-access', { path: label }, {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+        // const { data } = await axiosInstance.post('/v1/permission-route/check-access', { path: label }, {
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        // });
+        const { data, error } = await fetchWithAuth('/v1/permission-route/check-access', {
+            method: 'POST',
+            data: { path: label }
+        }
+        )
         console.log(data)
         console.log("35 line")
         if (!data.success) {

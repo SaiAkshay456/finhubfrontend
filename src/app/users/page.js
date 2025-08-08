@@ -5,14 +5,18 @@ import BasketSearchDebounce from "@/components/BasketSearchDebounce"
 import TableOfUser from "@/components/TableOfUser"
 import { ArrowUp } from "lucide-react"
 import axiosInstance from "@/helpers/axios"
+import { fetchWithAuth } from "@/lib/api"
 import { API_BASE, RISK_ROUTES, USER_MANAGE_ROUTES } from "@/helpers/apiRoutes"
 export async function fetchQuestionnaires(token) {
     try {
-        const { data } = await axiosInstance.get(`${API_BASE}/${RISK_ROUTES.GET_QUESTIONNARIES}`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
+        const { data, error } = await fetchWithAuth(`${API_BASE}/${RISK_ROUTES.GET_QUESTIONNARIES}`, {
+            method: 'GET'
         })
+        // const { data } = await axiosInstance.get(`${API_BASE}/${RISK_ROUTES.GET_QUESTIONNARIES}`, {
+        //     headers: {
+        //         Authorization: `Bearer ${token}`,
+        //     },
+        // })
         const questionnaires = data
         return questionnaires
     } catch (err) {
@@ -63,10 +67,13 @@ export default async function AllUsersPage({ searchParams }) {
             ? `search=${encodeURIComponent(sanitizedSearchTerm)}&`
             : '';
         const apiURL = `${API_BASE}/${USER_MANAGE_ROUTES.GET_ALL_USERS}?${searchQuery}page=${currentPage}&limit=${limit}`
-        const { data } = await axiosInstance.get(apiURL, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
+        // const { data } = await axiosInstance.get(apiURL, {
+        //     headers: {
+        //         Authorization: `Bearer ${token}`,
+        //     },
+        // })
+        const { data } = await fetchWithAuth(apiURL, {
+            method: 'GET'
         })
         if (data.success) {
             users = data.users
