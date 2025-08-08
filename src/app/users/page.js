@@ -12,6 +12,7 @@ export async function fetchQuestionnaires(token) {
         const { data, error } = await fetchWithAuth(`${API_BASE}/${RISK_ROUTES.GET_QUESTIONNARIES}`, {
             method: 'GET'
         })
+        console.log("Questionnaires fetched:", data)
         // const { data } = await axiosInstance.get(`${API_BASE}/${RISK_ROUTES.GET_QUESTIONNARIES}`, {
         //     headers: {
         //         Authorization: `Bearer ${token}`,
@@ -75,6 +76,7 @@ export default async function AllUsersPage({ searchParams }) {
         const { data } = await fetchWithAuth(apiURL, {
             method: 'GET'
         })
+        console.log("Data fetched:", data)
         if (data.success) {
             users = data.users
             totalPages = data.totalPages
