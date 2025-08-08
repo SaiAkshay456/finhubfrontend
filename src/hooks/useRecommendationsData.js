@@ -1,8 +1,8 @@
 
 "use client"
 import { useState, useEffect, useRef } from 'react';
-import axiosInstance from '../helpers/axios';
-
+// import axiosInstance from '../helpers/axios';
+import axios from '@/lib/api';
 const fetchStockPrice = async (symbol) => {
     try {
         await fetch(
@@ -37,7 +37,7 @@ export const useRecommendationsData = () => {
     const fetchRecommendations = async () => {
         setIsLoading(true);
         try {
-            const { data } = await axiosInstance.get(
+            const { data } = await axios.get(
                 '/v1/recommendations/getRecommendations'
             );
             if (data.success) {
@@ -61,13 +61,13 @@ export const useRecommendationsData = () => {
                 try {
                     let price = null;
                     if (rec.assetType === 'Stock') {
-                        const res = await axiosInstance.get(
+                        const res = await axios.get(
                             `/v1/stocks/get/${rec.mutualFund}`
                         );
                         const instrument_token = res.data.data.instrument_token;
                         price = await fetchStockPrice(instrument_token);
                     } else if (rec.assetType === 'Mutual Fund') {
-                        const res = await axiosInstance.get(
+                        const res = await axios.get(
                             `/v1/mutual-funds/get/${rec.mutualFund}`
                         );
                         price = res.data.data.nav;

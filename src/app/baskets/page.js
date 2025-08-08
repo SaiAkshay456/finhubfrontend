@@ -99,15 +99,19 @@ import axiosInstance from '@/helpers/axios';
 import { cookies } from 'next/headers';
 import BasketModalTrigger from '@/components/BasketModalTrigger';
 import ShowRecommendation from '@/components/ShowRecommendation';
+import { fetchWithAuth } from '@/lib/api';
 const BasketsTable = async () => {
     const cookieStore = cookies();
     const token = cookieStore.get('token')?.value;
 
     let baskets = [];
     try {
-        const { data } = await axiosInstance.get(`/v1/model-basket/get-all/baskets`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+        const { data, error } = await fetchWithAuth('/v1/model-basket/get-all/baskets', {
+            method: 'GET'
+        })
+        // const { data } = await axiosInstance.get(`/v1/model-basket/get-all/baskets`, {
+        //     headers: { Authorization: `Bearer ${token}` }
+        // });
         baskets = data.data || [];
     } catch (error) {
         console.error('Error fetching baskets:', error.message);

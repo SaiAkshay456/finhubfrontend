@@ -1767,7 +1767,7 @@ import { useRouter } from 'next/navigation';
 import { useRecommendationsData } from '@/hooks/useRecommendationsData';
 import Select from 'react-select';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
-import axios from 'axios';
+import axios from '@/lib/api';
 
 export default function CreateBasketModal({ isOpen, onClose }) {
     // Basic basket details
@@ -1826,7 +1826,7 @@ export default function CreateBasketModal({ isOpen, onClose }) {
         const fetchRoutes = async () => {
             if (assetClass) {
                 try {
-                    const res = await axios.get(`https://finhub-backend.onrender.com/v1/model-basket/get/route/${assetClass}`);
+                    const res = await axios.get(`/v1/model-basket/get/route/${assetClass}`);
                     setRoutes(res.data.routes.map(r => ({
                         value: r.name,
                         label: r.name
@@ -1963,7 +1963,7 @@ export default function CreateBasketModal({ isOpen, onClose }) {
                 percentage: rec.percentage,
             }));
 
-            const res = await axios.post('https://finhub-backend.onrender.com/v1/model-basket/create-basket', {
+            const res = await axios.post('/v1/model-basket/create-basket', {
                 title,
                 description,
                 threeYearReturn,
