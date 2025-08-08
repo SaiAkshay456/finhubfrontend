@@ -77,7 +77,7 @@
 //                                             {q.title || "Untitled Questionnaire"}
 //                                         </h3>
 //                                         <button
-//                                             // onClick={() => handleDelete(q.id)}
+//                                             // onClick={() => handleDelete(qid)}
 //                                             className="hover:text-red-700 p-1 focus:outline-none focus:ring-2 focus:ring-red-300"
 //                                             aria-label="Delete questionnaire"
 //                                         >
@@ -141,7 +141,7 @@
 // }
 
 'use client';
-import { useParams } from 'next/navigation';
+import { use } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import AssignRiskCategory from '../../components/AssignRiskCategory';
@@ -150,7 +150,7 @@ import clientAxiosInstance from '@/lib/clientAxios';
 
 
 export default function RiskProfileOfUser() {
-    const { id } = useParams();
+    const { id } = use();
     const [responses, setResponses] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -184,7 +184,7 @@ export default function RiskProfileOfUser() {
         if (id) {
             fetchResponses();
         }
-    }, [params.id, router]);
+    }, [id, router]);
 
     if (loading) {
         return (
@@ -216,7 +216,7 @@ export default function RiskProfileOfUser() {
                                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                         <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd"></path>
                                     </svg>
-                                    <span>User ID: {params.id}</span>
+                                    <span>User ID: {id}</span>
                                 </div>
                                 <div className="flex items-center gap-2 px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm">
                                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -323,7 +323,7 @@ export default function RiskProfileOfUser() {
                                     <p className="text-gray-600 text-sm">Assign a risk category based on the responses</p>
                                 </div>
                             </div>
-                            <AssignRiskCategory userId={params.id} />
+                            <AssignRiskCategory userId={id} />
                         </div>
                     </div>
                 )}
