@@ -398,6 +398,7 @@ export default function UserDetailsPage() {
                     setUser(data.user);
                     setKycDetails(data.kycDetails);
                     setPortfolio(data.latestPortfolio);
+                    console.log(data.kycDetails.aadharCard);
                 } else {
                     setError('Failed to fetch user details');
                 }
