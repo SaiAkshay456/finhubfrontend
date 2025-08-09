@@ -1,12 +1,11 @@
 'use client';
 import { useState } from 'react';
-import axios from 'axios';
+
 import { useRouter } from 'next/navigation';
-import axiosInstance from '@/helpers/axios';
 import { API_BASE, USER_MANAGE_ROUTES } from '@/helpers/apiRoutes';
 import clientAxiosInstance from '@/lib/clientAxios';
 
-export default function UpdateUserForm({ user, token }) {
+export default function UpdateUserForm({ user }) {
     const router = useRouter();
     const [formData, setFormData] = useState({
         username: user.username || '',

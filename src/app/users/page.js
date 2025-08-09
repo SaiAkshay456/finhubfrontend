@@ -255,8 +255,6 @@
 // }
 
 
-
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -287,13 +285,11 @@ export default function AllUsersPage({ searchParams }) {
     const search = searchParams?.search || '';
     const currentPage = Number.parseInt(searchParams?.page || '1');
     const limit = 5;
-
-    // useEffect hook to fetch data on the client side
     useEffect(() => {
         const fetchAllData = async () => {
             setLoading(true);
+            setError(null);
             try {
-                // Fetch user data
                 const rawSearch = search || '';
                 const sanitizedSearchTerm = rawSearch
                     .trim()
@@ -338,8 +334,7 @@ export default function AllUsersPage({ searchParams }) {
         };
 
         fetchAllData();
-    }, [search, currentPage, limit, router]);
-
+    }, [search, currentPage, router]); // `limit` is a constant, so it doesn't need to be in the dependency array
 
     const dashboardCardsData = [
         {
@@ -501,4 +496,3 @@ export default function AllUsersPage({ searchParams }) {
         </div>
     );
 }
-
