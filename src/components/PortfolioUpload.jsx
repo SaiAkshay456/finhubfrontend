@@ -22,8 +22,9 @@ export default function PortfolioUpload({ userId }) {
         formData.append("portfolioFile", file);
         try {
             setUploading(true);
-            await clientAxiosInstance.put(`${API_BASE}/${USER_MANAGE_ROUTES.UPLOAD_PORTFOLIO}/${userId}`, formData);
+            const data = await clientAxiosInstance.put(`${API_BASE}/${USER_MANAGE_ROUTES.UPLOAD_PORTFOLIO}/${userId}`, formData);
             setSuccess(true);
+            console.log(data);
             setFile(null);
         } catch (err) {
             setError("Upload failed. Try again.");
