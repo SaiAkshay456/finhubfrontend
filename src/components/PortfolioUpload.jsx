@@ -1,6 +1,5 @@
 'use client';
 import { useState } from 'react';
-import axiosInstance from '@/helpers/axios';
 import { API_BASE, USER_MANAGE_ROUTES } from '@/helpers/apiRoutes';
 import clientAxiosInstance from '@/lib/clientAxios';
 

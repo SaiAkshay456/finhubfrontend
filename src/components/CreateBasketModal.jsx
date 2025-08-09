@@ -1,13 +1,12 @@
+
 'use client';
-import clientAxiosInstance from '@/lib/clientAxios';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useRecommendationsData } from '@/hooks/useRecommendationsData';
 import Select from 'react-select';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
-
+import clientAxiosInstance from '@/lib/clientAxios';
 export default function CreateBasketModal({ isOpen, onClose }) {
-    // Basic basket details
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [threeYearReturn, setThreeYearReturn] = useState('');
@@ -18,18 +17,15 @@ export default function CreateBasketModal({ isOpen, onClose }) {
     const [selectedRecommendations, setSelectedRecommendations] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [three_y_sharpe, setThreeYSharpe] = useState('');
-
     const [basketPrice, setBasketPrice] = useState('');
-    const [remainingBasketPrice, setRemainingBasketPrice] = useState(null);
     const [newRecommendationId, setNewRecommendationId] = useState('');
     const [newRecommendationPercentage, setNewRecommendationPercentage] = useState('');
-
     const [totalAllocatedPercentage, setTotalAllocatedPercentage] = useState(0);
-
+    const [totalAllocatedCost, setTotalAllocatedCost] = useState(0);
     const [msg, setMsg] = useState(null);
     const router = useRouter();
     const { recommendations, cmpMap, isLoading } = useRecommendationsData();
-
+    const [filteredRecommendations, setFilteredRecommendations] = useState([]);
     const assetClasses = ['Equity', 'Debt', 'Commodity'].map(cls => ({
         value: cls,
         label: cls
@@ -40,16 +36,12 @@ export default function CreateBasketModal({ isOpen, onClose }) {
         { value: 'Medium', label: 'Medium' },
         { value: 'High', label: 'High' }
     ];
-
-    // Helper function to display messages
     const showMessage = (text, type) => {
         setMsg({ text, type });
-        // Automatically clear the message after 5 seconds
-
-        setMsg(null);
-
+        setTimeout(() => {
+            setMsg(null);
+        }, 5000);
     };
-
     useEffect(() => {
         const fetchRoutes = async () => {
             if (assetClass) {
@@ -69,16 +61,53 @@ export default function CreateBasketModal({ isOpen, onClose }) {
             }
             setRoute('');
             setSelectedRecommendations([]);
+            setTotalAllocatedPercentage(0);
         };
 
         fetchRoutes();
     }, [assetClass]);
-
     useEffect(() => {
-        if (basketPrice && remainingBasketPrice === null) {
-            setRemainingBasketPrice(parseFloat(basketPrice));
+        const currentBasketPriceValue = parseFloat(basketPrice) || 0;
+        let newTotalPercentage = 0;
+        let newTotalAllocatedCost = 0;
+
+        const updatedRecommendations = selectedRecommendations.map(rec => {
+            newTotalPercentage += rec.percentage;
+
+            const cmp = cmpMap[rec.mutualFund];
+            if (!cmp || currentBasketPriceValue === 0) {
+                return { ...rec, quantity: 0, allocation: 0 };
+            }
+
+            const allocationAmount = (rec.percentage / 100) * currentBasketPriceValue;
+            const quantity = Math.ceil(allocationAmount / cmp);
+            const actualCost = quantity * cmp;
+            newTotalAllocatedCost += actualCost;
+
+            return { ...rec, quantity, allocation: actualCost };
+        });
+
+        setSelectedRecommendations(updatedRecommendations);
+        setTotalAllocatedPercentage(newTotalPercentage);
+        setTotalAllocatedCost(newTotalAllocatedCost);
+    }, [basketPrice, selectedRecommendations.length, cmpMap]);
+
+    // Filter recommendations based on basket price
+    useEffect(() => {
+        if (recommendations.length > 0 && basketPrice) {
+            const price = parseFloat(basketPrice);
+            const filtered = recommendations.filter(rec => {
+                const cmp = cmpMap[rec.mutualFund];
+                // Only show recommendations where CMP is less than the basket price
+                return cmp !== null && cmp !== undefined && cmp < price;
+            });
+            setFilteredRecommendations(filtered);
+        } else {
+            // Clear the filtered list if no basket price is set
+            setFilteredRecommendations([]);
         }
-    }, [basketPrice, remainingBasketPrice]);
+    }, [recommendations, cmpMap, basketPrice]);
+
 
     const handleAddRecommendation = () => {
         if (!newRecommendationId || newRecommendationPercentage === '' || !basketPrice) {
@@ -86,18 +115,14 @@ export default function CreateBasketModal({ isOpen, onClose }) {
             return;
         }
 
-        const percentage = parseFloat(newRecommendationPercentage);
-        if (isNaN(percentage) || percentage <= 0 || percentage > 100) {
+        const newPercentage = parseFloat(newRecommendationPercentage);
+        if (isNaN(newPercentage) || newPercentage <= 0 || newPercentage > 100) {
             showMessage('Please enter a valid percentage between 1 and 100.', 'warning');
             return;
         }
+
         if (selectedRecommendations.some(rec => rec._id === newRecommendationId)) {
             showMessage('This recommendation is already in the basket.', 'warning');
-            return;
-        }
-        const newTotalPercentage = totalAllocatedPercentage + percentage;
-        if (newTotalPercentage > 100) {
-            showMessage(`Adding this recommendation would exceed 100% allocation. You can only allocate ${100 - totalAllocatedPercentage}% more.`, 'warning');
             return;
         }
 
@@ -109,28 +134,24 @@ export default function CreateBasketModal({ isOpen, onClose }) {
             showMessage(`CMP for ${rec.name} is not available. Please try again.`, 'error');
             return;
         }
-        const allocationAmount = (percentage / 100) * parseFloat(basketPrice);
-        const quantity = Math.ceil(allocationAmount / cmp);
-        const actualCost = quantity * cmp;
-        if (actualCost > remainingBasketPrice) {
-            showMessage(`The actual cost of this allocation (₹${actualCost.toFixed(2)}) exceeds the remaining basket price (₹${remainingBasketPrice.toFixed(2)}). Please use a lower percentage or increase the basket price.`, 'warning');
+
+        // Check if adding the new percentage exceeds 100%
+        if (totalAllocatedPercentage + newPercentage > 100.01) {
+            showMessage(`Adding this recommendation would exceed 100% allocation. You can only allocate ${(100 - totalAllocatedPercentage).toFixed(2)}% more.`, 'warning');
             return;
         }
 
         const newSelectedRec = {
             ...rec,
-            percentage: percentage,
+            percentage: newPercentage,
             cmp: cmp,
-            quantity: quantity,
-            allocation: actualCost,
+            // The useEffect will handle the quantity and allocation calculation
+            quantity: 0,
+            allocation: 0,
         };
 
-        setSelectedRecommendations(prev => [...prev, newSelectedRec]);
-        setTotalAllocatedPercentage(newTotalPercentage);
-        // Update the remaining basket price by subtracting the actual cost.
-        setRemainingBasketPrice(prev => prev - actualCost);
-
-        // Reset the selection fields for the next entry.
+        const updatedRecommendations = [...selectedRecommendations, newSelectedRec];
+        setSelectedRecommendations(updatedRecommendations);
         setNewRecommendationId('');
         setNewRecommendationPercentage('');
         showMessage(`Recommendation '${rec.name}' added successfully.`, 'success');
@@ -140,10 +161,9 @@ export default function CreateBasketModal({ isOpen, onClose }) {
         const recToRemove = selectedRecommendations.find(rec => rec._id === _id);
         if (!recToRemove) return;
 
-        setSelectedRecommendations(prev => prev.filter(rec => rec._id !== _id));
-        // When a recommendation is removed, add its percentage and actual cost back to the totals.
-        setTotalAllocatedPercentage(prev => prev - recToRemove.percentage);
-        setRemainingBasketPrice(prev => prev + recToRemove.allocation);
+        const remainingRecommendations = selectedRecommendations.filter(rec => rec._id !== _id);
+        setSelectedRecommendations(remainingRecommendations);
+
         showMessage(`Recommendation '${recToRemove.name}' removed from basket.`, 'success');
     };
 
@@ -161,16 +181,17 @@ export default function CreateBasketModal({ isOpen, onClose }) {
             showMessage('Please add at least one recommendation to the basket.', 'warning');
             return;
         }
-        if (totalAllocatedPercentage < 100) {
-            showMessage(`Basket is only ${totalAllocatedPercentage}% allocated. Please complete the allocation before submitting.`, 'warning');
+
+        // Use a tolerance for checking if the total allocation is 100%
+        if (totalAllocatedPercentage < 99.99 || totalAllocatedPercentage > 100.01) {
+            showMessage(`Basket is only ${totalAllocatedPercentage.toFixed(2)}% allocated. Please complete the allocation before submitting.`, 'warning');
             return;
         }
 
         setIsSubmitting(true);
         try {
-            // Prepare the payload for the backend with calculated data.
             const recommendationsPayload = selectedRecommendations.map(rec => ({
-                _id: rec._id, // Send the recommendation's original ID
+                _id: rec._id,
                 cmp: rec.cmp,
                 quantity: rec.quantity,
                 percentage: rec.percentage,
@@ -184,21 +205,19 @@ export default function CreateBasketModal({ isOpen, onClose }) {
                 assetClass,
                 route,
                 three_y_sharpe,
-                basketPrice: parseFloat(basketPrice),
+                basketPrice: parseFloat(totalAllocatedCost),
                 recommendations: recommendationsPayload,
             });
-
             if (res.data.success) {
-                // Display success message and then close the modal
                 showMessage(res.data.message, 'success');
                 setTitle('');
                 setDescription('');
                 setAssetClass('');
                 setRoute('');
-                setBasketPrice('');
-                setRemainingBasketPrice(null);
                 setTotalAllocatedPercentage(0);
                 setSelectedRecommendations([]);
+                setTotalAllocatedCost(0);
+                setBasketPrice('');
                 onClose();
                 router.refresh();
             } else {
@@ -212,7 +231,8 @@ export default function CreateBasketModal({ isOpen, onClose }) {
         }
     };
 
-    const recommendationOptions = recommendations.map(rec => {
+    // Create options from the filtered recommendations
+    const recommendationOptions = filteredRecommendations.map(rec => {
         const cmp = cmpMap[rec.mutualFund];
         const cmpDisplay = cmp !== null && cmp !== undefined ? ` (CMP: ₹${cmp})` : '';
         return {
@@ -222,7 +242,7 @@ export default function CreateBasketModal({ isOpen, onClose }) {
     });
 
     const remainingPercentage = 100 - totalAllocatedPercentage;
-    const isAllocationComplete = totalAllocatedPercentage === 100;
+    const isAllocationComplete = totalAllocatedPercentage >= 99.99 && totalAllocatedPercentage <= 100.01;
 
     if (!isOpen) return null;
 
@@ -230,12 +250,14 @@ export default function CreateBasketModal({ isOpen, onClose }) {
         success: 'bg-green-50 border-green-200 text-green-800',
         warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
         error: 'bg-red-50 border-red-200 text-red-800',
+        info: 'bg-blue-50 border-blue-200 text-blue-800',
     };
 
     const messageIconStyles = {
         success: 'bg-green-200 text-green-800',
         warning: 'bg-yellow-200 text-yellow-800',
         error: 'bg-red-200 text-red-800',
+        info: 'bg-blue-200 text-blue-800',
     };
 
     return (
@@ -260,7 +282,6 @@ export default function CreateBasketModal({ isOpen, onClose }) {
                             </svg>
                         </button>
                     </div>
-
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div className="space-y-2">
@@ -274,7 +295,6 @@ export default function CreateBasketModal({ isOpen, onClose }) {
                                     placeholder="e.g. Tech Leaders"
                                 />
                             </div>
-
                             <div className="space-y-2">
                                 <label className="block text-sm font-medium text-gray-700">3Y Sharpe *</label>
                                 <input
@@ -285,7 +305,6 @@ export default function CreateBasketModal({ isOpen, onClose }) {
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                                 />
                             </div>
-
                             <div className="space-y-2">
                                 <label className="block text-sm font-medium text-gray-700">3Y Return *</label>
                                 <input
@@ -296,7 +315,6 @@ export default function CreateBasketModal({ isOpen, onClose }) {
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                                 />
                             </div>
-
                             <div className="space-y-2">
                                 <label className="block text-sm font-medium text-gray-700">3Y Risk *</label>
                                 <Select
@@ -309,7 +327,6 @@ export default function CreateBasketModal({ isOpen, onClose }) {
                                 />
                             </div>
                         </div>
-
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <label className="block text-sm font-medium text-gray-700">Asset Class *</label>
@@ -323,7 +340,6 @@ export default function CreateBasketModal({ isOpen, onClose }) {
                                     placeholder="Select Asset Class"
                                 />
                             </div>
-
                             {routes.length > 0 && (
                                 <div className="space-y-2">
                                     <label className="block text-sm font-medium text-gray-700">Route *</label>
@@ -339,30 +355,20 @@ export default function CreateBasketModal({ isOpen, onClose }) {
                                 </div>
                             )}
                         </div>
-
                         <div className="space-y-2">
-                            <label className="block text-sm font-medium text-gray-700">Basket Price *</label>
+                            <label className="block text-sm font-medium text-gray-700">Universal Basket Price *</label>
                             <input
                                 type="number"
                                 value={basketPrice}
-                                onChange={(e) => {
-                                    setBasketPrice(e.target.value);
-                                    setRemainingBasketPrice(parseFloat(e.target.value));
-                                }}
+                                onChange={(e) => setBasketPrice(e.target.value)}
                                 required
                                 min="0"
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                                 placeholder="e.g. 10000"
-                                disabled={selectedRecommendations.length > 0}
                             />
-                            {basketPrice && remainingBasketPrice !== null && (
-                                <p className="text-sm text-gray-500 mt-1">
-                                    Remaining Price: ₹{remainingBasketPrice.toFixed(2)}
-                                </p>
-                            )}
                         </div>
 
-                        {basketPrice && assetClass && route && (
+                        {assetClass && route && (
                             <>
                                 <div className="space-y-2">
                                     <label className="block text-sm font-medium text-gray-700">Add Recommendations *</label>
@@ -371,7 +377,7 @@ export default function CreateBasketModal({ isOpen, onClose }) {
                                             <Select
                                                 options={recommendationOptions}
                                                 isLoading={isLoading}
-                                                isDisabled={isLoading || recommendations.length === 0 || isAllocationComplete}
+                                                isDisabled={isLoading || filteredRecommendations.length === 0}
                                                 placeholder={isLoading ? 'Loading...' : 'Select Recommendation'}
                                                 value={recommendationOptions.find(option => option.value === newRecommendationId)}
                                                 onChange={(selectedOption) => setNewRecommendationId(selectedOption?.value || '')}
@@ -385,15 +391,14 @@ export default function CreateBasketModal({ isOpen, onClose }) {
                                             value={newRecommendationPercentage}
                                             onChange={(e) => setNewRecommendationPercentage(e.target.value)}
                                             min="1"
-                                            max={100 - totalAllocatedPercentage} // Max value is the remaining percentage
+                                            max={100 - totalAllocatedPercentage}
                                             placeholder="%"
                                             className="w-20 px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                                            disabled={isAllocationComplete}
                                         />
                                         <button
                                             type="button"
                                             onClick={handleAddRecommendation}
-                                            disabled={!newRecommendationId || !newRecommendationPercentage || isAllocationComplete}
+                                            disabled={!newRecommendationId || newRecommendationPercentage === '' || (parseFloat(newRecommendationPercentage) + totalAllocatedPercentage > 100.01)}
                                             className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed transition-colors"
                                         >
                                             Add
@@ -401,19 +406,18 @@ export default function CreateBasketModal({ isOpen, onClose }) {
                                     </div>
                                     <div className="mt-2 text-sm">
                                         <span className="font-medium">Total Allocated: </span>
-                                        <span className={totalAllocatedPercentage === 100 ? 'text-green-600' : 'text-gray-800'}>{totalAllocatedPercentage}%</span>
-                                        <span className="font-medium ml-4">Remaining to Allocate: </span>
-                                        <span className={remainingPercentage === 0 ? 'text-green-600' : 'text-red-500'}>
-                                            {remainingPercentage}%
+                                        <span className={isAllocationComplete ? 'text-green-600' : 'text-gray-800'}>{totalAllocatedPercentage.toFixed(2)}%</span>
+                                        <span className="font-medium ml-4">Total Cost: </span>
+                                        <span className={totalAllocatedCost > 0 && totalAllocatedCost <= parseFloat(basketPrice) ? 'text-green-600' : 'text-red-500'}>
+                                            ₹{totalAllocatedCost.toFixed(2)}
                                         </span>
                                     </div>
                                 </div>
-
                                 {isAllocationComplete && (
                                     <div className="mt-4 p-3 rounded-md border bg-green-50 border-green-200 text-green-800 flex items-center gap-2">
                                         <CheckCircle2 size={16} />
                                         <span className="text-sm font-medium">
-                                            Basket is fully allocated. You can now submit or remove a recommendation to adjust the allocation.
+                                            Basket is fully allocated. The total cost is ₹{totalAllocatedCost.toFixed(2)}. You can now submit or remove a recommendation to adjust the allocation.
                                         </span>
                                     </div>
                                 )}
@@ -425,7 +429,7 @@ export default function CreateBasketModal({ isOpen, onClose }) {
                                             {selectedRecommendations.map(rec => (
                                                 <div key={rec._id} className="flex items-center justify-between py-2 px-3 hover:bg-gray-50 rounded">
                                                     <span className="text-sm text-gray-800">
-                                                        {rec.name} ({rec.percentage}%) - {rec.quantity} units @ ₹{rec.cmp}
+                                                        {rec.name} ({rec.percentage.toFixed(2)}%) - {rec.quantity} units @ ₹{rec.cmp.toFixed(2)}
                                                     </span>
                                                     <button
                                                         type="button"
@@ -443,7 +447,6 @@ export default function CreateBasketModal({ isOpen, onClose }) {
                                 )}
                             </>
                         )}
-
                         <div className="space-y-2">
                             <label className="block text-sm font-medium text-gray-700">Description</label>
                             <textarea
@@ -453,7 +456,6 @@ export default function CreateBasketModal({ isOpen, onClose }) {
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                             />
                         </div>
-
                         <div className="flex justify-end pt-4">
                             <button
                                 type="submit"
@@ -479,3 +481,4 @@ export default function CreateBasketModal({ isOpen, onClose }) {
         </div>
     );
 }
+

@@ -45,12 +45,10 @@
 
 import { useState, useEffect } from 'react';
 import { Geist, Geist_Mono } from 'next/font/google';
-import { useRouter } from 'next/navigation';
 import { AuthProvider } from '@/providers/AuthProvider';
 import axiosInstance from '@/helpers/axios';
 import ClientLayoutWrapper from '@/components/ClientLayoutWrapper';
 import './globals.css';
-
 const geistSans = Geist({ subsets: ['latin'], variable: '--font-geist-sans' });
 const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono' });
 

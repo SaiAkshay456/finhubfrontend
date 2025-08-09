@@ -42,7 +42,6 @@
 'use client';
 
 import { API_BASE, USER_MANAGE_ROUTES } from '@/helpers/apiRoutes';
-// import axiosInstance from '@/helpers/axios';
 import clientAxiosInstance from '@/lib/clientAxios';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
