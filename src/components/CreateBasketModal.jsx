@@ -224,7 +224,7 @@ export default function CreateBasketModal({ isOpen, onClose }) {
                 throw new Error(res.data.message || 'Failed to create basket');
             }
         } catch (error) {
-            console.error(error);
+            console.log(error, "line 227");
             showMessage('An error occurred. Please check the console for details.', 'error');
         } finally {
             setIsSubmitting(false);
