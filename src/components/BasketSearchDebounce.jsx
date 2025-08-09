@@ -96,42 +96,194 @@
 //     );
 // }
 
+// 'use client';
+
+// import { useState, useEffect } from 'react';
+// import { useRouter, useSearchParams } from 'next/navigation';
+// import debounce from 'lodash.debounce';
+
+// export default function BasketSearchDebounce({
+//     placeHolder = "Search baskets by title, description..."
+// }) {
+//     const router = useRouter();
+//     const searchParams = useSearchParams();
+//     const [search, setSearch] = useState(searchParams.get('search') || '');
+//     const [loading, setLoading] = useState(false);
+
+//     const debouncedSearchUpdate = debounce((value) => {
+//         setLoading(true);
+//         const params = new URLSearchParams(window.location.search);
+//         if (value.trim()) {
+//             params.set('search', value.trim());
+//             params.set('page', '1');
+//         } else {
+//             params.delete('search');
+//             params.set('page', '1');
+//         }
+//         router.push(`?${params.toString()}`);
+//         setTimeout(() => {
+//             setLoading(false); // simulate end of loading (or set this from response elsewhere)
+//         }, 400); // adjust this if your data load is async
+//     }, 100);
+
+//     useEffect(() => {
+//         debouncedSearchUpdate(search);
+//         return () => debouncedSearchUpdate.cancel();
+//     }, [search]);
+
+//     return (
+//         <form onSubmit={(e) => e.preventDefault()} className="flex flex-col sm:flex-row gap-4">
+//             <div className="relative flex-1">
+//                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+//                     <svg
+//                         className="h-5 w-5 text-gray-500"
+//                         xmlns="http://www.w3.org/2000/svg"
+//                         viewBox="0 0 20 20"
+//                         fill="currentColor"
+//                         aria-hidden="true"
+//                     >
+//                         <path
+//                             fillRule="evenodd"
+//                             d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+//                             clipRule="evenodd"
+//                         />
+//                     </svg>
+//                 </div>
+//                 <input
+//                     type="text"
+//                     placeholder={placeHolder}
+//                     value={search}
+//                     onChange={(e) => setSearch(e.target.value)}
+//                     className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500 text-gray-900 transition-all duration-200 text-base"
+//                 />
+//                 {loading && (
+//                     <div className="absolute right-3 top-1/2 -translate-y-1/2">
+//                         <div className="h-4 w-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+//                     </div>
+//                 )}
+//             </div>
+
+//             {search && (
+//                 <button
+//                     type="button"
+//                     onClick={() => {
+//                         setSearch('');
+//                         const params = new URLSearchParams(window.location.search);
+//                         params.delete('search');
+//                         params.set('page', '1');
+//                         router.push(`?${params.toString()}`);
+//                     }}
+//                     className="px-3 py-2 text-base font-medium cursor-pointer text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 shadow-sm whitespace-nowrap"
+//                 >
+//                     Clear Search
+//                 </button>
+//             )}
+//         </form>
+//     );
+// }
+
+
 'use client';
 
-import { useSearchParams, useRouter } from 'next/navigation';
-import { useDebouncedCallback } from 'use-debounce';
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function BasketSearchDebounce({ placeholder }) {
-    const searchParams = useSearchParams();
+export default function BasketSearchDebounce({
+    placeHolder = "Search baskets by title, description..."
+}) {
     const router = useRouter();
-    const handleSearch = useDebouncedCallback((term) => {
+    const searchParams = useSearchParams();
+    const [search, setSearch] = useState(searchParams.get('search') || '');
+    const [loading, setLoading] = useState(false);
 
+    // Using useCallback to memoize the debounced function
+    const debouncedSearchUpdate = useCallback((value) => {
+        setLoading(true);
+        // ALWAYS use the 'searchParams' from the hook, not window.location
         const params = new URLSearchParams(searchParams.toString());
-
-        if (term) {
-            params.set('search', term);
+        if (value.trim()) {
+            params.set('search', value.trim());
+            params.set('page', '1');
         } else {
             params.delete('search');
+            params.set('page', '1');
         }
-
-        // When a user starts a new search, it's best practice to reset them to page 1
-        params.set('page', '1');
-
-        // Push the updated URL. The router will handle the navigation.
-        // The '?' is automatically added by the router.
         router.push(`?${params.toString()}`);
-    }, 300); // 300ms debounce delay
+
+        // This timeout is just for visual feedback, can be removed
+        setTimeout(() => {
+            setLoading(false);
+        }, 400);
+    }, [searchParams, router]);
+
+    // Debounce effect
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            // Only trigger the update if the search term in state is different from the one in the URL
+            if (search !== (searchParams.get('search') || '')) {
+                debouncedSearchUpdate(search);
+            }
+        }, 300); // 300ms debounce delay
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [search, searchParams, debouncedSearchUpdate]);
+
+    // Sync state with URL if the user navigates (e.g., using back/forward buttons)
+    useEffect(() => {
+        setSearch(searchParams.get('search') || '');
+    }, [searchParams]);
+
 
     return (
-        <input
-            type="text"
-            // Use defaultValue to set the initial value from the URL without making it a controlled component
-            defaultValue={searchParams.get('search') || ''}
-            onChange={(e) => {
-                handleSearch(e.target.value);
-            }}
-            placeholder={placeholder}
-            className="w-full px-4 py-2 text-sm text-gray-800 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow duration-200"
-        />
+        <form onSubmit={(e) => e.preventDefault()} className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg
+                        className="h-5 w-5 text-gray-500"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        aria-hidden="true"
+                    >
+                        <path
+                            fillRule="evenodd"
+                            d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                            clipRule="evenodd"
+                        />
+                    </svg>
+                </div>
+                <input
+                    type="text"
+                    placeholder={placeHolder}
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500 text-gray-900 transition-all duration-200 text-base"
+                />
+                {loading && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <div className="h-4 w-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                )}
+            </div>
+
+            {search && (
+                <button
+                    type="button"
+                    onClick={() => {
+                        setSearch('');
+                        // Use the reactive searchParams from the hook here as well
+                        const params = new URLSearchParams(searchParams.toString());
+                        params.delete('search');
+                        params.set('page', '1');
+                        router.push(`?${params.toString()}`);
+                    }}
+                    className="px-3 py-2 text-base font-medium cursor-pointer text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 shadow-sm whitespace-nowrap"
+                >
+                    Clear Search
+                </button>
+            )}
+        </form>
     );
 }
