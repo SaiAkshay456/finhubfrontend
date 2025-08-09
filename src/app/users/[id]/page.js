@@ -392,10 +392,7 @@ export default function UserDetailsPage({ params }) {
     useEffect(() => {
         const fetchUserDetails = async () => {
             try {
-                const { data } = await clientAxiosInstance.get(`${API_BASE}/${USER_MANAGE_ROUTES.GET_USER_DETAILS}/${id}`, {
-
-                });
-
+                const { data } = await clientAxiosInstance.get(`${API_BASE}/${USER_MANAGE_ROUTES.GET_USER_DETAILS}/${id}`);
                 if (data.success) {
                     setUser(data.user);
                     setKycDetails(data.kycDetails);
@@ -506,7 +503,7 @@ export default function UserDetailsPage({ params }) {
                 {/* KYC Form */}
                 {!user.status.isKycCompleted && (
                     <div className="mb-8">
-                        <KycFormUser userId={user._id} token={token} />
+                        <KycFormUser userId={user._id} />
                     </div>
                 )}
 
