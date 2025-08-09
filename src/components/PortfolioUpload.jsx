@@ -22,7 +22,11 @@ export default function PortfolioUpload({ userId }) {
         formData.append("portfolioFile", file);
         try {
             setUploading(true);
-            const data = await clientAxiosInstance.put(`${API_BASE}/${USER_MANAGE_ROUTES.UPLOAD_PORTFOLIO}/${userId}`, formData);
+            const data = await clientAxiosInstance.put(`${API_BASE}/${USER_MANAGE_ROUTES.UPLOAD_PORTFOLIO}/${userId}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
             setSuccess(true);
             console.log(data);
             setFile(null);
