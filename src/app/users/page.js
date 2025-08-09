@@ -259,13 +259,13 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import LinkComponent from '@/components/LinkComponent';
-import PaginationLayout from '@/components/PaginationLayout';
-import BasketSearchDebounce from '@/components/BasketSearchDebounce';
-import TableOfUser from '@/components/TableOfUser';
-import { ArrowUp } from 'lucide-react';
-import clientAxiosInstance from '@/lib/clientAxios';
-import { API_BASE, RISK_ROUTES, USER_MANAGE_ROUTES } from '@/helpers/apiRoutes';
+import LinkComponent from "@/components/LinkComponent";
+import PaginationLayout from "@/components/PaginationLayout";
+import BasketSearchDebounce from "@/components/BasketSearchDebounce";
+import TableOfUser from "@/components/TableOfUser";
+import { ArrowUp } from "lucide-react";
+import clientAxiosInstance from "@/lib/clientAxios";
+import { API_BASE, RISK_ROUTES, USER_MANAGE_ROUTES } from "@/helpers/apiRoutes";
 
 export default function AllUsersPage({ searchParams }) {
     const [users, setUsers] = useState([]);
@@ -282,9 +282,10 @@ export default function AllUsersPage({ searchParams }) {
 
     const router = useRouter();
 
-    const search = searchParams?.search || '';
-    const currentPage = Number.parseInt(searchParams?.page || '1');
+    const search = searchParams?.search || "";
+    const currentPage = Number.parseInt(searchParams?.page || "1");
     const limit = 5;
+
     useEffect(() => {
         const fetchAllData = async () => {
             setLoading(true);
@@ -294,7 +295,7 @@ export default function AllUsersPage({ searchParams }) {
                 const sanitizedSearchTerm = rawSearch
                     .trim()
                     .replace(/['"`[\]{}<>\\]/g, '')
-                    .replace(/\s{2,}/g, '');
+                    .replace(/\s{2,}/g, ' ');
                 const isValidSearch = sanitizedSearchTerm.length > 0;
                 const searchQuery = isValidSearch
                     ? `search=${encodeURIComponent(sanitizedSearchTerm)}&`
@@ -313,18 +314,16 @@ export default function AllUsersPage({ searchParams }) {
                         totalKycPendingUsers: usersRes.data.totalKycPendingUsers,
                     });
                 } else {
-                    setError(usersRes.data.message || 'Failed to fetch users');
+                    setError(usersRes.data.message || "Failed to fetch users");
                 }
 
-                // Fetch questionnaires
                 const questionnairesRes = await clientAxiosInstance.get(`${API_BASE}/${RISK_ROUTES.GET_QUESTIONNARIES}`);
                 if (questionnairesRes.data.success) {
                     setQuestionnaires(questionnairesRes.data);
                 }
             } catch (err) {
-                console.error('Failed to fetch users or questionnaires:', err);
-                setError('Failed to connect to server');
-                // Redirect to login if a 401 Unauthorized error occurs
+                console.error("Failed to fetch users or questionnaires:", err);
+                setError("Failed to connect to server");
                 if (err.response?.status === 401) {
                     router.push('/login');
                 }
@@ -334,37 +333,37 @@ export default function AllUsersPage({ searchParams }) {
         };
 
         fetchAllData();
-    }, [search, currentPage, router]); // `limit` is a constant, so it doesn't need to be in the dependency array
+    }, [search, currentPage, router]);
 
     const dashboardCardsData = [
         {
-            label: 'Total Users',
+            label: "Totals Users",
             value: stats.totalUsers,
             change: stats.totalUsers,
-            changeType: 'increase',
-            timeframe: 'Views (7 Days)',
+            changeType: "increase",
+            timeframe: "Views (7 Days)",
         },
         {
-            label: 'Active Users',
+            label: "Active Users",
             value: stats.totalActiveUsers,
-            change: '-1',
-            changeType: 'decrease',
-            timeframe: 'Past (7 Days)',
+            change: "-1",
+            changeType: "decrease",
+            timeframe: "Past (7 Days)",
         },
         {
-            label: 'Suspended Users',
+            label: "Suspended Users",
             value: stats.totalSuspendedUsers,
-            change: '0',
-            changeType: 'increase',
-            timeframe: 'Past (7 Days)',
+            change: "0",
+            changeType: "increase",
+            timeframe: "Past (7 Days)",
         },
         {
-            label: 'KYC Pending',
+            label: "KYC Pending",
             value: stats.totalKycPendingUsers,
-            change: '0',
-            changeType: 'increase',
-            timeframe: '(Past 5 days)',
-            valueColor: 'text-black-600',
+            change: "0",
+            changeType: "increase",
+            timeframe: "(Past 5 days)",
+            valueColor: "text-black-600",
             hasChart: true,
         },
     ];
@@ -373,33 +372,6 @@ export default function AllUsersPage({ searchParams }) {
         return (
             <div className="flex items-center justify-center h-screen">
                 <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="m-6">
-                    <div className="bg-gradient-to-r from-red-50 to-pink-50 border-l-4 border-red-500 p-6 rounded-xl shadow-sm">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.728-.833-2.498 0L4.316 16.5c-.77.833.192 2.5 1.732 2.5z"
-                                    />
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 className="text-red-800 font-semibold">Error</h3>
-                                <p className="text-red-700">{error}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         );
     }
@@ -429,7 +401,7 @@ export default function AllUsersPage({ searchParams }) {
                             <div className="flex flex-col gap-0.5">
                                 <h3 className="text-xs font-medium text-gray-500">{card.label}</h3>
                                 <div className="flex items-center gap-1.5">
-                                    <div className={`text-xl font-semibold ${card.valueColor || 'text-gray-800'}`}>
+                                    <div className={`text-xl font-semibold ${card.valueColor || "text-gray-800"}`}>
                                         {card.value}
                                     </div>
                                     <span
@@ -447,6 +419,28 @@ export default function AllUsersPage({ searchParams }) {
                     <div className="bg-gradient-to-r from-gray-50 to-slate-50 p-6 border-b border-gray-200">
                         <BasketSearchDebounce placeHolder="Search users by name, email, or username..." />
                     </div>
+                    {error && (
+                        <div className="m-6">
+                            <div className="bg-gradient-to-r from-red-50 to-pink-50 border-l-4 border-red-500 p-6 rounded-xl shadow-sm">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                                        <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.728-.833-2.498 0L4.316 16.5c-.77.833.192 2.5 1.732 2.5z"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-red-800 font-semibold">Error</h3>
+                                        <p className="text-red-700">{error}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                     {!error && users.length === 0 ? (
                         stats.totalUsers === 0 ? (
                             <div className="min-h-[400px] min-w-full flex items-center justify-center border border-dashed border-gray-300 rounded-md">
@@ -457,7 +451,7 @@ export default function AllUsersPage({ searchParams }) {
                                                 strokeLinecap="round"
                                                 strokeLinejoin="round"
                                                 strokeWidth={2}
-                                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
                                             />
                                         </svg>
                                     </div>
@@ -468,6 +462,7 @@ export default function AllUsersPage({ searchParams }) {
                                     </button>
                                 </div>
                             </div>
+
                         ) : (
                             <div className="flex justify-center items-center py-20">
                                 <div className="text-center">
@@ -475,7 +470,7 @@ export default function AllUsersPage({ searchParams }) {
                                         <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
                                         <div
                                             className="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-indigo-400 rounded-full animate-spin mx-auto"
-                                            style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}
+                                            style={{ animationDirection: "reverse", animationDuration: "1.5s" }}
                                         ></div>
                                     </div>
                                     <p className="text-gray-600 font-medium">Loading users...</p>
@@ -494,5 +489,5 @@ export default function AllUsersPage({ searchParams }) {
                 </div>
             </div>
         </div>
-    );
+    )
 }
