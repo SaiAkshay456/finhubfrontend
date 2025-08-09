@@ -378,10 +378,11 @@ import UserExtraSections from "../../../components/UserExtraSections";
 import PortfolioUpload from "../../../components/PortfolioUpload"
 import KycModal from "@/components/KycModal";
 import clientAxiosInstance from '@/lib/clientAxios';
+import { useParams } from 'next/navigation';
 
-export default function UserDetailsPage({ params }) {
+export default function UserDetailsPage() {
     const router = useRouter();
-    const { id } = params;
+    const { id } = useParams();
 
     const [user, setUser] = useState(null);
     const [kycDetails, setKycDetails] = useState(null);

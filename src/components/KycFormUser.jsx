@@ -49,7 +49,6 @@ export default function KycFormUser({ userId }) {
                     headers: {
                         'Content-Type': 'multipart/form-data' // if protected
                     },
-                    // if using cookies (optional
                 })
             setSuccess(true);
         } catch (err) {
