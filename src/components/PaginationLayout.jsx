@@ -3,14 +3,20 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import React from 'react';
 
-export default function PaginationLayout({ currentPage, totalPages, search }) {
+// Remove 'search' from the component's props
+export default function PaginationLayout({ currentPage, totalPages }) {
     const router = useRouter();
     const searchParams = useSearchParams();
 
     const createPageLink = (pageNum) => {
+        // Create a mutable copy of the current URL search params
         const params = new URLSearchParams(searchParams.toString());
-        params.set('page', pageNum);
-        if (search) params.set('search', search);
+
+        // Set the new page number
+        params.set('page', String(pageNum));
+
+        // The 'search' parameter is already in 'params' if it exists in the URL.
+        // We no longer need the 'if (search) ...' line.
         return `?${params.toString()}`;
     };
 
@@ -19,6 +25,7 @@ export default function PaginationLayout({ currentPage, totalPages, search }) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    // ... the rest of your component logic remains the same
     const generatePages = () => {
         const pages = [];
 
@@ -26,9 +33,7 @@ export default function PaginationLayout({ currentPage, totalPages, search }) {
             for (let i = 1; i <= totalPages; i++) pages.push(i);
         } else {
             pages.push(1);
-
             if (currentPage > 4) pages.push('...');
-
             for (
                 let i = Math.max(2, currentPage - 1);
                 i <= Math.min(totalPages - 1, currentPage + 1);
@@ -36,12 +41,9 @@ export default function PaginationLayout({ currentPage, totalPages, search }) {
             ) {
                 pages.push(i);
             }
-
             if (currentPage < totalPages - 3) pages.push('...');
-
             pages.push(totalPages);
         }
-
         return pages;
     };
 
@@ -53,7 +55,6 @@ export default function PaginationLayout({ currentPage, totalPages, search }) {
                 </span>
             );
         }
-
         return (
             <button
                 key={pg}
@@ -77,9 +78,7 @@ export default function PaginationLayout({ currentPage, totalPages, search }) {
             >
                 Prev
             </button>
-
             {pageItems}
-
             <button
                 onClick={() => goToPage(Math.min(currentPage + 1, totalPages))}
                 disabled={currentPage === totalPages}

@@ -464,7 +464,7 @@ export default function AllUsersPage() {
                     )}
                 </div>
                 <div className="mt-8">
-                    <PaginationLayout currentPage={currentPage} totalPages={totalPages} search={search} />
+                    <PaginationLayout currentPage={currentPage} totalPages={totalPages} />
                 </div>
             </div>
         </div>
