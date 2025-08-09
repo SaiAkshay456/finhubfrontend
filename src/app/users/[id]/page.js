@@ -409,7 +409,7 @@ export default function UserDetailsPage({ params }) {
         };
 
         fetchUserDetails();
-    }, [id, router, token]);
+    }, [id, router]);
 
     const formatDate = (dateString) => {
         if (!dateString) return 'N/A';
