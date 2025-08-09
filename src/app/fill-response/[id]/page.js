@@ -1,4 +1,4 @@
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import ResponseUser from "../../../components/ResponseUser";
 import TempLoginUser from "../../../components/TempLoginUser";
 import axiosInstance from "@/helpers/axios";
