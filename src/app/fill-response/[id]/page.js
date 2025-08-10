@@ -101,11 +101,12 @@
 
 "use client";
 
+import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
-import { getCookie } from "cookies-next";
 import ResponseUser from "../../../components/ResponseUser";
-import TempLoginUser from "../../../components/TempLoginUser";
 import clientAxiosInstance from "@/lib/clientAxios";
+
+
 async function getExpiryOfUUID(id) {
     try {
         const { data } = await clientAxiosInstance.get(`/v1/response/fill-response/${id}`);
@@ -126,69 +127,63 @@ async function getQuestionsById(questionnaireId) {
     }
 }
 
-export default function FillResponsePage({ params }) {
-    const { id } = params;
-    const [token, setToken] = useState(null);
+export default function FillResponsePage() {
+    const { id } = useParams();
+
+    // State management for client-side rendering
     const [linkData, setLinkData] = useState(null);
     const [questions, setQuestions] = useState(null);
     const [isExpired, setIsExpired] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [alreadySubmitted, setAlreadySubmitted] = useState(false);
-    useEffect(() => {
-        const tempToken = getCookie("temp_token");
-        setToken(tempToken);
-    }, []);
 
     useEffect(() => {
-        if (token === null) {
-            if (token === undefined) {
-                setIsLoading(false);
-            }
-            return;
-        }
+        // This effect runs when the component mounts
         const fetchData = async () => {
             if (!id) {
                 setError("No ID found in the URL.");
                 setIsLoading(false);
                 return;
             }
+
+            // Fetch the link data first
             const fetchedLinkData = await getExpiryOfUUID(id);
+
             if (!fetchedLinkData) {
+                // This can mean the link was already used or is invalid
                 setAlreadySubmitted(true);
                 setIsLoading(false);
                 return;
             }
+
             setLinkData(fetchedLinkData);
+
+            // Check if the link is expired
             const expired = new Date(fetchedLinkData.expiresAt) < new Date();
             if (expired) {
                 setIsExpired(true);
                 setIsLoading(false);
                 return;
             }
+
+            // If the link is valid, fetch the questions
             const fetchedQuestions = await getQuestionsById(fetchedLinkData.questionnaireId);
             setQuestions(fetchedQuestions);
             setIsLoading(false);
         };
 
         fetchData();
-    }, [id, token]);
+    }, [id]); // Dependency for the effect
+
+    // Render a loading state while fetching data
     if (isLoading) {
         return <div className="text-center mt-20">Loading...</div>;
     }
+
+    // Render an error message if something went wrong
     if (error) {
         return <div className="text-red-600 text-center mt-20">{error}</div>;
-    }
-    if (!token) {
-        return (
-            <div className="max-w-md mx-auto p-6 mt-20 bg-white shadow rounded">
-                <h2 className="text-xl font-bold mb-2 text-center text-gray-700">Temporary Login</h2>
-                <p className="text-sm text-gray-500 mb-4 text-center">
-                    Enter the temporary credentials sent to your email.
-                </p>
-                <TempLoginUser tokenId={id} />
-            </div>
-        );
     }
 
     // Render message for already submitted responses
@@ -248,4 +243,3 @@ export default function FillResponsePage({ params }) {
         </div>
     );
 }
-
