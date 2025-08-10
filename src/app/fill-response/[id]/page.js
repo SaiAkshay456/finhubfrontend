@@ -5,9 +5,7 @@ import axiosInstance from "@/helpers/axios";
 
 export async function getExpiryOfUUID(id) {
     try {
-        const { data } = await axiosInstance.get(`/v1/response/fill-response/${id}`, {
-        });
-
+        const { data } = await axiosInstance.get(`/v1/response/fill-response/${id}`);
         const result = data
         console.log(result.data)
         return result?.data || null;
@@ -18,8 +16,7 @@ export async function getExpiryOfUUID(id) {
 }
 export async function getQuestionsById(questionnaireId) {
     try {
-        const { data } = await axiosInstance.get(`/v1/response/get/questionarrie/${questionnaireId}`, {
-        });
+        const { data } = await axiosInstance.get(`/v1/response/get/questionarrie/${questionnaireId}`);
         console.log(data.questions)
         return data?.questions || [];
     } catch (err) {
