@@ -105,7 +105,7 @@ import { useEffect, useState } from "react";
 import ResponseUser from "../../../components/ResponseUser";
 import TempLoginUser from "../../../components/TempLoginUser";
 import clientAxiosInstance from "@/lib/clientAxios";
-
+import { useParams } from "next/navigation";
 export async function getExpiryOfUUID(id) {
     try {
         const { data } = await clientAxiosInstance.get(`/v1/response/fill-response/${id}`, {
@@ -130,8 +130,8 @@ export async function getQuestionsById(questionnaireId) {
     }
 }
 
-export default function FillResponsePage({ params }) {
-    const { id } = params;
+export default function FillResponsePage() {
+    const { id } = useParams();
     const [token, setToken] = useState(null);
     const [linkData, setLinkData] = useState(null);
     const [questions, setQuestions] = useState([]);
