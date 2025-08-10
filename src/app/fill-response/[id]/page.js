@@ -98,7 +98,6 @@
 //     );
 // }
 
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -106,10 +105,11 @@ import ResponseUser from "../../../components/ResponseUser";
 import TempLoginUser from "../../../components/TempLoginUser";
 import clientAxiosInstance from "@/lib/clientAxios";
 import { useParams } from "next/navigation";
+
 export async function getExpiryOfUUID(id) {
     try {
         const { data } = await clientAxiosInstance.get(`/v1/response/fill-response/${id}`, {
-            withCredentials: true,
+            withCredentials: true
         });
         return data?.data || null;
     } catch (err) {
@@ -121,7 +121,7 @@ export async function getExpiryOfUUID(id) {
 export async function getQuestionsById(questionnaireId) {
     try {
         const { data } = await clientAxiosInstance.get(`/v1/response/get/questionarrie/${questionnaireId}`, {
-            withCredentials: true,
+            withCredentials: true
         });
         return data?.questions || [];
     } catch (err) {
@@ -137,6 +137,7 @@ export default function FillResponsePage() {
     const [questions, setQuestions] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    // Check for token in cookies initially
     useEffect(() => {
         const match = document.cookie.match(/(?:^|;\s*)temp_token=([^;]+)/);
         if (match) {
@@ -144,6 +145,7 @@ export default function FillResponsePage() {
         }
     }, []);
 
+    // Fetch data when id + token available
     useEffect(() => {
         if (!id || !token) {
             setLoading(false);
@@ -181,7 +183,7 @@ export default function FillResponsePage() {
                 <p className="text-sm text-gray-500 mb-4 text-center">
                     Enter the temporary credentials sent to your email.
                 </p>
-                <TempLoginUser tokenId={id} />
+                <TempLoginUser tokenId={id} onLoginSuccess={(cookieToken) => setToken(cookieToken)} />
             </div>
         );
     }
@@ -235,5 +237,3 @@ export default function FillResponsePage() {
         </div>
     );
 }
-
-
