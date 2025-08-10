@@ -1,253 +1,99 @@
-// import { cookies } from "next/headers";
-// import ResponseUser from "../../../components/ResponseUser";
-// import TempLoginUser from "../../../components/TempLoginUser";
-// import axiosInstance from "@/helpers/axios";
-
-// export async function getExpiryOfUUID(id) {
-//     try {
-//         const { data } = await axiosInstance.get(`/v1/response/fill-response/${id}`);
-//         const result = data
-//         console.log(result.data)
-//         return result?.data || null;
-//     } catch (err) {
-//         console.error("Error fetching link data:", err);
-//         return null;
-//     }
-// }
-// export async function getQuestionsById(questionnaireId) {
-//     try {
-//         const { data } = await axiosInstance.get(`/v1/response/get/questionarrie/${questionnaireId}`);
-//         console.log(data.questions)
-//         return data?.questions || [];
-//     } catch (err) {
-//         console.error("Error fetching questions:", err);
-//         return [];
-//     }
-// }
-
-// export default async function FillResponsePage({ params }) {
-//     const { id } = params;
-//     if (!id) return <div className="text-red-600">No ID in URL</div>;
-
-//     const token = await cookies().get("temp_token")?.value;
-
-//     if (!token) {
-//         return (
-//             <div className="max-w-md mx-auto p-6 mt-20 bg-white shadow rounded">
-//                 <h2 className="text-xl font-bold mb-2 text-center text-gray-700">Temporary Login</h2>
-//                 <p className="text-sm text-gray-500 mb-4 text-center">
-//                     Enter the temporary credentials sent to your email.
-//                 </p>
-//                 <TempLoginUser tokenId={id} />
-//             </div>
-//         );
-//     }
-
-//     const linkData = await getExpiryOfUUID(id);
-//     if (!linkData) {
-//         return (
-//             <div className="text-center mt-20 text-yellow-700 text-lg">
-//                 You have already submitted your response. Please contact the
-//                 administrator if you need to update it.
-//             </div>
-//         );
-//     }
-
-//     const isExpired = new Date(linkData.expiresAt) < new Date();
-//     if (isExpired) {
-//         return (
-//             <div className="text-center mt-20 text-yellow-700 text-lg">
-//                 This link has expired or already been used.
-//             </div>
-//         );
-//     }
-
-//     const questions = await getQuestionsById(linkData.questionnaireId);
-
-//     return (
-//         <div className="max-w-3xl mx-auto p-6">
-//             <div className="mb-8 text-center">
-//                 <h1 className="text-3xl font-bold text-gray-900 mb-2">Questionnaire Response</h1>
-//                 <p className="text-gray-600 max-w-lg mx-auto">
-//                     Please provide your answers below. All responses are submitted securely.
-//                 </p>
-//             </div>
-
-//             <div className="bg-white rounded-xl shadow-md p-6">
-//                 <div className="mb-6 text-center">
-//                     <h2 className="text-xl font-semibold text-gray-800">
-//                         {questions.title || "Untitled Questionnaire"}
-//                     </h2>
-//                     <p className="text-gray-600 text-sm mt-2">
-//                         Response deadline: {new Date(linkData.expiresAt).toLocaleString()}
-//                     </p>
-//                 </div>
-
-//                 <ResponseUser
-//                     questions={questions.questions}
-//                     questionarieId={linkData.questionnaireId}
-//                     userId={linkData.userId}
-//                     tokenId={id}
-//                 />
-//             </div>
-
-//             <div className="mt-6 text-center text-sm text-gray-500">
-//                 <p>Your responses will be recorded anonymously</p>
-//             </div>
-//         </div>
-//     );
-// }
-
-'use client';
-
-import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
-
-// Your Components
+import { cookies } from "next/headers";
 import ResponseUser from "../../../components/ResponseUser";
 import TempLoginUser from "../../../components/TempLoginUser";
+import axiosInstance from "@/helpers/axios";
 
-// Your client-side Axios instance
-import clientAxiosInstance from "@/lib/clientAxios";
-
-// Helper components for a better UI
-const LoadingState = () => (
-    <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
-    </div>
-);
-
-const MessageState = ({ message, type = 'warning' }) => {
-    const colors = type === 'warning' ? 'yellow' : 'red';
-    return (
-        <div className={`text-center mt-20 text-${colors}-700 text-lg p-4 bg-${colors}-100 rounded-md`}>
-            {message}
-        </div>
-    );
-};
-
-export default function FillResponsePage() {
-    const { id } = useParams();
-
-    // State to manage the component's view and data
-    const [status, setStatus] = useState('loading'); // loading, loginRequired, success, submitted, expired, error
-    const [linkData, setLinkData] = useState(null);
-    const [questions, setQuestions] = useState(null);
-    const [errorMsg, setErrorMsg] = useState('');
-
-    // This function fetches data and acts as an auth check
-    const fetchData = async () => {
-        if (!id) {
-            setStatus('error');
-            setErrorMsg('No ID was found in the URL.');
-            return;
-        }
-
-        setStatus('loading');
-        try {
-            // Attempt to get link data. Fails if user isn't logged in.
-            const { data: linkResult } = await clientAxiosInstance.get(`/v1/response/fill-response/${id}`);
-
-            if (!linkResult.data) {
-                setStatus('submitted');
-                return;
-            }
-
-            const currentLinkData = linkResult.data;
-            setLinkData(currentLinkData);
-
-            if (new Date(currentLinkData.expiresAt) < new Date()) {
-                setStatus('expired');
-                return;
-            }
-
-            // If link is valid, fetch questions
-            const { data: questionsResult } = await clientAxiosInstance.get(`/v1/response/get/questionarrie/${currentLinkData.questionnaireId}`);
-            setQuestions(questionsResult);
-            setStatus('success');
-
-        } catch (err) {
-            console.error("Error fetching page data:", err);
-            if (err.response?.status === 401 || err.response?.status === 403) {
-                // This means the user needs to log in
-                setStatus('loginRequired');
-            } else {
-                setStatus('error');
-                setErrorMsg(err.response?.data?.message || "An unexpected error occurred.");
-            }
-        }
-    };
-
-    // Fetch data when the component first loads
-    useEffect(() => {
-        fetchData();
-    }, [id]);
-
-    // This function gets called by the child component after a successful login
-    const handleLoginSuccess = () => {
-        fetchData(); // Re-run the fetch logic now that the user is logged in
-    };
-
-    // Render UI based on the current status
-    if (status === 'loading') {
-        return <LoadingState />;
+export async function getExpiryOfUUID(id) {
+    try {
+        const { data } = await axiosInstance.get(`/v1/response/fill-response/${id}`);
+        const result = data
+        console.log(result.data)
+        return result?.data || null;
+    } catch (err) {
+        console.error("Error fetching link data:", err);
+        return null;
     }
+}
+export async function getQuestionsById(questionnaireId) {
+    try {
+        const { data } = await axiosInstance.get(`/v1/response/get/questionarrie/${questionnaireId}`);
+        console.log(data.questions)
+        return data?.questions || [];
+    } catch (err) {
+        console.error("Error fetching questions:", err);
+        return [];
+    }
+}
 
-    if (status === 'loginRequired') {
+export default async function FillResponsePage({ params }) {
+    const { id } = params;
+    if (!id) return <div className="text-red-600">No ID in URL</div>;
+
+    const token = await cookies().get("temp_token")?.value;
+
+    if (!token) {
         return (
             <div className="max-w-md mx-auto p-6 mt-20 bg-white shadow rounded">
                 <h2 className="text-xl font-bold mb-2 text-center text-gray-700">Temporary Login</h2>
                 <p className="text-sm text-gray-500 mb-4 text-center">
                     Enter the temporary credentials sent to your email.
                 </p>
-                <TempLoginUser tokenId={id} onLoginSuccess={handleLoginSuccess} />
+                <TempLoginUser tokenId={id} />
             </div>
         );
     }
 
-    if (status === 'submitted') {
-        return <MessageState message="You have already submitted your response. Please contact the administrator if you need to update it." />;
-    }
-
-    if (status === 'expired') {
-        return <MessageState message="This link has expired or already been used." />;
-    }
-
-    if (status === 'error') {
-        return <MessageState message={errorMsg} type="error" />;
-    }
-
-    if (status === 'success' && linkData && questions) {
+    const linkData = await getExpiryOfUUID(id);
+    if (!linkData) {
         return (
-            <div className="max-w-3xl mx-auto p-6">
-                <div className="mb-8 text-center">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Questionnaire Response</h1>
-                    <p className="text-gray-600 max-w-lg mx-auto">
-                        Please provide your answers below. All responses are submitted securely.
+            <div className="text-center mt-20 text-yellow-700 text-lg">
+                You have already submitted your response. Please contact the
+                administrator if you need to update it.
+            </div>
+        );
+    }
+
+    const isExpired = new Date(linkData.expiresAt) < new Date();
+    if (isExpired) {
+        return (
+            <div className="text-center mt-20 text-yellow-700 text-lg">
+                This link has expired or already been used.
+            </div>
+        );
+    }
+
+    const questions = await getQuestionsById(linkData.questionnaireId);
+
+    return (
+        <div className="max-w-3xl mx-auto p-6">
+            <div className="mb-8 text-center">
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">Questionnaire Response</h1>
+                <p className="text-gray-600 max-w-lg mx-auto">
+                    Please provide your answers below. All responses are submitted securely.
+                </p>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-md p-6">
+                <div className="mb-6 text-center">
+                    <h2 className="text-xl font-semibold text-gray-800">
+                        {questions.title || "Untitled Questionnaire"}
+                    </h2>
+                    <p className="text-gray-600 text-sm mt-2">
+                        Response deadline: {new Date(linkData.expiresAt).toLocaleString()}
                     </p>
                 </div>
-                <div className="bg-white rounded-xl shadow-md p-6">
-                    <div className="mb-6 text-center">
-                        <h2 className="text-xl font-semibold text-gray-800">
-                            {questions.title || "Untitled Questionnaire"}
-                        </h2>
-                        <p className="text-gray-600 text-sm mt-2">
-                            Response deadline: {new Date(linkData.expiresAt).toLocaleString()}
-                        </p>
-                    </div>
-                    <ResponseUser
-                        questions={questions.questions}
-                        questionarieId={linkData.questionnaireId}
-                        userId={linkData.userId}
-                        tokenId={id}
-                    />
-                </div>
-                <div className="mt-6 text-center text-sm text-gray-500">
-                    <p>Your responses will be recorded anonymously</p>
-                </div>
-            </div>
-        );
-    }
 
-    return null;
+                <ResponseUser
+                    questions={questions.questions}
+                    questionarieId={linkData.questionnaireId}
+                    userId={linkData.userId}
+                    tokenId={id}
+                />
+            </div>
+
+            <div className="mt-6 text-center text-sm text-gray-500">
+                <p>Your responses will be recorded anonymously</p>
+            </div>
+        </div>
+    );
 }
