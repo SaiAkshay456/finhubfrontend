@@ -126,12 +126,12 @@
 //     );
 // }
 
-'use client';
 
+'use client';
 import { useState } from 'react';
 import clientAxiosInstance from '@/lib/clientAxios';
 
-// The component now accepts an `onLoginSuccess` callback function
+// The component now accepts an `onLoginSuccess` function as a prop
 export default function TempLoginUser({ tokenId, onLoginSuccess }) {
     const [formData, setFormData] = useState({ username: '', password: '' });
     const [error, setError] = useState('');
@@ -145,25 +145,24 @@ export default function TempLoginUser({ tokenId, onLoginSuccess }) {
             const { data } = await clientAxiosInstance.post('/v1/response-login/login-user', { ...formData, tokenId }, {
                 headers: { 'Content-Type': 'application/json' },
             });
-
             if (!data.success) {
                 setError(data.message || 'Invalid credentials');
             } else {
-                // On success, call the callback from the parent instead of refreshing
-                if (onLoginSuccess) {
-                    onLoginSuccess();
-                }
+                // Instead of refreshing the page, call the parent's function
+                onLoginSuccess();
             }
         } catch (err) {
-            console.error(err);
-            setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+            console.log(err);
+            setError(err.response?.data?.message);
         } finally {
             setIsLoading(false);
         }
     };
 
+    // The rest of your JSX remains exactly the same
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Error Message */}
             {error && (
                 <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center space-x-3">
                     <svg className="w-5 h-5 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -172,6 +171,7 @@ export default function TempLoginUser({ tokenId, onLoginSuccess }) {
                     <p className="text-red-700 text-sm font-medium">{error}</p>
                 </div>
             )}
+            {/* Username Input */}
             <div className="space-y-2">
                 <label htmlFor="username" className="block text-sm font-semibold text-gray-700">
                     Username
@@ -194,6 +194,7 @@ export default function TempLoginUser({ tokenId, onLoginSuccess }) {
                     />
                 </div>
             </div>
+            {/* Password Input */}
             <div className="space-y-2">
                 <label htmlFor="password" className="block text-sm font-semibold text-gray-700">
                     Password
@@ -216,6 +217,7 @@ export default function TempLoginUser({ tokenId, onLoginSuccess }) {
                     />
                 </div>
             </div>
+            {/* Submit Button */}
             <button
                 type="submit"
                 disabled={isLoading}
@@ -237,6 +239,7 @@ export default function TempLoginUser({ tokenId, onLoginSuccess }) {
                     </>
                 )}
             </button>
+            {/* Security Notice */}
             <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-xl">
                 <div className="flex items-center space-x-2">
                     <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

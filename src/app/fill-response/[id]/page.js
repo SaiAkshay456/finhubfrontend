@@ -98,7 +98,6 @@
 //     );
 // }
 
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -108,46 +107,45 @@ import { useParams } from 'next/navigation';
 import ResponseUser from "../../../components/ResponseUser";
 import TempLoginUser from "../../../components/TempLoginUser";
 
-// Use your client-side Axios instance
+// Your client-side Axios instance
 import clientAxiosInstance from "@/lib/clientAxios";
 
-// UI Components for better user experience
-const LoadingSpinner = () => (
+// Helper components for a better UI
+const LoadingState = () => (
     <div className="flex justify-center items-center h-screen">
         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
     </div>
 );
 
-const MessageDisplay = ({ message, type = 'error' }) => {
-    const color = type === 'error' ? 'red' : 'yellow';
+const MessageState = ({ message, type = 'warning' }) => {
+    const colors = type === 'warning' ? 'yellow' : 'red';
     return (
-        <div className={`text-center mt-20 text-${color}-700 text-lg p-4 bg-${color}-100 rounded-md`}>
+        <div className={`text-center mt-20 text-${colors}-700 text-lg p-4 bg-${colors}-100 rounded-md`}>
             {message}
         </div>
     );
 };
 
 export default function FillResponsePage() {
-    const params = useParams();
-    const { id } = params;
+    const { id } = useParams();
 
-    // State to manage UI and data
-    const [status, setStatus] = useState('loading'); // loading, loginRequired, expired, submitted, success, error
+    // State to manage the component's view and data
+    const [status, setStatus] = useState('loading'); // loading, loginRequired, success, submitted, expired, error
     const [linkData, setLinkData] = useState(null);
-    const [questionsData, setQuestionsData] = useState(null);
-    const [errorMessage, setErrorMessage] = useState('');
+    const [questions, setQuestions] = useState(null);
+    const [errorMsg, setErrorMsg] = useState('');
 
-    // Central function to fetch all necessary data
+    // This function fetches data and acts as an auth check
     const fetchData = async () => {
         if (!id) {
             setStatus('error');
-            setErrorMessage('No ID found in the URL.');
+            setErrorMsg('No ID was found in the URL.');
             return;
         }
 
         setStatus('loading');
         try {
-            // 1. Fetch link metadata (this also implicitly checks auth)
+            // Attempt to get link data. Fails if user isn't logged in.
             const { data: linkResult } = await clientAxiosInstance.get(`/v1/response/fill-response/${id}`);
 
             if (!linkResult.data) {
@@ -155,46 +153,44 @@ export default function FillResponsePage() {
                 return;
             }
 
-            const fetchedLinkData = linkResult.data;
-            setLinkData(fetchedLinkData);
+            const currentLinkData = linkResult.data;
+            setLinkData(currentLinkData);
 
-            // 2. Check if the link is expired
-            if (new Date(fetchedLinkData.expiresAt) < new Date()) {
+            if (new Date(currentLinkData.expiresAt) < new Date()) {
                 setStatus('expired');
                 return;
             }
 
-            // 3. If link is valid, fetch the questionnaire
-            const { data: questionsResult } = await clientAxiosInstance.get(`/v1/response/get/questionarrie/${fetchedLinkData.questionnaireId}`);
-
-            setQuestionsData(questionsResult);
+            // If link is valid, fetch questions
+            const { data: questionsResult } = await clientAxiosInstance.get(`/v1/response/get/questionarrie/${currentLinkData.questionnaireId}`);
+            setQuestions(questionsResult);
             setStatus('success');
 
         } catch (err) {
-            console.error("Error during data fetch:", err);
-            // Handle different error types
+            console.error("Error fetching page data:", err);
             if (err.response?.status === 401 || err.response?.status === 403) {
+                // This means the user needs to log in
                 setStatus('loginRequired');
-            } else if (err.response?.data?.message?.includes("already submitted")) {
-                setStatus('submitted');
             } else {
                 setStatus('error');
-                setErrorMessage(err.response?.data?.message || 'An unexpected error occurred.');
+                setErrorMsg(err.response?.data?.message || "An unexpected error occurred.");
             }
         }
     };
+
+    // Fetch data when the component first loads
     useEffect(() => {
         fetchData();
     }, [id]);
-    const handleLoginSuccess = () => {
-        fetchData();
-    };
-    if (status === 'loading') {
-        return <LoadingSpinner />;
-    }
 
-    if (status === 'error') {
-        return <MessageDisplay message={errorMessage} type="error" />;
+    // This function gets called by the child component after a successful login
+    const handleLoginSuccess = () => {
+        fetchData(); // Re-run the fetch logic now that the user is logged in
+    };
+
+    // Render UI based on the current status
+    if (status === 'loading') {
+        return <LoadingState />;
     }
 
     if (status === 'loginRequired') {
@@ -210,24 +206,18 @@ export default function FillResponsePage() {
     }
 
     if (status === 'submitted') {
-        return (
-            <MessageDisplay
-                message="You have already submitted your response. Please contact the administrator if you need to update it."
-                type="warning"
-            />
-        );
+        return <MessageState message="You have already submitted your response. Please contact the administrator if you need to update it." />;
     }
 
     if (status === 'expired') {
-        return (
-            <MessageDisplay
-                message="This link has expired or already been used."
-                type="warning"
-            />
-        );
+        return <MessageState message="This link has expired or already been used." />;
     }
 
-    if (status === 'success' && linkData && questionsData) {
+    if (status === 'error') {
+        return <MessageState message={errorMsg} type="error" />;
+    }
+
+    if (status === 'success' && linkData && questions) {
         return (
             <div className="max-w-3xl mx-auto p-6">
                 <div className="mb-8 text-center">
@@ -239,14 +229,14 @@ export default function FillResponsePage() {
                 <div className="bg-white rounded-xl shadow-md p-6">
                     <div className="mb-6 text-center">
                         <h2 className="text-xl font-semibold text-gray-800">
-                            {questionsData.title || "Untitled Questionnaire"}
+                            {questions.title || "Untitled Questionnaire"}
                         </h2>
                         <p className="text-gray-600 text-sm mt-2">
                             Response deadline: {new Date(linkData.expiresAt).toLocaleString()}
                         </p>
                     </div>
                     <ResponseUser
-                        questions={questionsData.questions}
+                        questions={questions.questions}
                         questionarieId={linkData.questionnaireId}
                         userId={linkData.userId}
                         tokenId={id}
@@ -259,5 +249,5 @@ export default function FillResponsePage() {
         );
     }
 
-    return <MessageDisplay message="An unknown error occurred." />;
+    return null;
 }
