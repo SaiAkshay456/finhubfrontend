@@ -98,142 +98,166 @@
 //     );
 // }
 
-"use client";
 
-import { useEffect, useState } from "react";
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
+
+// Your Components
 import ResponseUser from "../../../components/ResponseUser";
 import TempLoginUser from "../../../components/TempLoginUser";
+
+// Use your client-side Axios instance
 import clientAxiosInstance from "@/lib/clientAxios";
-import { useParams } from "next/navigation";
 
-export async function getExpiryOfUUID(id) {
-    try {
-        const { data } = await clientAxiosInstance.get(`/v1/response/fill-response/${id}`, {
-            withCredentials: true
-        });
-        return data?.data || null;
-    } catch (err) {
-        console.error("Error fetching link data:", err);
-        return null;
-    }
-}
+// UI Components for better user experience
+const LoadingSpinner = () => (
+    <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+);
 
-export async function getQuestionsById(questionnaireId) {
-    try {
-        const { data } = await clientAxiosInstance.get(`/v1/response/get/questionarrie/${questionnaireId}`, {
-            withCredentials: true
-        });
-        return data?.questions || [];
-    } catch (err) {
-        console.error("Error fetching questions:", err);
-        return [];
-    }
-}
+const MessageDisplay = ({ message, type = 'error' }) => {
+    const color = type === 'error' ? 'red' : 'yellow';
+    return (
+        <div className={`text-center mt-20 text-${color}-700 text-lg p-4 bg-${color}-100 rounded-md`}>
+            {message}
+        </div>
+    );
+};
 
 export default function FillResponsePage() {
-    const { id } = useParams();
-    const [token, setToken] = useState(null);
+    const params = useParams();
+    const { id } = params;
+
+    // State to manage UI and data
+    const [status, setStatus] = useState('loading'); // loading, loginRequired, expired, submitted, success, error
     const [linkData, setLinkData] = useState(null);
-    const [questions, setQuestions] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [questionsData, setQuestionsData] = useState(null);
+    const [errorMessage, setErrorMessage] = useState('');
 
-    // Check for token in cookies initially
-    useEffect(() => {
-        const match = document.cookie.match(/(?:^|;\s*)temp_token=([^;]+)/);
-        if (match) {
-            setToken(match[1]);
-        }
-    }, []);
-
-    // Fetch data when id + token available
-    useEffect(() => {
-        if (!id || !token) {
-            setLoading(false);
+    // Central function to fetch all necessary data
+    const fetchData = async () => {
+        if (!id) {
+            setStatus('error');
+            setErrorMessage('No ID found in the URL.');
             return;
         }
 
-        const fetchData = async () => {
-            const data = await getExpiryOfUUID(id);
-            setLinkData(data);
+        setStatus('loading');
+        try {
+            // 1. Fetch link metadata (this also implicitly checks auth)
+            const { data: linkResult } = await clientAxiosInstance.get(`/v1/response/fill-response/${id}`);
 
-            if (data && !isExpired(data.expiresAt)) {
-                const q = await getQuestionsById(data.questionnaireId);
-                setQuestions(q);
+            if (!linkResult.data) {
+                setStatus('submitted');
+                return;
             }
-            setLoading(false);
-        };
 
+            const fetchedLinkData = linkResult.data;
+            setLinkData(fetchedLinkData);
+
+            // 2. Check if the link is expired
+            if (new Date(fetchedLinkData.expiresAt) < new Date()) {
+                setStatus('expired');
+                return;
+            }
+
+            // 3. If link is valid, fetch the questionnaire
+            const { data: questionsResult } = await clientAxiosInstance.get(`/v1/response/get/questionarrie/${fetchedLinkData.questionnaireId}`);
+
+            setQuestionsData(questionsResult);
+            setStatus('success');
+
+        } catch (err) {
+            console.error("Error during data fetch:", err);
+            // Handle different error types
+            if (err.response?.status === 401 || err.response?.status === 403) {
+                setStatus('loginRequired');
+            } else if (err.response?.data?.message?.includes("already submitted")) {
+                setStatus('submitted');
+            } else {
+                setStatus('error');
+                setErrorMessage(err.response?.data?.message || 'An unexpected error occurred.');
+            }
+        }
+    };
+    useEffect(() => {
         fetchData();
-    }, [id, token]);
-
-    const isExpired = (date) => new Date(date) < new Date();
-
-    if (loading) {
-        return <div className="text-center mt-20">Loading...</div>;
+    }, [id]);
+    const handleLoginSuccess = () => {
+        fetchData();
+    };
+    if (status === 'loading') {
+        return <LoadingSpinner />;
     }
 
-    if (!id) {
-        return <div className="text-red-600">No ID in URL</div>;
+    if (status === 'error') {
+        return <MessageDisplay message={errorMessage} type="error" />;
     }
 
-    if (!token) {
+    if (status === 'loginRequired') {
         return (
             <div className="max-w-md mx-auto p-6 mt-20 bg-white shadow rounded">
                 <h2 className="text-xl font-bold mb-2 text-center text-gray-700">Temporary Login</h2>
                 <p className="text-sm text-gray-500 mb-4 text-center">
                     Enter the temporary credentials sent to your email.
                 </p>
-                <TempLoginUser tokenId={id} onLoginSuccess={(cookieToken) => setToken(cookieToken)} />
+                <TempLoginUser tokenId={id} onLoginSuccess={handleLoginSuccess} />
             </div>
         );
     }
 
-    if (!linkData) {
+    if (status === 'submitted') {
         return (
-            <div className="text-center mt-20 text-yellow-700 text-lg">
-                You have already submitted your response. Please contact the administrator if you need to update it.
-            </div>
+            <MessageDisplay
+                message="You have already submitted your response. Please contact the administrator if you need to update it."
+                type="warning"
+            />
         );
     }
 
-    if (isExpired(linkData.expiresAt)) {
+    if (status === 'expired') {
         return (
-            <div className="text-center mt-20 text-yellow-700 text-lg">
-                This link has expired or already been used.
-            </div>
+            <MessageDisplay
+                message="This link has expired or already been used."
+                type="warning"
+            />
         );
     }
 
-    return (
-        <div className="max-w-3xl mx-auto p-6">
-            <div className="mb-8 text-center">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Questionnaire Response</h1>
-                <p className="text-gray-600 max-w-lg mx-auto">
-                    Please provide your answers below. All responses are submitted securely.
-                </p>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-md p-6">
-                <div className="mb-6 text-center">
-                    <h2 className="text-xl font-semibold text-gray-800">
-                        {questions.title || "Untitled Questionnaire"}
-                    </h2>
-                    <p className="text-gray-600 text-sm mt-2">
-                        Response deadline: {new Date(linkData.expiresAt).toLocaleString()}
+    if (status === 'success' && linkData && questionsData) {
+        return (
+            <div className="max-w-3xl mx-auto p-6">
+                <div className="mb-8 text-center">
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Questionnaire Response</h1>
+                    <p className="text-gray-600 max-w-lg mx-auto">
+                        Please provide your answers below. All responses are submitted securely.
                     </p>
                 </div>
-
-                <ResponseUser
-                    questions={questions.questions}
-                    questionarieId={linkData.questionnaireId}
-                    userId={linkData.userId}
-                    tokenId={id}
-                />
+                <div className="bg-white rounded-xl shadow-md p-6">
+                    <div className="mb-6 text-center">
+                        <h2 className="text-xl font-semibold text-gray-800">
+                            {questionsData.title || "Untitled Questionnaire"}
+                        </h2>
+                        <p className="text-gray-600 text-sm mt-2">
+                            Response deadline: {new Date(linkData.expiresAt).toLocaleString()}
+                        </p>
+                    </div>
+                    <ResponseUser
+                        questions={questionsData.questions}
+                        questionarieId={linkData.questionnaireId}
+                        userId={linkData.userId}
+                        tokenId={id}
+                    />
+                </div>
+                <div className="mt-6 text-center text-sm text-gray-500">
+                    <p>Your responses will be recorded anonymously</p>
+                </div>
             </div>
+        );
+    }
 
-            <div className="mt-6 text-center text-sm text-gray-500">
-                <p>Your responses will be recorded anonymously</p>
-            </div>
-        </div>
-    );
+    return <MessageDisplay message="An unknown error occurred." />;
 }
