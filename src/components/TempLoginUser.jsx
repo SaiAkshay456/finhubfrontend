@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import axiosInstance from '@/helpers/axios';
+import clientAxiosInstance from '@/lib/clientAxios';
 
 export default function TempLoginUser({ tokenId }) {
     const [formData, setFormData] = useState({ username: '', password: '' });
@@ -14,7 +14,7 @@ export default function TempLoginUser({ tokenId }) {
         setIsLoading(true);
         setError('');
         try {
-            const { data } = await axiosInstance.post('/v1/response-login/login-user', { ...formData, tokenId }, {
+            const { data } = await clientAxiosInstance.post('/v1/response-login/login-user', { ...formData, tokenId }, {
                 headers: { 'Content-Type': 'application/json' },
             });
             if (!data.success) {
