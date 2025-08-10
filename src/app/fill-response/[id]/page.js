@@ -101,15 +101,16 @@
 
 "use client";
 
-import { useParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import ResponseUser from "../../../components/ResponseUser";
+import TempLoginUser from "../../../components/TempLoginUser";
 import clientAxiosInstance from "@/lib/clientAxios";
 
-
-async function getExpiryOfUUID(id) {
+export async function getExpiryOfUUID(id) {
     try {
-        const { data } = await clientAxiosInstance.get(`/v1/response/fill-response/${id}`);
+        const { data } = await clientAxiosInstance.get(`/v1/response/fill-response/${id}`, {
+            withCredentials: true,
+        });
         return data?.data || null;
     } catch (err) {
         console.error("Error fetching link data:", err);
@@ -117,9 +118,11 @@ async function getExpiryOfUUID(id) {
     }
 }
 
-async function getQuestionsById(questionnaireId) {
+export async function getQuestionsById(questionnaireId) {
     try {
-        const { data } = await clientAxiosInstance.get(`/v1/response/get/questionarrie/${questionnaireId}`);
+        const { data } = await clientAxiosInstance.get(`/v1/response/get/questionarrie/${questionnaireId}`, {
+            withCredentials: true,
+        });
         return data?.questions || [];
     } catch (err) {
         console.error("Error fetching questions:", err);
@@ -127,77 +130,71 @@ async function getQuestionsById(questionnaireId) {
     }
 }
 
-export default function FillResponsePage() {
-    const { id } = useParams();
-
-    // State management for client-side rendering
+export default function FillResponsePage({ params }) {
+    const { id } = params;
+    const [token, setToken] = useState(null);
     const [linkData, setLinkData] = useState(null);
-    const [questions, setQuestions] = useState(null);
-    const [isExpired, setIsExpired] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [alreadySubmitted, setAlreadySubmitted] = useState(false);
+    const [questions, setQuestions] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // This effect runs when the component mounts
+        const match = document.cookie.match(/(?:^|;\s*)temp_token=([^;]+)/);
+        if (match) {
+            setToken(match[1]);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!id || !token) {
+            setLoading(false);
+            return;
+        }
+
         const fetchData = async () => {
-            if (!id) {
-                setError("No ID found in the URL.");
-                setIsLoading(false);
-                return;
+            const data = await getExpiryOfUUID(id);
+            setLinkData(data);
+
+            if (data && !isExpired(data.expiresAt)) {
+                const q = await getQuestionsById(data.questionnaireId);
+                setQuestions(q);
             }
-
-            // Fetch the link data first
-            const fetchedLinkData = await getExpiryOfUUID(id);
-
-            if (!fetchedLinkData) {
-                // This can mean the link was already used or is invalid
-                setAlreadySubmitted(true);
-                setIsLoading(false);
-                return;
-            }
-
-            setLinkData(fetchedLinkData);
-
-            // Check if the link is expired
-            const expired = new Date(fetchedLinkData.expiresAt) < new Date();
-            if (expired) {
-                setIsExpired(true);
-                setIsLoading(false);
-                return;
-            }
-
-            // If the link is valid, fetch the questions
-            const fetchedQuestions = await getQuestionsById(fetchedLinkData.questionnaireId);
-            setQuestions(fetchedQuestions);
-            setIsLoading(false);
+            setLoading(false);
         };
 
         fetchData();
-    }, [id]); // Dependency for the effect
+    }, [id, token]);
 
-    // Render a loading state while fetching data
-    if (isLoading) {
+    const isExpired = (date) => new Date(date) < new Date();
+
+    if (loading) {
         return <div className="text-center mt-20">Loading...</div>;
     }
 
-    // Render an error message if something went wrong
-    if (error) {
-        return <div className="text-red-600 text-center mt-20">{error}</div>;
+    if (!id) {
+        return <div className="text-red-600">No ID in URL</div>;
     }
 
-    // Render message for already submitted responses
-    if (alreadySubmitted) {
+    if (!token) {
         return (
-            <div className="text-center mt-20 text-yellow-700 text-lg">
-                You have already submitted your response. Please contact the
-                administrator if you need to update it.
+            <div className="max-w-md mx-auto p-6 mt-20 bg-white shadow rounded">
+                <h2 className="text-xl font-bold mb-2 text-center text-gray-700">Temporary Login</h2>
+                <p className="text-sm text-gray-500 mb-4 text-center">
+                    Enter the temporary credentials sent to your email.
+                </p>
+                <TempLoginUser tokenId={id} />
             </div>
         );
     }
 
-    // Render message for expired links
-    if (isExpired) {
+    if (!linkData) {
+        return (
+            <div className="text-center mt-20 text-yellow-700 text-lg">
+                You have already submitted your response. Please contact the administrator if you need to update it.
+            </div>
+        );
+    }
+
+    if (isExpired(linkData.expiresAt)) {
         return (
             <div className="text-center mt-20 text-yellow-700 text-lg">
                 This link has expired or already been used.
@@ -205,7 +202,6 @@ export default function FillResponsePage() {
         );
     }
 
-    // Render the main questionnaire form
     return (
         <div className="max-w-3xl mx-auto p-6">
             <div className="mb-8 text-center">
@@ -216,25 +212,21 @@ export default function FillResponsePage() {
             </div>
 
             <div className="bg-white rounded-xl shadow-md p-6">
-                {questions && linkData && (
-                    <>
-                        <div className="mb-6 text-center">
-                            <h2 className="text-xl font-semibold text-gray-800">
-                                {questions.title || "Untitled Questionnaire"}
-                            </h2>
-                            <p className="text-gray-600 text-sm mt-2">
-                                Response deadline: {new Date(linkData.expiresAt).toLocaleString()}
-                            </p>
-                        </div>
+                <div className="mb-6 text-center">
+                    <h2 className="text-xl font-semibold text-gray-800">
+                        {questions.title || "Untitled Questionnaire"}
+                    </h2>
+                    <p className="text-gray-600 text-sm mt-2">
+                        Response deadline: {new Date(linkData.expiresAt).toLocaleString()}
+                    </p>
+                </div>
 
-                        <ResponseUser
-                            questions={questions.questions}
-                            questionarieId={linkData.questionnaireId}
-                            userId={linkData.userId}
-                            tokenId={id}
-                        />
-                    </>
-                )}
+                <ResponseUser
+                    questions={questions.questions}
+                    questionarieId={linkData.questionnaireId}
+                    userId={linkData.userId}
+                    tokenId={id}
+                />
             </div>
 
             <div className="mt-6 text-center text-sm text-gray-500">
@@ -243,3 +235,5 @@ export default function FillResponsePage() {
         </div>
     );
 }
+
+
